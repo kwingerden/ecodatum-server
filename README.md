@@ -29,7 +29,7 @@ cd ecodatum-www-server
 5. Build Vapor project 
 
 ```bash
-vapor build
+vapor build --verbose --clean --release
 ```
 
 6. Create Supervisor configuration file: `sudo /etc/supervisor/conf.d/ecodatum-www-server.conf` with the following content:
