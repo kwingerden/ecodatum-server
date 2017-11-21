@@ -3,25 +3,56 @@
 import PackageDescription
 
 let package = Package(
-    name: "ecodatum-www-server",
-    products: [
-        .library(name: "App", targets: ["App"]),
-        .executable(name: "Run", targets: ["Run"])
-    ],
-    dependencies: [
-        .package(url: "https://github.com/vapor/vapor.git", .upToNextMajor(from: "2.2.0")),
-        .package(url: "https://github.com/vapor/leaf-provider.git", .upToNextMajor(from: "1.1.0")),
-    ],
-    targets: [
-        .target(name: "App", dependencies: ["Vapor", "LeafProvider"],
-               exclude: [
-                   "Config",
-                   "Database",
-                   "Public",
-                   "Resources"
-               ]),
-        .target(name: "Run", dependencies: ["App"]),
-        .testTarget(name: "AppTests", dependencies: ["App", "Testing"])
-    ]
+  name: "ecodatum-server",
+  products: [
+    .library(
+      name: "EcoDatumLib", 
+      targets: [
+        "EcoDatumLib"
+      ]
+    ),
+    .executable(
+      name: "EcoDatumServer", 
+      targets: [
+        "EcoDatumServer"
+      ]
+    )
+  ],
+  dependencies: [
+    .package(
+      url: "https://github.com/vapor/vapor.git", 
+      .upToNextMajor(from: "2.2.0")),
+    .package(
+      url: "https://github.com/vapor/leaf-provider.git", 
+      .upToNextMajor(from: "1.1.0"))
+  ],
+  targets: [
+    .target(
+      name: "EcoDatumLib", 
+      dependencies: [
+        "Vapor", 
+        "LeafProvider"
+      ],
+      exclude: [
+        "Config",
+        "Database",
+        "Public",
+        "Resources"
+      ]
+    ),
+    .target(
+      name: "EcoDatumServer", 
+      dependencies: [
+        "EcoDatumLib"
+      ]
+    ),
+    .testTarget(
+      name: "EcoDatumLibTests", 
+      dependencies: [
+        "EcoDatumLib", 
+        "Testing"
+      ]
+    )
+  ]
 )
 

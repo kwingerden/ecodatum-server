@@ -1,4 +1,0 @@
-module CHTTP {
-    umbrella "/Users/e27528/Development/Projects/ecodatum-www-server/.build/checkouts/engine.git-3311994267206676365/Sources/CHTTP/include"
-    export *
-}
