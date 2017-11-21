@@ -1,0 +1,12 @@
+#!/bin/bash
+
+BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ROOT_DIR="$(dirname "$BIN_DIR")"
+KEY=`openssl rand -base64 32`
+cat << EOF > $ROOT_DIR/Config/secrets/crypto.json
+{
+  "cipher": {
+    "key": "$KEY"
+  }
+}
+EOF
