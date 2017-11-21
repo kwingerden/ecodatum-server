@@ -1,7 +1,7 @@
 #if os(Linux)
 
 import XCTest
-@testable import AppTests
+@testable import EcoDatumLibTests
 
 XCTMain([
     // AppTests

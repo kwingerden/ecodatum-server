@@ -3,7 +3,7 @@ import Foundation
 import Testing
 import HTTP
 @testable import Vapor
-@testable import App
+@testable import EcoDatumLib
 
 /// This file shows an example of testing
 /// routes through the Droplet.

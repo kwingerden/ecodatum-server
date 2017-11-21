@@ -1,5 +1,5 @@
 import Foundation
-@testable import App
+@testable import EcoDatumLib
 @testable import Vapor
 import XCTest
 import Testing
