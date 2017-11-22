@@ -1,0 +1,9 @@
+#!/bin/bash
+
+IMAGE_IDS=($(docker images | grep '^<none>' | awk '{split($0,a," "); print a[3]}'))
+if [ ${#IMAGE_IDS[@]} -gt 0 ]; then
+    for id in "${IMAGE_IDS[@]}"
+    do
+    	docker rmi $id
+    done
+fi

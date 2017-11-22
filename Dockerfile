@@ -8,9 +8,20 @@ RUN apt-get update && \
     curl -sL https://apt.vapor.sh | bash && \
     apt-get update && \
     apt-get -y install vapor && \
-    swift build --configuration release && \
     rm -r /var/lib/apt/lists/*;
+
+WORKDIR /ecodatum-server
+
+COPY bin bin
+COPY Config Config
+COPY Public Public
+COPY Resources Resources
+COPY Sources Sources
+COPY Tests Tests
+COPY Package.swift Package.swift
+
+RUN ./bin/build-release
 
 EXPOSE 8080
 
-CMD [".build/release/Run", "serve", "--env=production"]
+CMD ["./bin/run-production"]

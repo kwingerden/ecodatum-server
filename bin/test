@@ -1,7 +1,6 @@
 #!/bin/bash
 
-BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-ROOT_DIR="$(dirname "$BIN_DIR")"
+ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 pushd $ROOT_DIR
 vapor test
 popd

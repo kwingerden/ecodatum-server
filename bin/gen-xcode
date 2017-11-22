@@ -2,5 +2,5 @@
 
 ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 pushd $ROOT_DIR
-vapor run --release serve --env=production
+vapor xcode
 popd
