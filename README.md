@@ -1,55 +1,68 @@
-# Ecodatum web application server
+# EcoDatum Web Application Server
 
-## Ubuntu 16.04 Installation
+## Mac OS X EcoDatum Development Installation/Setup
 
-1. Add Vapor's APT repo:
+1. Install [XCode 9.1](https://developer.apple.com/xcode/downloads/), which will also install Swift 4.
+Make sure to also install the XCode command-line tools so that Git is also installed and available 
+from the command line.
 
-```bash
-eval "$(curl -sL https://apt.vapor.sh)"
-```
+2. Download and install [Docker for Mac OS X](https://download.docker.com/mac/stable/Docker.dmg).
 
-2. Install Git, Vapor, Swift and Supervisor
-
-```bash
-sudo apt-get install git swift vapor supervisor
-```
-
-3. Clone EcoDatum WWW server:
+3. Run the MySQL Docker Container for development with the following command:
 
 ```bash
-git clone https://github.com/kwingerden/ecodatum-www-server.git
+./bin/docker-run-mysql
 ```
 
-4. Change directory 
+4. Install Homebrew with the following command:
 
 ```bash
-cd ecodatum-www-server
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
 
-5. Build Vapor project 
+5. Verify that Vapor can now be installed with following command:
 
 ```bash
-vapor build --verbose --clean --release
+eval "$(curl -sL check.vapor.sh)"
+```
+```
+✅  Compatible Xcode
+✅  Compatible with Vapor 2
 ```
 
-6. Create Supervisor configuration file: `sudo /etc/supervisor/conf.d/ecodatum-www-server.conf` with the following content:
-
-```ini
-[program:ecodatum-www-server]
-command=vapor run --env=production
-directory=/home/ubuntu/ecodatum-www-server/          
-autorestart=true
-user=ubuntu
-stdout_logfile=/var/log/supervisor/%(program_name)-stdout.log
-stderr_logfile=/var/log/supervisor/%(program_name)-stderr.log
-```
-
-7. Update Supervisor configuration with the following commands:
+6. Install Vapor (and corresponding MySQL client) with the following commands:
 
 ```bash
-sudo supervisorctl reread
-sudo supervisorctl add ecodatum-www-server
-sudo supervisorctl start ecodatum-www-server
+brew tap vapor/homebrew-tap
+brew update
+brew install vapor
+brew install vapor/tap/cmysql
 ```
 
-8. The server should now be running on `0.0.0.0:8080`. The port and IP can be changed in the `Config/server.json` file.
+7. Build a debug version of the EcoDatum Server:
+
+
+```bash
+./bin/vapor-build-debug
+```
+
+8. Set the EcoDatum Server cipher key:
+
+
+```bash
+./bin/vapor-set-cipher-key
+```
+
+9. Run the development version of EcoDatum Server:
+
+
+```bash
+./bin/vapor-run-development
+```
+
+10. Access the EcoDatum Server with a browser:
+
+```bash
+open http://0.0.0.0:8080
+```
+

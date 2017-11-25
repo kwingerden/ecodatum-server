@@ -21,7 +21,7 @@ services:
       - ecodatum-database
 
   ecodatum-database:
-    image: mysql:8.0.3
+    image: mysql:5.7.20
     networks:
       - private-network
     ports:
