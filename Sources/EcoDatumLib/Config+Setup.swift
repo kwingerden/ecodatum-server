@@ -1,6 +1,7 @@
 import AuthProvider
 import FluentProvider
 import LeafProvider
+import MySQLProvider
 
 extension Config {
     public func setup() throws {
@@ -17,6 +18,7 @@ extension Config {
         try addProvider(AuthProvider.Provider.self)
         try addProvider(FluentProvider.Provider.self)
         try addProvider(LeafProvider.Provider.self)
+        try addProvider(MySQLProvider.Provider.self)
     }
     
     /// Add all models that should have their

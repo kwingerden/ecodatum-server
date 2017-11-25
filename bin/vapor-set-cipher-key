@@ -2,16 +2,7 @@
 
 ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 
-if [ -f "$ROOT_DIR/.env" ]
-then
-  . $ROOT_DIR/.env
-fi
-
-if [ -z ${var+x} ]
-then
-  CIPHER_KEY=`openssl rand -base64 32`
-fi
-
+CIPHER_KEY=$1
 cat << EOF > $ROOT_DIR/Config/secrets/crypto.json
 {
   "cipher": {

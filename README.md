@@ -50,7 +50,7 @@ brew install vapor/tap/cmysql
 
 
 ```bash
-./bin/vapor-set-cipher-key
+./bin/vapor-gen-cipher-key
 ```
 
 9. Run the development version of EcoDatum Server:

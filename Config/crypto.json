@@ -1,7 +1,6 @@
 {
   "cipher": {
     "method": "aes256",
-    "encoding": "base64",
-    "key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+    "encoding": "base64"
   }
 }

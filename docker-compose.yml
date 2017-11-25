@@ -5,15 +5,15 @@ services:
   ecodatum-server:
     build:
       context: ./
+      args:
+        CIPER_KEY: $CIPER_KEY
+        MYSQL_PASSWORD: $MYSQL_PASSWORD
     image: kwingerden/ecodatum-server:1.0
     networks:
       - public-network
       - private-network
     ports:
       - "8080:8080"
-    environment:
-      - MYSQL_USER=$MYSQL_USER
-      - MYSQL_PASSWORD=$MYSQL_PASSWORD
     volumes:
       - shared-volume:/shared-volume
     restart: always

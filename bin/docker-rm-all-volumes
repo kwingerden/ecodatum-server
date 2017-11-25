@@ -1,0 +1,9 @@
+#!/bin/bash
+
+DOCKER_VOLUMES=($(docker volume ls -qf dangling=true))
+if [ ${#DOCKER_VOLUMES[@]} -gt 0 ]; then
+    for id in "${DOCKER_VOLUMES[@]}"
+    do
+    	docker volume rm $id
+    done
+fi
