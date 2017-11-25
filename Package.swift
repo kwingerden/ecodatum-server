@@ -23,6 +23,12 @@ let package = Package(
       url: "https://github.com/vapor/vapor.git", 
       .upToNextMajor(from: "2.2.0")),
     .package(
+      url: "https://github.com/vapor/auth-provider.git", 
+      .upToNextMajor(from: "1.2.0")),
+    .package(
+      url: "https://github.com/vapor/fluent-provider.git", 
+      .upToNextMajor(from: "1.3.0")),
+    .package(
       url: "https://github.com/vapor/leaf-provider.git", 
       .upToNextMajor(from: "1.1.0"))
   ],
@@ -30,8 +36,10 @@ let package = Package(
     .target(
       name: "EcoDatumLib", 
       dependencies: [
-        "Vapor", 
-        "LeafProvider"
+        "AuthProvider",
+        "FluentProvider",
+        "LeafProvider",
+        "Vapor"
       ],
       exclude: [
         "Config",

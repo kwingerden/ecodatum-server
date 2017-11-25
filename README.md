@@ -1,6 +1,6 @@
 # EcoDatum Web Application Server
 
-## Mac OS X EcoDatum Development Installation/Setup
+## Mac OS X EcoDatum Server First Time Development Installation
 
 1. Install [XCode 9.1](https://developer.apple.com/xcode/downloads/), which will also install Swift 4.
 Make sure to also install the XCode command-line tools so that Git is also installed and available 
