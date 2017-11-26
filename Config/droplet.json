@@ -11,5 +11,7 @@
     "date",
     "file"
   ],
-  "commands": []
+  "commands": [
+    "prepare"
+  ]
 }

@@ -39,11 +39,11 @@ let package = Package(
     .target(
       name: "EcoDatumLib", 
       dependencies: [
+        "Vapor",
         "AuthProvider",
         "FluentProvider",
         "LeafProvider",
-        "MySQLProvider",
-        "Vapor"
+        "MySQLProvider"
       ],
       exclude: [
         "Config",
