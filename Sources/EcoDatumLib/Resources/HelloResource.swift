@@ -10,17 +10,17 @@ final class HelloController: ResourceRepresentable {
   }
   
   // GET /hello
-  func index(_ req: Request) throws -> ResponseRepresentable {
+  func index(_ request: Request) throws -> ResponseRepresentable {
     return try view.make("hello", [
       "name": "World"
-      ], for: req)
+      ], for: request)
   }
   
   // GET /hello/:string
-  func show(_ req: Request, _ string: String) throws -> ResponseRepresentable {
+  func show(_ request: Request, _ string: String) throws -> ResponseRepresentable {
     return try view.make("hello", [
       "name": string
-      ], for: req)
+      ], for: request)
   }
   
   func makeResource() -> Resource<String> {

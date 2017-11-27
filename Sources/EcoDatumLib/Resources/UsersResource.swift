@@ -1,12 +1,16 @@
 import Vapor
+import HTTP
 
-extension Droplet {
+final class UsersResource: ResourceRepresentable {
   
-  func setupUnauthenticatedRoutes() throws {
-    post("users", handler: createUser)
+  let hash: HashProtocol
+  
+  init(_ hash: HashProtocol) {
+    self.hash = hash
   }
   
-  private func createUser(_ request: Request) throws -> ResponseRepresentable {
+  // POST /users
+  func store(_ request: Request) throws -> ResponseRepresentable {
     // require that the request body be json
     guard let json = request.json else {
       throw Abort(.badRequest)
@@ -27,11 +31,15 @@ extension Droplet {
     }
     
     // hash the password and set it on the user
-    user.password = try self.hash.make(password.makeBytes()).makeString()
+    user.password = try hash.make(password.makeBytes()).makeString()
     
     // save and return the new user
     try user.save()
     return user
+  }
+  
+  func makeResource() -> Resource<String> {
+    return Resource(store: store)
   }
   
 }
