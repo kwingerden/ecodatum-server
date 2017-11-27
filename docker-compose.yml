@@ -22,6 +22,7 @@ services:
 
   ecodatum-database:
     image: mysql:5.7.20
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     networks:
       - private-network
     ports:

@@ -113,6 +113,14 @@ extension User: PasswordAuthenticatable {
 // is not yet allowed in Swift
 private var _userPasswordVerifier: PasswordVerifier? = nil
 
+// MARK: TIMESTAMP
+
+extension User: Timestampable { }
+
+// MARK: DELETE
+
+extension User: SoftDeletable { }
+
 // MARK: Request
 
 extension Request {

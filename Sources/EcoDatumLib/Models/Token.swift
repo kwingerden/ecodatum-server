@@ -89,3 +89,13 @@ extension Token: JSONRepresentable {
 
 /// Allows the Token to be returned directly in route closures.
 extension Token: ResponseRepresentable { }
+
+
+// MARK: TIMESTAMP
+
+extension Token: Timestampable { }
+
+// MARK: DELETE
+
+extension Token: SoftDeletable { }
+

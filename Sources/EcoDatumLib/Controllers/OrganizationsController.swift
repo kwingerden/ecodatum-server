@@ -14,15 +14,14 @@ final class OrganizationsController: ResourceRepresentable {
       throw Abort(.badRequest, reason: "Organization must have a name.")
     }
     
-    let code = String(
-      randomWithLength: 6,
-      allowedCharactersType: .alphaNumeric)
-      .uppercased()
+    let code = String(randomUpperCaseAlphaNumericLength: 6)
     guard try Organization.makeQuery().filter("code", code).first() == nil else {
-      throw Abort(.badRequest, reason: "An organization with that code already exists.")
+      throw Abort(.badRequest, reason: "An organization with code \(code) already exists.")
     }
     
-    let userId = try request.user().assertExists()
+    let userId = try request
+      .user()
+      .assertExists()
     let organization = Organization(
       name: name,
       code: code,
@@ -33,7 +32,6 @@ final class OrganizationsController: ResourceRepresentable {
     return organization
     
   }
-  
   
   func makeResource() -> Resource<String> {
     return Resource(store: store)

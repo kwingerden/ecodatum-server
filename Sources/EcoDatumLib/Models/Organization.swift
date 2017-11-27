@@ -46,9 +46,20 @@ extension Organization: Preparation {
     try database.create(self) {
       builder in
       builder.id()
-      builder.string("name")
-      builder.string("code")
-      builder.foreignId(for: User.self)
+      builder.varchar(
+        "name",
+        length: 255,
+        optional: false,
+        unique: false)
+      builder.char(
+        "code",
+        length: 6,
+        optional: false,
+        unique: true)
+      builder.foreignId(
+        for: User.self,
+        optional: false,
+        unique: false)
     }
   }
   
@@ -91,4 +102,11 @@ extension Organization: JSONConvertible {
 
 extension Organization: ResponseRepresentable { }
 
+// MARK: TIMESTAMP
+
+extension Organization: Timestampable { }
+
+// MARK: DELETE
+
+extension Organization: SoftDeletable { }
 
