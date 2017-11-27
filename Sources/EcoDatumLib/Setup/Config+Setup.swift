@@ -21,6 +21,7 @@ extension Config {
   private func setupPreparations() throws {
     // The order of the following preparations matters!!
     preparations.append(User.self)
+    preparations.append(Organization.self)
     preparations.append(Token.self)
   }
   

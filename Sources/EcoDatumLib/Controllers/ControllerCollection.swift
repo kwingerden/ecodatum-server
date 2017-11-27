@@ -1,7 +1,7 @@
 import AuthProvider
 import Vapor
 
-final class Controllers: RouteCollection {
+final class ControllerCollection: RouteCollection {
   
   let hash: HashProtocol
   
@@ -15,11 +15,15 @@ final class Controllers: RouteCollection {
   
   func build(_ builder: RouteBuilder) throws {
   
+    // MARK: Unauthenticated Contollers
+    
     builder.group(middleware: []) {
       builder in
       builder.resource("hello", HelloController(view))
-      builder.resource("users", UsersResource(hash))
+      builder.resource("users", UsersController(hash))
     }
+    
+    // MARK: Password Protected Contollers
     
     builder.group(middleware: [
       PasswordAuthenticationMiddleware(User.self)
@@ -28,11 +32,14 @@ final class Controllers: RouteCollection {
       builder.resource("login", LoginController())
     }
     
+    // MARK: Token Protected Contollers
+    
     builder.group(middleware: [
       TokenAuthenticationMiddleware(User.self)
     ]) {
       builder in
-      builder.resource("me", MeResource())
+      builder.resource("me", MeController())
+      builder.resource("organizations", OrganizationsController())
     }
   }
   

@@ -119,6 +119,15 @@
         }
       },
       {
+        "package": "HandySwift",
+        "repositoryURL": "https://github.com/Flinesoft/HandySwift.git",
+        "state": {
+          "branch": null,
+          "revision": "7d8b3c3d4455150820d24357b56eb9e7444905f8",
+          "version": "2.4.0"
+        }
+      },
+      {
         "package": "JSON",
         "repositoryURL": "https://github.com/vapor/json.git",
         "state": {

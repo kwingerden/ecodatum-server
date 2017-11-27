@@ -1,7 +1,7 @@
 import Vapor
 import HTTP
 
-final class MeResource: ResourceRepresentable {
+final class MeController: ResourceRepresentable {
   
   // GET /me
   func index(_ request: Request) throws -> ResponseRepresentable {

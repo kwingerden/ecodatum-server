@@ -5,9 +5,7 @@ extension Droplet {
   
   public func setup() throws {
     try setupPasswordVerifier()
-    try setupUnauthenticatedRoutes()
-    try setupPasswordProtectedRoutes()
-    try setupTokenProtectedRoutes()
+    try setupControllers()
   }
   
   private func setupPasswordVerifier() throws {
@@ -17,6 +15,11 @@ extension Droplet {
         reason: "\(type(of: hash)) must conform to PasswordVerifier.")
     }
     User.passwordVerifier = verifier
+  }
+  
+  private func setupControllers() throws {
+    let controllers = ControllerCollection(hash, view)
+    try collection(controllers)
   }
   
 }

@@ -1,7 +1,7 @@
 import Vapor
 import HTTP
 
-final class UsersResource: ResourceRepresentable {
+final class UsersController: ResourceRepresentable {
   
   let hash: HashProtocol
   
