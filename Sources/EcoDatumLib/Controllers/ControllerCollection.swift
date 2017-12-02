@@ -3,14 +3,10 @@ import Vapor
 
 final class ControllerCollection: RouteCollection {
   
-  let hash: HashProtocol
+  let drop: Droplet
   
-  let view: ViewRenderer
-  
-  init(_ hash: HashProtocol,
-       _ view: ViewRenderer) {
-    self.hash = hash
-    self.view = view
+  init(_ drop: Droplet) {
+    self.drop = drop
   }
   
   func build(_ builder: RouteBuilder) throws {
@@ -19,8 +15,8 @@ final class ControllerCollection: RouteCollection {
     
     builder.group(middleware: []) {
       builder in
-      builder.resource("hello", HelloController(view))
-      builder.resource("users", UsersController(hash))
+      builder.resource("hello", HelloController(drop))
+      builder.resource("users", UsersController(drop))
     }
     
     // MARK: Password Protected Contollers
@@ -29,7 +25,7 @@ final class ControllerCollection: RouteCollection {
       PasswordAuthenticationMiddleware(User.self)
     ]) {
       builder in
-      builder.resource("login", LoginController())
+      builder.resource("login", LoginController(drop))
     }
     
     // MARK: Token Protected Contollers
@@ -38,8 +34,8 @@ final class ControllerCollection: RouteCollection {
       TokenAuthenticationMiddleware(User.self)
     ]) {
       builder in
-      builder.resource("me", MeController())
-      builder.resource("organizations", OrganizationsController())
+      builder.resource("me", MeController(drop))
+      builder.resource("organizations", OrganizationsController(drop))
     }
   }
   

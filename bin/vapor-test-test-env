@@ -2,5 +2,5 @@
 
 ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 pushd $ROOT_DIR
-vapor test --env=test
+env UNIT_TEST_ENV=test vapor test
 popd

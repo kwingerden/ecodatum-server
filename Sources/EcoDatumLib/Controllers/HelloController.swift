@@ -3,22 +3,22 @@ import HTTP
 
 final class HelloController: ResourceRepresentable {
   
-  let view: ViewRenderer
+  let drop: Droplet
   
-  init(_ view: ViewRenderer) {
-    self.view = view
+  init(_ drop: Droplet) {
+    self.drop = drop
   }
   
   // GET /hello
   func index(_ request: Request) throws -> ResponseRepresentable {
-    return try view.make("hello", [
+    return try drop.view.make("hello", [
       "name": "World"
       ], for: request)
   }
   
   // GET /hello/:string
   func show(_ request: Request, _ string: String) throws -> ResponseRepresentable {
-    return try view.make("hello", [
+    return try drop.view.make("hello", [
       "name": string
       ], for: request)
   }

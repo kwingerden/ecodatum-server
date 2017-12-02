@@ -3,10 +3,10 @@ import HTTP
 
 final class UsersController: ResourceRepresentable {
   
-  let hash: HashProtocol
+  let drop: Droplet
   
-  init(_ hash: HashProtocol) {
-    self.hash = hash
+  init(_ drop: Droplet) {
+    self.drop = drop
   }
   
   // POST /users
@@ -31,7 +31,7 @@ final class UsersController: ResourceRepresentable {
     }
     
     // hash the password and set it on the user
-    user.password = try hash.make(password.makeBytes()).makeString()
+    user.password = try drop.hash.make(password.makeBytes()).makeString()
     
     // save and return the new user
     try user.save()

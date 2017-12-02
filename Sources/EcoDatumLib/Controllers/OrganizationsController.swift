@@ -3,6 +3,12 @@ import Vapor
 
 final class OrganizationsController: ResourceRepresentable {
   
+  let drop: Droplet
+  
+  init(_ drop: Droplet) {
+    self.drop = drop
+  }
+  
   // POST /organizations
   func store(_ request: Request) throws -> ResponseRepresentable {
     
@@ -15,18 +21,13 @@ final class OrganizationsController: ResourceRepresentable {
     }
     
     let code = String(randomUpperCaseAlphaNumericLength: 6)
-    guard try Organization.makeQuery().filter("code", code).first() == nil else {
+    let result = try Organization.makeQuery().filter("code", code).first()
+    guard result == nil else {
       throw Abort(.badRequest, reason: "An organization with code \(code) already exists.")
     }
     
-    let userId = try request
-      .user()
-      .assertExists()
-    let organization = Organization(
-      name: name,
-      code: code,
-      userId: userId)
-    
+    let userId = try request.user().assertExists()
+    let organization = Organization(name: name, code: code,userId: userId)
     try organization.save()
     
     return organization

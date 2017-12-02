@@ -7,21 +7,24 @@ import Sockets
 
 class PostControllerTests: TestCase {
 
-  let controller = HelloController(TestViewRenderer())
+  let drop = try! Droplet.testable()
   
   func testIndex() throws {
-    let req = Request.makeTest(method: .get)
-    try controller.index(req).makeResponse()
-      .assertBody(contains: "hello")
+    let controller = HelloController(drop)
+    let request = Request.makeTest(method: .get)
+    try controller.index(request).makeResponse()
+      .assertBody(contains: "Hello")
       .assertBody(contains: "World")
   }
   
   func testShow() throws {
-    let req = Request.makeTest(method: .get)
-    try controller.show(req, "Foo").makeResponse()
-      .assertBody(contains: "hello") // path
-      .assertBody(contains: "Foo") // custom name
+    let controller = HelloController(drop)
+    let request = Request.makeTest(method: .get)
+    try controller.show(request, "Foo").makeResponse()
+      .assertBody(contains: "Hello") 
+      .assertBody(contains: "Foo")
   }
+  
 }
 
 // MARK: Manifest

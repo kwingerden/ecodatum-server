@@ -7,10 +7,12 @@ import Testing
 extension Droplet {
   
   static func testable() throws -> Droplet {
-    let config = try Config(arguments: ["vapor", "--env=test"])
+    var env = ProcessInfo.processInfo.environment["UNIT_TEST_ENV"] ?? "test"
+    let config = try Config(arguments: ["vapor", "--env=\(env)"])
     try config.setup()
     let drop = try Droplet(config)
     try drop.setup()
+    drop.log.info("Testable Droplet has been initialized.")
     return drop
   }
   

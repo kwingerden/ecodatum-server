@@ -4,6 +4,7 @@ import Vapor
 extension Droplet {
   
   public func setup() throws {
+    log.info("Informational log")
     try setupPasswordVerifier()
     try setupControllers()
   }
@@ -18,7 +19,7 @@ extension Droplet {
   }
   
   private func setupControllers() throws {
-    let controllers = ControllerCollection(hash, view)
+    let controllers = ControllerCollection(self)
     try collection(controllers)
   }
   
