@@ -15,8 +15,8 @@ final class ControllerCollection: RouteCollection {
     
     builder.group(middleware: []) {
       builder in
-      builder.resource("hello", HelloController(drop))
-      builder.resource("users", UsersController(drop))
+      builder.resource(Constants.HELLO_RESOURCE, HelloController(drop))
+      builder.resource(Constants.USERS_RESOURCE, UsersController(drop))
     }
     
     // MARK: Password Protected Contollers
@@ -25,7 +25,7 @@ final class ControllerCollection: RouteCollection {
       PasswordAuthenticationMiddleware(User.self)
     ]) {
       builder in
-      builder.resource("login", LoginController(drop))
+      builder.resource(Constants.LOGIN_RESOURCE, LoginController(drop))
     }
     
     // MARK: Token Protected Contollers
@@ -34,8 +34,8 @@ final class ControllerCollection: RouteCollection {
       TokenAuthenticationMiddleware(User.self)
     ]) {
       builder in
-      builder.resource("me", MeController(drop))
-      builder.resource("organizations", OrganizationsController(drop))
+      builder.resource(Constants.ME_RESOURCE, MeController(drop))
+      builder.resource(Constants.ORGANIZATIONS_RESOURCE, OrganizationsController(drop))
     }
   }
   

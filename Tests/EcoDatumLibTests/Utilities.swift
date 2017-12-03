@@ -7,7 +7,7 @@ import Testing
 extension Droplet {
   
   static func testable() throws -> Droplet {
-    var env = ProcessInfo.processInfo.environment["UNIT_TEST_ENV"] ?? "test"
+    let env = ProcessInfo.processInfo.environment["UNIT_TEST_ENV"] ?? "test"
     let config = try Config(arguments: ["vapor", "--env=\(env)"])
     try config.setup()
     let drop = try Droplet(config)

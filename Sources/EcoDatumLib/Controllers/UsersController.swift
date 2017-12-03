@@ -11,31 +11,35 @@ final class UsersController: ResourceRepresentable {
   
   // POST /users
   func store(_ request: Request) throws -> ResponseRepresentable {
-    // require that the request body be json
+    
     guard let json = request.json else {
       throw Abort(.badRequest)
     }
     
-    // initialize the name and email from
-    // the request json
-    let user = try User(json: json)
+    guard let email: String = try json.get(User.Keys.email) else {
+      throw Abort(.badRequest, reason: "Organization must have a email.")
+    }
     
-    // ensure no user with this email already exists
-    guard try User.makeQuery().filter("email", user.email).first() == nil else {
+    guard try User.makeQuery().filter(User.Keys.email, email).first() == nil else {
       throw Abort(.badRequest, reason: "A user with that email already exists.")
     }
     
-    // require a plaintext password is supplied
-    guard let password = json["password"]?.string else {
-      throw Abort(.badRequest)
+    guard let name: String = try json.get(User.Keys.name) else {
+      throw Abort(.badRequest, reason: "Organization must have a name.")
     }
     
-    // hash the password and set it on the user
-    user.password = try drop.hash.make(password.makeBytes()).makeString()
-    
-    // save and return the new user
+    guard let password: String = try json.get(User.Keys.password) else {
+      throw Abort(.badRequest, reason: "Organization must have a password.")
+    }
+
+    let user = User(
+      name: name,
+      email: email,
+      password: try drop.hash.make(password.makeBytes()).makeString())
     try user.save()
+
     return user
+  
   }
   
   func makeResource() -> Resource<String> {

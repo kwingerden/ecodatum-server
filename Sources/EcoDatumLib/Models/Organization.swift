@@ -22,7 +22,9 @@ final class Organization: Model {
     static let userId = User.foreignIdKey
   }
   
-  init(name: String, code: String, userId: Identifier) {
+  init(name: String,
+       code: String,
+       userId: Identifier) {
     self.name = name
     self.code = code
     self.userId = userId
@@ -88,14 +90,7 @@ extension Organization {
 
 // MARK: JSON
 
-extension Organization: JSONConvertible {
-  
-  convenience init(json: JSON) throws {
-    self.init(
-      name: try json.get(Keys.name),
-      code: try json.get(Keys.code),
-      userId: try json.get(Keys.userId))
-  }
+extension Organization: JSONRepresentable {
   
   func makeJSON() throws -> JSON {
     var json = JSON()
@@ -123,7 +118,6 @@ extension Organization: Updateable {
   public static var updateableKeys: [UpdateableKey<Organization>] {
     return [
       UpdateableKey(Organization.Keys.name, String.self) {
-        //(organization: Organization, name: String) in
         organization, name in
         organization.name = name
       }

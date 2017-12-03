@@ -27,12 +27,12 @@ final class OrganizationsController: ResourceRepresentable {
       throw Abort(.badRequest, reason: "Invalid type. Expecting JSON.")
     }
     
-    guard let name = json["name"]?.string else {
+    guard let name: String = try json.get(Organization.Keys.name) else {
       throw Abort(.badRequest, reason: "Organization must have a name.")
     }
     
     let code = String(randomUpperCaseAlphaNumericLength: 6)
-    let result = try Organization.makeQuery().filter("code", code).first()
+    let result = try Organization.makeQuery().filter(Organization.Keys.code, code).first()
     guard result == nil else {
       throw Abort(.badRequest, reason: "An organization with code \(code) already exists.")
     }
