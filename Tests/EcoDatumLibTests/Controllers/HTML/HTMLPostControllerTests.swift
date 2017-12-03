@@ -5,12 +5,12 @@ import Sockets
 @testable import Vapor
 @testable import EcoDatumLib
 
-class PostControllerTests: TestCase {
+class HTMLPostControllerTests: TestCase {
 
   let drop = try! Droplet.testable()
   
   func testIndex() throws {
-    let controller = HelloController(drop)
+    let controller = HTMLHelloController(drop)
     let request = Request.makeTest(method: .get)
     try controller.index(request).makeResponse()
       .assertBody(contains: "Hello")
@@ -18,7 +18,7 @@ class PostControllerTests: TestCase {
   }
   
   func testShow() throws {
-    let controller = HelloController(drop)
+    let controller = HTMLHelloController(drop)
     let request = Request.makeTest(method: .get)
     try controller.show(request, "Foo").makeResponse()
       .assertBody(contains: "Hello") 
@@ -29,7 +29,7 @@ class PostControllerTests: TestCase {
 
 // MARK: Manifest
 
-extension PostControllerTests {
+extension HTMLPostControllerTests {
   
   // Needed for Linux tests. Make sure to update MainLinux.swift when new tests are added.
   static let allTests = [

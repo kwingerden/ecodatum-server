@@ -1,7 +1,7 @@
 import Vapor
 import HTTP
 
-final class UsersController: ResourceRepresentable {
+final class V1UsersController: ResourceRepresentable {
   
   let drop: Droplet
   
@@ -31,15 +31,15 @@ final class UsersController: ResourceRepresentable {
     guard let password: String = try json.get(User.Keys.password) else {
       throw Abort(.badRequest, reason: "Organization must have a password.")
     }
-
+    
     let user = User(
       name: name,
       email: email,
       password: try drop.hash.make(password.makeBytes()).makeString())
     try user.save()
-
+    
     return user
-  
+    
   }
   
   func makeResource() -> Resource<String> {
@@ -47,5 +47,6 @@ final class UsersController: ResourceRepresentable {
   }
   
 }
+
 
 

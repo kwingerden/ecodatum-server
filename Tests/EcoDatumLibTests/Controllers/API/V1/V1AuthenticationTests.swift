@@ -5,7 +5,7 @@ import HTTP
 @testable import Vapor
 @testable import EcoDatumLib
 
-class AuthenticationTests: TestCase {
+class V1AuthenticationTests: TestCase {
   
   let drop = try! Droplet.testable()
   
@@ -19,7 +19,7 @@ class AuthenticationTests: TestCase {
     // Create user
     try drop.testResponse(
       to: .post,
-      at: "/\(Constants.USERS_RESOURCE)",
+      at: "/api/v1/users",
       hostname: hostname,
       headers: [
         Constants.CONTENT_TYPE_HEADER_KEY : Constants.JSON_CONTENT_TYPE
@@ -36,7 +36,7 @@ class AuthenticationTests: TestCase {
     // Login as user and obtain token
     let tokenResponse = try drop.testResponse(
       to: .post,
-      at: "/\(Constants.LOGIN_RESOURCE)",
+      at: "/api/v1/login",
       hostname: hostname,
       headers: [
         Constants.AUTHORIZATION_HEADER_KEY : email.basicAuthorization(password: password),
@@ -56,7 +56,7 @@ class AuthenticationTests: TestCase {
     // User authentication token to access protected resource
     try drop.testResponse(
       to: .get,
-      at: "/\(Constants.ME_RESOURCE)",
+      at: "/api/v1/me",
       hostname: hostname,
       headers: [
         Constants.AUTHORIZATION_HEADER_KEY: token.bearerAuthorization()
@@ -71,7 +71,7 @@ class AuthenticationTests: TestCase {
 
 // MARK: Manifest
 
-extension AuthenticationTests {
+extension V1AuthenticationTests {
   
   // Needed for Linux tests. Make sure to update MainLinux.swift when new tests are added.
   static let allTests = [("test", test)]

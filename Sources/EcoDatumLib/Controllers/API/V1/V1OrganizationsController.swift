@@ -1,7 +1,7 @@
 import Crypto
 import Vapor
 
-final class OrganizationsController: ResourceRepresentable {
+final class V1OrganizationsController: ResourceRepresentable {
   
   let drop: Droplet
   
@@ -77,4 +77,5 @@ final class OrganizationsController: ResourceRepresentable {
   }
   
 }
+
 

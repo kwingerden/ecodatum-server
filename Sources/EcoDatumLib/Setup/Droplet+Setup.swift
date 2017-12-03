@@ -19,8 +19,13 @@ extension Droplet {
   }
   
   private func setupControllers() throws {
-    let controllers = ControllerCollection(self)
-    try collection(controllers)
+    
+    let html = HTMLRouteCollection(self)
+    try collection(html)
+    
+    let api = APIRouteCollection(self)
+    try collection(api)
+    
   }
   
 }

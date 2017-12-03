@@ -1,7 +1,7 @@
 import Vapor
 import HTTP
 
-final class HelloController: ResourceRepresentable {
+final class HTMLHelloController: ResourceRepresentable {
   
   let drop: Droplet
   
@@ -31,3 +31,4 @@ final class HelloController: ResourceRepresentable {
   }
   
 }
+
