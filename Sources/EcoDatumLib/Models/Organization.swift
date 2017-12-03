@@ -7,13 +7,20 @@ final class Organization: Model {
   let storage = Storage()
   
   // The name of the organization
-  let name: String
+  var name: String
   
   // The unique alphanumeric code assigned to the organization
   let code: String
-
+  
   // The identifier of the user to which this organization belongs
   let userId: Identifier
+  
+  struct Keys {
+    static let id = "id"
+    static let name = "name"
+    static let code = "code"
+    static let userId = User.foreignIdKey
+  }
   
   init(name: String, code: String, userId: Identifier) {
     self.name = name
@@ -24,16 +31,16 @@ final class Organization: Model {
   // MARK: Row
   
   init(row: Row) throws {
-    name = try row.get("name")
-    code = try row.get("code")
-    userId = try row.get(User.foreignIdKey)
+    name = try row.get(Keys.name)
+    code = try row.get(Keys.code)
+    userId = try row.get(Keys.userId)
   }
   
   func makeRow() throws -> Row {
     var row = Row()
-    try row.set("name", name)
-    try row.set("code", code)
-    try row.set(User.foreignIdKey, userId)
+    try row.set(Keys.name, name)
+    try row.set(Keys.code, code)
+    try row.set(Keys.userId, userId)
     return row
   }
 }
@@ -41,18 +48,18 @@ final class Organization: Model {
 // MARK: Preparation
 
 extension Organization: Preparation {
-
+  
   static func prepare(_ database: Database) throws {
     try database.create(self) {
       builder in
       builder.id()
       builder.varchar(
-        "name",
+        Keys.name,
         length: 255,
         optional: false,
         unique: false)
       builder.char(
-        "code",
+        Keys.code,
         length: 6,
         optional: false,
         unique: true)
@@ -72,7 +79,7 @@ extension Organization: Preparation {
 // MARK: Relations
 
 extension Organization {
-
+  
   var user: Parent<Organization, User> {
     return parent(id: userId)
   }
@@ -84,18 +91,21 @@ extension Organization {
 extension Organization: JSONConvertible {
   
   convenience init(json: JSON) throws {
-    // Organizations will not be fully created with JSON
-    throw Abort(.methodNotAllowed)
+    self.init(
+      name: try json.get(Keys.name),
+      code: try json.get(Keys.code),
+      userId: try json.get(Keys.userId))
   }
   
   func makeJSON() throws -> JSON {
     var json = JSON()
-    try json.set("id", id)
-    try json.set("name", name)
-    try json.set("code", code)
-    try json.set("userId", userId)
+    try json.set(Keys.id, id)
+    try json.set(Keys.name, name)
+    try json.set(Keys.code, code)
+    try json.set(Keys.userId, userId)
     return json
   }
+  
 }
 
 // MARK: HTTP
@@ -105,6 +115,22 @@ extension Organization: ResponseRepresentable { }
 // MARK: TIMESTAMP
 
 extension Organization: Timestampable { }
+
+// MARK: UPDATE
+
+extension Organization: Updateable {
+  
+  public static var updateableKeys: [UpdateableKey<Organization>] {
+    return [
+      UpdateableKey(Organization.Keys.name, String.self) {
+        //(organization: Organization, name: String) in
+        organization, name in
+        organization.name = name
+      }
+    ]
+  }
+  
+}
 
 // MARK: DELETE
 

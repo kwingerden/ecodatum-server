@@ -9,6 +9,17 @@ final class OrganizationsController: ResourceRepresentable {
     self.drop = drop
   }
   
+  // GET /organizations
+  func index(_ request: Request) throws -> ResponseRepresentable {
+    return try Organization.all().makeJSON()
+  }
+  
+  // GET /organizations/:id
+  func show(_ request: Request,
+            _ organization: Organization) throws -> ResponseRepresentable {
+    return organization
+  }
+  
   // POST /organizations
   func store(_ request: Request) throws -> ResponseRepresentable {
     
@@ -27,15 +38,42 @@ final class OrganizationsController: ResourceRepresentable {
     }
     
     let userId = try request.user().assertExists()
-    let organization = Organization(name: name, code: code,userId: userId)
+    let organization = Organization(name: name, code: code, userId: userId)
     try organization.save()
     
     return organization
     
   }
   
-  func makeResource() -> Resource<String> {
-    return Resource(store: store)
+  // PATCH /organizations/:id
+  func update(_ request: Request,
+              organization: Organization) throws -> ResponseRepresentable {
+    try organization.update(for: request)
+    try organization.save()
+    return organization
+  }
+  
+  // DELETE /organizations/:id
+  func destroy(_ request: Request,
+               organization: Organization) throws -> ResponseRepresentable {
+    try organization.delete()
+    return Response(status: .ok)
+  }
+  
+  // DELETE /organizations
+  func clear(_ request: Request) throws -> ResponseRepresentable {
+    try Organization.makeQuery().delete()
+    return Response(status: .ok)
+  }
+  
+  func makeResource() -> Resource<Organization> {
+    return Resource(
+      index: index,
+      store: store,
+      show: show,
+      update: update,
+      destroy: destroy,
+      clear: clear)
   }
   
 }
