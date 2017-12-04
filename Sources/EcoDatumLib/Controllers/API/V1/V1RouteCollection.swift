@@ -31,10 +31,13 @@ final class V1RouteCollection: RouteCollection {
     
     // MARK: Token Protected Contollers
     
+    let exirationSeconds = drop.config["app", "token-expiration-seconds"]?.int ?? 86400
     v1.group(middleware: [
+      TokenExpirationMiddleware(exirationSeconds),
       TokenAuthenticationMiddleware(User.self)
     ]) {
       builder in
+      builder.resource("logout", V1LogoutController(drop))
       builder.resource("me", V1MeController(drop))
       builder.resource("organizations", V1OrganizationsController(drop))
     }

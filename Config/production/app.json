@@ -1,3 +1,3 @@
 {
-	"foo": "foo-bar"
+	"token-expiration-seconds": 86400
 }

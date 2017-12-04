@@ -1,4 +1,5 @@
 import Vapor
+import AuthProvider
 import FluentProvider
 import Crypto
 
@@ -101,7 +102,4 @@ extension Token: ResponseRepresentable { }
 
 extension Token: Timestampable { }
 
-// MARK: DELETE
-
-extension Token: SoftDeletable { }
 
