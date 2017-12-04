@@ -16,6 +16,17 @@ class V1AuthenticationTests: TestCase {
     let email = "test.user@email.com"
     let password = "password"
     
+    // Use fake authentication token, which should fail
+    try drop.testResponse(
+      to: .get,
+      at: "/api/v1/me",
+      hostname: hostname,
+      headers: [
+        Constants.AUTHORIZATION_HEADER_KEY: "cw8zlApGsLlQYaBJSzsQWw==".bearerAuthorization()
+      ],
+      body: nil)
+      .assertStatus(is: .unauthorized)
+    
     // Create user
     try drop.testResponse(
       to: .post,
@@ -53,7 +64,7 @@ class V1AuthenticationTests: TestCase {
         return
     }
     
-    // User authentication token to access protected resource
+    // Use authentication token to access protected resource
     try drop.testResponse(
       to: .get,
       at: "/api/v1/me",
@@ -64,6 +75,28 @@ class V1AuthenticationTests: TestCase {
       body: nil)
       .assertStatus(is: .ok)
       .assertBody(equals: "Hello, Test User")
+    
+    // Logout user
+    try drop.testResponse(
+      to: .get,
+      at: "/api/v1/logout",
+      hostname: hostname,
+      headers: [
+        Constants.AUTHORIZATION_HEADER_KEY: token.bearerAuthorization()
+      ],
+      body: nil)
+      .assertStatus(is: .ok)
+    
+    // Make sure cannot access protected page anymore.
+    try drop.testResponse(
+      to: .get,
+      at: "/api/v1/me",
+      hostname: hostname,
+      headers: [
+        Constants.AUTHORIZATION_HEADER_KEY: token.bearerAuthorization()
+      ],
+      body: nil)
+      .assertStatus(is: .unauthorized)
     
   }
   
