@@ -2,6 +2,40 @@
 
 import PackageDescription
 
+let DEPENDENCIES = [
+  "Vapor": (
+    majorVersion: 2,
+    url: "https://github.com/vapor/vapor.git"),
+  "AuthProvider": (
+    majorVersion: 1,
+    url: "https://github.com/vapor/auth-provider.git"),
+  "FluentProvider": (
+    majorVersion: 1,
+    url: "https://github.com/vapor/fluent-provider.git"),
+  "LeafProvider": (
+    majorVersion: 1,
+    url: "https://github.com/vapor/leaf-provider.git"),
+  "MySQLProvider": (
+    majorVersion: 2,
+    url: "https://github.com/vapor/mysql-provider.git")
+]
+
+func toPackage(_ name: String) -> PackageDescription.Package.Dependency {
+  let url = DEPENDENCIES[name]!.url
+  let majorVersion = DEPENDENCIES[name]!.majorVersion
+  let upToNextMajor = PackageDescription.Package.Dependency.Requirement.upToNextMajor(
+    from: PackageDescription.Version(majorVersion, 0, 0))
+  return PackageDescription.Package.Dependency.package(url: url, upToNextMajor)
+}
+
+let PACKAGE_DEPENDENCIES = DEPENDENCIES.map {
+  toPackage($0.key)
+}
+
+let TARGET_DEPENDENCIES = DEPENDENCIES.map {
+  PackageDescription.Target.Dependency.byName(name: $0.key)
+}
+
 let package = Package(
   name: "ecodatum-server",
   products: [
@@ -18,33 +52,11 @@ let package = Package(
       ]
     )
   ],
-  dependencies: [
-    .package(
-      url: "https://github.com/vapor/auth-provider.git", 
-      .upToNextMajor(from: "1.2.0")),
-    .package(
-      url: "https://github.com/vapor/fluent-provider.git", 
-      .upToNextMajor(from: "1.3.0")),
-    .package(
-      url: "https://github.com/vapor/leaf-provider.git", 
-      .upToNextMajor(from: "1.1.0")),
-    .package(
-      url: "https://github.com/vapor/mysql-provider.git", 
-      .upToNextMajor(from: "2.0.0")),
-    .package(
-      url: "https://github.com/vapor/vapor.git", 
-      .upToNextMajor(from: "2.2.0")),
-  ],
+  dependencies: PACKAGE_DEPENDENCIES,
   targets: [
     .target(
       name: "EcoDatumLib", 
-      dependencies: [
-        "Vapor",
-        "AuthProvider",
-        "FluentProvider",
-        "LeafProvider",
-        "MySQLProvider"
-      ],
+      dependencies: TARGET_DEPENDENCIES,
       exclude: [
         "Config",
         "Database",
