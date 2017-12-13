@@ -17,7 +17,10 @@ let DEPENDENCIES = [
     url: "https://github.com/vapor/leaf-provider.git"),
   "MySQLProvider": (
     majorVersion: 2,
-    url: "https://github.com/vapor/mysql-provider.git")
+    url: "https://github.com/vapor/mysql-provider.git"),
+  "AwaitKit": (
+    majorVersion: 3,
+    url: "https://github.com/kwingerden/AwaitKit.git")
 ]
 
 func toPackage(_ name: String) -> PackageDescription.Package.Dependency {

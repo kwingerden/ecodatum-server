@@ -16,19 +16,24 @@ final class User: Model {
   /// The user's _hashed_ password
   var password: String?
   
+  var isAdmin: Bool
+  
   struct Keys {
     static let id = "id"
     static let name = "name"
     static let email = "email"
     static let password = "password"
+    static let isAdmin = "is_admin"
   }
   
   init(name: String,
        email: String,
-       password: String? = nil) {
+       password: String? = nil,
+       isAdmin: Bool = false) {
     self.name = name
     self.email = email
     self.password = password
+    self.isAdmin = isAdmin
   }
   
   // MARK: Row
@@ -37,6 +42,7 @@ final class User: Model {
     name = try row.get(Keys.name)
     email = try row.get(Keys.email)
     password = try row.get(Keys.password)
+    isAdmin = try row.get(Keys.isAdmin)
   }
   
   func makeRow() throws -> Row {
@@ -44,6 +50,7 @@ final class User: Model {
     try row.set(Keys.name, name)
     try row.set(Keys.email, email)
     try row.set(Keys.password, password)
+    try row.set(Keys.isAdmin, isAdmin)
     return row
   }
   
@@ -59,6 +66,7 @@ extension User: Preparation {
       builder.string(Keys.name)
       builder.string(Keys.email)
       builder.string(Keys.password)
+      builder.bool(Keys.isAdmin)
     }
   }
   
@@ -77,6 +85,7 @@ extension User: JSONRepresentable {
     try json.set(Keys.id, id)
     try json.set(Keys.name, name)
     try json.set(Keys.email, email)
+    try json.set(Keys.isAdmin, isAdmin)
     return json
   }
   
@@ -111,16 +120,6 @@ extension User: Timestampable { }
 
 extension User: SoftDeletable { }
 
-// MARK: Request
-
-extension Request {
-
-  func user() throws -> User {
-    return try auth.assertAuthenticated()
-  }
-  
-}
-
 // MARK: Token
 
 extension User: TokenAuthenticatable {
@@ -128,3 +127,4 @@ extension User: TokenAuthenticatable {
   typealias TokenType = Token
 
 }
+

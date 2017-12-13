@@ -50,6 +50,7 @@ extension Token {
       token: random.base64Encoded.makeString(),
       userId: user.assertExists())
   }
+  
 }
 
 // MARK: Relations

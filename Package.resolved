@@ -20,6 +20,15 @@
         }
       },
       {
+        "package": "AwaitKit",
+        "repositoryURL": "https://github.com/kwingerden/AwaitKit.git",
+        "state": {
+          "branch": null,
+          "revision": "e4cd3d1734a73925eac861fabb3bdc686d22d82a",
+          "version": "3.0.3"
+        }
+      },
+      {
         "package": "BCrypt",
         "repositoryURL": "https://github.com/vapor/bcrypt.git",
         "state": {
@@ -197,6 +206,15 @@
           "branch": null,
           "revision": "642f357d08ec5aa335ae2e3c4633c72da7b5a0c4",
           "version": "2.1.1"
+        }
+      },
+      {
+        "package": "PromiseKit",
+        "repositoryURL": "https://github.com/mxcl/PromiseKit.git",
+        "state": {
+          "branch": null,
+          "revision": "61f796319b16f0d4f3a8cd939d8e7f9a74963038",
+          "version": "4.3.2"
         }
       },
       {
