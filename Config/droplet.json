@@ -12,6 +12,7 @@
     "file"
   ],
   "commands": [
+    "test-command",
     "prepare"
   ]
 }
