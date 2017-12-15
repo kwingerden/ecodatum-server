@@ -5,8 +5,8 @@ let config = try Config()
 try config.setup()
 
 config.addConfigurable(
-  command: TestCommand.init, 
-  name: "test-command")
+  command: CreateRootUserCommand.init, 
+  name: "create-root-user")
 
 let drop = try Droplet(config)
 try drop.setup()

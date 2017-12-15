@@ -84,11 +84,18 @@ extension Token: Preparation {
 
 // MARK: JSON
 
-extension Token: JSONRepresentable {
+extension Token: JSONConvertible {
+  
+  convenience init(json: JSON) throws {
+    self.init(token: try json.get(Keys.token),
+              userId: try json.get(Keys.userId))
+  }
   
   func makeJSON() throws -> JSON {
     var json = JSON()
+    try json.set(Keys.id, id)
     try json.set(Keys.token, token)
+    try json.set(Keys.userId, userId)
     return json
   }
   

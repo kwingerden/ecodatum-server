@@ -11,13 +11,23 @@ final class V1OrganizationsController: ResourceRepresentable {
   
   // GET /organizations
   func index(_ request: Request) throws -> ResponseRepresentable {
+    
+    guard try request.user().isAdmin else {
+      throw Abort(.unauthorized)
+    }
     return try Organization.all().makeJSON()
+  
   }
   
   // GET /organizations/:id
   func show(_ request: Request,
             _ organization: Organization) throws -> ResponseRepresentable {
+  
+    guard try request.user().isAdmin else {
+      throw Abort(.unauthorized)
+    }
     return organization
+  
   }
   
   // POST /organizations

@@ -14,7 +14,7 @@ final class User: Model {
   var email: String
   
   /// The user's _hashed_ password
-  var password: String?
+  var password: String
   
   var isAdmin: Bool
   
@@ -28,7 +28,7 @@ final class User: Model {
   
   init(name: String,
        email: String,
-       password: String? = nil,
+       password: String,
        isAdmin: Bool = false) {
     self.name = name
     self.email = email
@@ -78,7 +78,14 @@ extension User: Preparation {
 
 // MARK: JSON
 
-extension User: JSONRepresentable {
+extension User: JSONConvertible {
+  
+  convenience init(json: JSON) throws {
+    self.init(name: try json.get(Keys.name),
+              email: try json.get(Keys.email),
+              password: try json.get(Keys.password),
+              isAdmin: try json.get(Keys.isAdmin))
+  }
   
   func makeJSON() throws -> JSON {
     var json = JSON()
@@ -104,12 +111,15 @@ extension User: PasswordAuthenticatable {
   }
   
   public static var passwordVerifier: PasswordVerifier? {
-    get { return _userPasswordVerifier }
-    set { _userPasswordVerifier = newValue }
+    get {
+      return _userPasswordVerifier
+    }
+    set {
+      _userPasswordVerifier = newValue
+    }
   }
   
 }
-
 private var _userPasswordVerifier: PasswordVerifier? = nil
 
 // MARK: TIMESTAMP

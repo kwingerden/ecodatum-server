@@ -12,7 +12,7 @@
     "file"
   ],
   "commands": [
-    "test-command",
+    "create-root-user",
     "prepare"
   ]
 }

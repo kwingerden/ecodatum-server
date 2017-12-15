@@ -1,3 +1,8 @@
 {
-	"token-expiration-seconds": 60
+	"token-expiration-seconds": 60,
+	"root-user": {
+		"name": "root",
+		"email": "admin@ecodatum.org",
+		"password": "password"
+	}
 }

@@ -90,7 +90,13 @@ extension Organization {
 
 // MARK: JSON
 
-extension Organization: JSONRepresentable {
+extension Organization: JSONConvertible {
+  
+  convenience init(json: JSON) throws {
+    self.init(name: try json.get(Keys.name),
+              code: try json.get(Keys.code),
+              userId: try json.get(Keys.userId))
+  }
   
   func makeJSON() throws -> JSON {
     var json = JSON()

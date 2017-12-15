@@ -87,7 +87,13 @@ extension Photo {
 
 // MARK: JSONRepresentable
 
-extension Photo: JSONRepresentable {
+extension Photo: JSONConvertible {
+  
+  convenience init(json: JSON) throws {
+    self.init(hash: try json.get(Keys.hash),
+              photo: try json.get(Keys.photo),
+              userId: try json.get(Keys.userId))
+  }
   
   func makeJSON() throws -> JSON {
     var json = JSON()
