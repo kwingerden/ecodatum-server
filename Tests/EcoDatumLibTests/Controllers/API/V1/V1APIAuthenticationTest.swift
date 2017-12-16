@@ -5,7 +5,7 @@ import HTTP
 @testable import Vapor
 @testable import EcoDatumLib
 
-class V1APIAuthenticationTests: TestCase {
+class V1APIAuthenticationTest: TestCase {
   
   let drop = try! Droplet.testable()
   
@@ -95,11 +95,3 @@ class V1APIAuthenticationTests: TestCase {
   
 }
 
-// MARK: Manifest
-
-extension V1APIAuthenticationTests {
-  
-  // Needed for Linux tests. Make sure to update MainLinux.swift when new tests are added.
-  static let allTests = [("test", test)]
-  
-}
