@@ -12,43 +12,38 @@ final class V1OrganizationsController: ResourceRepresentable {
   // GET /organizations
   func index(_ request: Request) throws -> ResponseRepresentable {
     
-    guard try request.user().isAdmin else {
-      throw Abort(.unauthorized)
+    if try request.checkUserIsAdmin() {
+      return try Organization.all().makeJSON()
+    } else {
+      return try Organization
+        .makeQuery()
+        .filter(Organization.Keys.userId, .equals, request.user().id)
+        .all()
+        .makeJSON()
     }
-    return try Organization.all().makeJSON()
-  
+    
   }
   
   // GET /organizations/:id
   func show(_ request: Request,
             _ organization: Organization) throws -> ResponseRepresentable {
-  
-    guard try request.user().isAdmin else {
-      throw Abort(.unauthorized)
-    }
+    
+    try assertUserOwnsOrganizationOrIsAdmin(request, organization)
     return organization
-  
+    
   }
   
   // POST /organizations
   func store(_ request: Request) throws -> ResponseRepresentable {
     
-    guard let json = request.json else {
-      throw Abort(.badRequest, reason: "Invalid type. Expecting JSON.")
-    }
-    
-    guard let name: String = try json.get(Organization.Keys.name) else {
+    guard let name: String = try request.assertJson().get(Organization.Keys.name) else {
       throw Abort(.badRequest, reason: "Organization must have a name.")
     }
     
-    let code = String(randomUpperCaseAlphaNumericLength: 6)
-    let result = try Organization.makeQuery().filter(Organization.Keys.code, code).first()
-    guard result == nil else {
-      throw Abort(.badRequest, reason: "An organization with code \(code) already exists.")
-    }
-    
     let userId = try request.user().assertExists()
-    let organization = Organization(name: name, code: code, userId: userId)
+    let organization = Organization(name: name,
+                                    code: String(randomUpperCaseAlphaNumericLength: 6),
+                                    userId: userId)
     try organization.save()
     
     return organization
@@ -58,22 +53,34 @@ final class V1OrganizationsController: ResourceRepresentable {
   // PATCH /organizations/:id
   func update(_ request: Request,
               organization: Organization) throws -> ResponseRepresentable {
+    
+    try assertUserOwnsOrganizationOrIsAdmin(request, organization)
     try organization.update(for: request)
     try organization.save()
+    
     return organization
+    
   }
   
   // DELETE /organizations/:id
   func destroy(_ request: Request,
                organization: Organization) throws -> ResponseRepresentable {
+    
+    try assertUserOwnsOrganizationOrIsAdmin(request, organization)
     try organization.delete()
+    
     return Response(status: .ok)
+    
   }
   
   // DELETE /organizations
   func clear(_ request: Request) throws -> ResponseRepresentable {
+    
+    try request.assertUserIsAdmin()
     try Organization.makeQuery().delete()
+    
     return Response(status: .ok)
+    
   }
   
   func makeResource() -> Resource<Organization> {
@@ -84,6 +91,20 @@ final class V1OrganizationsController: ResourceRepresentable {
       update: update,
       destroy: destroy,
       clear: clear)
+  }
+  
+  private func assertUserOwnsOrganizationOrIsAdmin(
+    _ request: Request,
+    _ organization: Organization) throws {
+    
+    let userOwnsOrganization = try request.checkUserOwnsOrganization(organization)
+    let userIsAdmin = try request.checkUserIsAdmin()
+    if userOwnsOrganization || userIsAdmin {
+      // Do nothing
+    } else {
+      throw Abort(.unauthorized)
+    }
+    
   }
   
 }

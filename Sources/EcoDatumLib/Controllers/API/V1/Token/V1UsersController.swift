@@ -1,5 +1,5 @@
-import Vapor
 import HTTP
+import Vapor
 
 final class V1UsersController: ResourceRepresentable {
   
@@ -12,9 +12,7 @@ final class V1UsersController: ResourceRepresentable {
   // GET /users
   func index(_ request: Request) throws -> ResponseRepresentable {
     
-    guard try request.user().isAdmin else {
-        throw Abort(.unauthorized)
-    }
+    try request.assertUserIsAdmin()
     return try User.all().makeJSON()
   
   }
@@ -23,9 +21,7 @@ final class V1UsersController: ResourceRepresentable {
   func show(_ request: Request,
             _ user: User) throws -> ResponseRepresentable {
     
-    guard try request.user().isAdmin else {
-      throw Abort(.unauthorized)
-    }
+    try assertRequestUserIsUserOrIsAdmin(request, user)
     return user
     
   }
@@ -33,11 +29,9 @@ final class V1UsersController: ResourceRepresentable {
   // POST /users
   func store(_ request: Request) throws -> ResponseRepresentable {
     
-    guard let json = request.json else {
-      throw Abort(.badRequest)
-    }
+    try request.assertUserIsAdmin()
     
-    let user = try User(json: json)
+    let user = try User(json: try request.assertJson())
     user.password = try drop.hash.make(user.password.makeBytes()).makeString()
     try user.save()
     
@@ -49,6 +43,18 @@ final class V1UsersController: ResourceRepresentable {
     return Resource(index: index,
                     store: store,
                     show: show)
+  }
+  
+  private func assertRequestUserIsUserOrIsAdmin(_ request: Request, _ user: User) throws {
+    
+    let requestUserIsUser = try request.checktRequestUserIsUser(user)
+    let userIsAdmin = try request.checkUserIsAdmin()
+    if requestUserIsUser || userIsAdmin {
+      // Do nothing
+    } else {
+      throw Abort(.unauthorized)
+    }
+    
   }
   
 }

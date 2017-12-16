@@ -61,10 +61,13 @@ final class User: Model {
 extension User: Preparation {
 
   static func prepare(_ database: Database) throws {
-    try database.create(self) { builder in
+    try database.create(self) {
+      builder in
       builder.id()
       builder.string(Keys.name)
-      builder.string(Keys.email)
+      builder.varchar(
+        Keys.email,
+        unique: true)
       builder.string(Keys.password)
       builder.bool(Keys.isAdmin)
     }

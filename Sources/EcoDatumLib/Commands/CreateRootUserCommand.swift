@@ -26,7 +26,8 @@ public final class CreateRootUserCommand: Command {
   
   public func run(arguments: [String]) throws {
     
-    if let _ = try User.makeQuery().filter("name", .equals, "root").first() {
+    if let _ = try User.makeQuery()
+      .filter("name", .equals, "root").first() {
       console.print("Root user already exists. No need to do anything.")
       return
     }
@@ -49,9 +50,12 @@ extension CreateRootUserCommand: ConfigInitializable {
     guard let rootUser = config.wrapped.object?["app"]?["root-user"],
       let name = rootUser["name"]?.string,
       let email = rootUser["email"]?.string,
-      let password = rootUser["password"]?.string else {
+      var password = rootUser["password"]?.string else {
       throw Abort(.badRequest)
     }
+    
+    let hash = try config.resolveHash()
+    password = try hash.make(password.makeBytes()).makeString()
     
     let console = try config.resolveConsole()
     self.init(console: console,

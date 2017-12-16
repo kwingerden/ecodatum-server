@@ -14,7 +14,8 @@ final class V1OrganizationCodeController: ResourceRepresentable {
             _ code: String) throws -> ResponseRepresentable {
     
     guard let organization = try Organization.makeQuery()
-      .filter("code", .equals, code).first() else {
+      .filter(Organization.Keys.code, .equals, code)
+      .first() else {
       throw Abort(.notFound)
     }
     
