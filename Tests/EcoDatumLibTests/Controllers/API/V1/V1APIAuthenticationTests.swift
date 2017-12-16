@@ -5,22 +5,22 @@ import HTTP
 @testable import Vapor
 @testable import EcoDatumLib
 
-class V1AuthenticationTests: TestCase {
+class V1APIAuthenticationTests: TestCase {
   
   let drop = try! Droplet.testable()
   
   func test() throws {
     
-    let hostname = "0.0.0.0"
-    let name = "Test User"
-    let email = "test.user@email.com"
-    let password = "password"
+    let rootUserToken = try drop.loginRootUser()
+    let testUser1 = try drop.createTestUser(1, rootUserToken)
+    let testUser1Token = try drop.loginTestUser(testUser1.email)
+    try drop.assertMe("Hello, \(testUser1.name)", testUser1Token)
     
+    /*
     // Use fake authentication token, which should fail
     try drop.testResponse(
       to: .get,
       at: "/api/v1/me",
-      hostname: hostname,
       headers: [
         Constants.AUTHORIZATION_HEADER_KEY: "cw8zlApGsLlQYaBJSzsQWw==".bearerAuthorization()
       ],
@@ -31,14 +31,10 @@ class V1AuthenticationTests: TestCase {
     try drop.testResponse(
       to: .post,
       at: "/api/v1/users",
-      hostname: hostname,
       headers: [
         Constants.CONTENT_TYPE_HEADER_KEY : Constants.JSON_CONTENT_TYPE
       ],
-      body: JSON(node: [
-        User.Keys.name: name,
-        User.Keys.email: email,
-        User.Keys.password: password]))
+      body: testUser1)
       .assertStatus(is: .ok)
       .assertJSON(User.Keys.id,  passes: { json in json.int != nil })
       .assertJSON(User.Keys.name, equals: name)
@@ -48,7 +44,6 @@ class V1AuthenticationTests: TestCase {
     let tokenResponse = try drop.testResponse(
       to: .post,
       at: "/api/v1/login",
-      hostname: hostname,
       headers: [
         Constants.AUTHORIZATION_HEADER_KEY : email.basicAuthorization(password: password),
         Constants.CONTENT_TYPE_HEADER_KEY : Constants.JSON_CONTENT_TYPE
@@ -68,7 +63,6 @@ class V1AuthenticationTests: TestCase {
     try drop.testResponse(
       to: .get,
       at: "/api/v1/me",
-      hostname: hostname,
       headers: [
         Constants.AUTHORIZATION_HEADER_KEY: token.bearerAuthorization()
       ],
@@ -80,7 +74,6 @@ class V1AuthenticationTests: TestCase {
     try drop.testResponse(
       to: .get,
       at: "/api/v1/logout",
-      hostname: hostname,
       headers: [
         Constants.AUTHORIZATION_HEADER_KEY: token.bearerAuthorization()
       ],
@@ -91,12 +84,12 @@ class V1AuthenticationTests: TestCase {
     try drop.testResponse(
       to: .get,
       at: "/api/v1/me",
-      hostname: hostname,
       headers: [
         Constants.AUTHORIZATION_HEADER_KEY: token.bearerAuthorization()
       ],
       body: nil)
       .assertStatus(is: .unauthorized)
+ */
     
   }
   
@@ -104,7 +97,7 @@ class V1AuthenticationTests: TestCase {
 
 // MARK: Manifest
 
-extension V1AuthenticationTests {
+extension V1APIAuthenticationTests {
   
   // Needed for Linux tests. Make sure to update MainLinux.swift when new tests are added.
   static let allTests = [("test", test)]
