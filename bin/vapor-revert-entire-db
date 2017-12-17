@@ -2,5 +2,5 @@
 
 ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 pushd $ROOT_DIR
-env UNIT_TEST_ENV=production vapor test
+vapor run prepare -y --revert --all
 popd

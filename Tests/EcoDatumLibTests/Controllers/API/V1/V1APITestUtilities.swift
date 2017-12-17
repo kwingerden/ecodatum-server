@@ -15,6 +15,9 @@ fileprivate let PASSES_IS_STRING = {
   json.string != nil
 }
 
+typealias TestUser = (id: Int, name: String, email: String, isAdmin: Bool)
+typealias TestOrganization = (id: Int, name: String, code: String, userId: String)
+
 extension Droplet {
   
   func loginRootUser() throws -> String {
@@ -45,43 +48,67 @@ extension Droplet {
     
   }
   
-  func createTestUser(_ index: Int,
-                      _ rootUserToken: String,
-                      isAdmin: Bool = false)
-    throws -> (id: Int, name: String, email: String, isAdmin: Bool) {
-      
-      let name = "Test User\(index)"
-      let email = "test.user\(index)@email.com"
-      
-      let response = try testResponse(
-        to: .post,
-        at: "/api/v1/users",
-        headers: [
-          Constants.AUTHORIZATION_HEADER_KEY: rootUserToken.bearerAuthorization(),
-          Constants.CONTENT_TYPE_HEADER_KEY : Constants.JSON_CONTENT_TYPE
-        ],
-        body: JSON(node: [
-          User.Keys.name: name,
-          User.Keys.email: email,
-          User.Keys.password: "password",
-          User.Keys.isAdmin: isAdmin
-          ]))
-        .assertStatus(is: .ok)
-        .assertJSON(User.Keys.id,  passes: PASSES_IS_INT)
-        .assertJSON(User.Keys.name, equals: name)
-        .assertJSON(User.Keys.email, equals: email)
-        .assertJSON(User.Keys.isAdmin, equals: isAdmin ? 1 : 0)
-      
-      guard let json = response.json else {
+  func createTestUser(_ rootUserToken: String,
+                      isAdmin: Bool = false) throws -> TestUser {
+    
+    let unique = String(randomUpperCaseAlphaNumericLength: 10)
+    let name = "Test User-\(unique)"
+    let email = "test.user-\(unique)@email.com"
+    
+    let response = try testResponse(
+      to: .post,
+      at: "/api/v1/users",
+      headers: [
+        Constants.AUTHORIZATION_HEADER_KEY: rootUserToken.bearerAuthorization(),
+        Constants.CONTENT_TYPE_HEADER_KEY : Constants.JSON_CONTENT_TYPE
+      ],
+      body: JSON(node: [
+        User.Keys.name: name,
+        User.Keys.email: email,
+        User.Keys.password: "password",
+        User.Keys.isAdmin: isAdmin
+        ]))
+      .assertStatus(is: .ok)
+      .assertJSON(User.Keys.id,  passes: PASSES_IS_INT)
+      .assertJSON(User.Keys.name, equals: name)
+      .assertJSON(User.Keys.email, equals: email)
+      .assertJSON(User.Keys.isAdmin, equals: isAdmin ? 1 : 0)
+    
+    guard let json = response.json else {
+      XCTFail("Error getting JSON from response \(response)")
+      throw Abort(.badRequest)
+    }
+    
+    return (id: try json.get(User.Keys.id),
+            name: try json.get(User.Keys.name),
+            email: try json.get(User.Keys.email),
+            isAdmin: try json.get(User.Keys.isAdmin))
+    
+  }
+  
+  func getAllUsers(_ rootUserToken: String) throws -> [TestUser] {
+    
+    let response = try testResponse(
+      to: .get,
+      at: "/api/v1/users",
+      headers: [
+        Constants.AUTHORIZATION_HEADER_KEY: rootUserToken.bearerAuthorization(),
+        ])
+    
+    guard let json = response.json,
+      let array = json.array else {
         XCTFail("Error getting JSON from response \(response)")
         throw Abort(.badRequest)
-      }
-      
-      return (id: try json.get(User.Keys.id),
-              name: try json.get(User.Keys.name),
-              email: try json.get(User.Keys.email),
-              isAdmin: try json.get(User.Keys.isAdmin))
-      
+    }
+    
+    return try array.map {
+      json in
+      (id: try json.get(User.Keys.id),
+       name: try json.get(User.Keys.name),
+       email: try json.get(User.Keys.email),
+       isAdmin: try json.get(User.Keys.isAdmin))
+    }
+    
   }
   
   func loginTestUser(_ email: String) throws -> String {
@@ -106,6 +133,18 @@ extension Droplet {
     
   }
   
+  func logout(_ token: String) throws {
+    
+    try testResponse(
+      to: .get,
+      at: "/api/v1/logout",
+      headers: [
+        Constants.AUTHORIZATION_HEADER_KEY: token.bearerAuthorization()
+      ])
+      .assertStatus(is: .ok)
+    
+  }
+  
   func assertMe(_ name: String, _ token: String) throws {
     
     try testResponse(
@@ -115,16 +154,30 @@ extension Droplet {
         Constants.AUTHORIZATION_HEADER_KEY: token.bearerAuthorization()
       ])
       .assertStatus(is: .ok)
-      .assertBody(equals: name)
+      .assertBody(equals: "Hello, \(name)")
     
   }
   
-  func createOrganization(_ index: Int,
-                          _ token: String)
-    throws -> (id: Int, name: String, code: String, userId: String) {
+  func assertTokenValidity(_ token: String, _ isValid: Bool = true) throws {
     
-    let name = "Test Group \(index)"
-      
+    let response = try testResponse(
+      to: .get,
+      at: "/api/v1/me",
+      headers: [
+        Constants.AUTHORIZATION_HEADER_KEY: token.bearerAuthorization()
+      ])
+    
+    if (isValid && response.status != .ok) || (!isValid && response.status == .ok) {
+      XCTFail()
+    }
+    
+  }
+  
+  func createOrganization(_ token: String) throws -> TestOrganization {
+    
+    let unique = String(randomUpperCaseAlphaNumericLength: 10)
+    let name = "TestOrganization-\(unique)"
+    
     let response = try testResponse(
       to: .post,
       at: "/api/v1/organizations",
@@ -150,6 +203,31 @@ extension Droplet {
             name: try json.get(Organization.Keys.name),
             code: try json.get(Organization.Keys.code),
             userId: try json.get(Organization.Keys.userId))
+    
+  }
+  
+  func getAllOrganizations(_ token: String) throws -> [TestOrganization] {
+    
+    let response = try testResponse(
+      to: .get,
+      at: "/api/v1/organizations",
+      headers: [
+        Constants.AUTHORIZATION_HEADER_KEY: token.bearerAuthorization(),
+        ])
+    
+    guard let json = response.json,
+      let array = json.array else {
+        XCTFail("Error getting JSON from response \(response)")
+        throw Abort(.badRequest)
+    }
+    
+    return try array.map {
+      json in
+      (id: try json.get(Organization.Keys.id),
+       name: try json.get(Organization.Keys.name),
+       code: try json.get(Organization.Keys.code),
+       userId: try json.get(Organization.Keys.userId))
+    }
     
   }
   
