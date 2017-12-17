@@ -17,6 +17,8 @@ fileprivate let PASSES_IS_STRING = {
 
 typealias TestUser = (id: Int, name: String, email: String, isAdmin: Bool)
 typealias TestOrganization = (id: Int, name: String, code: String, userId: String)
+typealias TestLitePhoto = (id: Int, userId: String)
+typealias TestFullPhoto = (id: Int, base64: String, userId: String)
 
 extension Droplet {
   
@@ -228,6 +230,50 @@ extension Droplet {
        code: try json.get(Organization.Keys.code),
        userId: try json.get(Organization.Keys.userId))
     }
+    
+  }
+  
+  func uploadPhoto(_ token: String, _ base64: String) throws -> TestLitePhoto {
+    
+    let response = try testResponse(
+      to: .post,
+      at: "/api/v1/photos",
+      headers: [
+        Constants.AUTHORIZATION_HEADER_KEY: token.bearerAuthorization(),
+        Constants.CONTENT_TYPE_HEADER_KEY : Constants.JSON_CONTENT_TYPE
+      ],
+      body: JSON(node: [
+        Photo.Keys.base64: base64
+        ]))
+      .assertStatus(is: .ok)
+
+    guard let json = response.json else {
+      XCTFail("Error getting JSON from response \(response)")
+      throw Abort(.badRequest)
+    }
+    
+    return (id: try json.get(Photo.Keys.id),
+            userId: try json.get(Photo.Keys.userId))
+    
+  }
+  
+  func getPhoto(_ token: String, _ id: Int) throws -> TestFullPhoto {
+    
+    let response = try testResponse(
+      to: .get,
+      at: "/api/v1/photos/\(id)",
+      headers: [
+        Constants.AUTHORIZATION_HEADER_KEY: token.bearerAuthorization(),
+        ])
+    
+    guard let json = response.json else {
+        XCTFail("Error getting JSON from response \(response)")
+        throw Abort(.badRequest)
+    }
+    
+    return (id: try json.get(Photo.Keys.id),
+            base64: try json.get(Photo.Keys.base64),
+            userId: try json.get(Organization.Keys.userId))
     
   }
   

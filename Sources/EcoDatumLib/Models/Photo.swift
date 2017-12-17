@@ -7,39 +7,32 @@ final class Photo: Model {
   
   let storage = Storage()
   
-  let hash: String
-  
-  let photo: Data
+  let base64: String
   
   let userId: Identifier
   
   struct Keys {
     static let id = "id"
-    static let hash = "hash"
-    static let photo = "photo"
+    static let base64 = "base64"
     static let userId = User.foreignIdKey
   }
   
-  init(hash: String,
-       photo: Data,
+  init(base64: String,
        userId: Identifier) {
-    self.hash = hash
-    self.photo = photo
+    self.base64 = base64
     self.userId = userId
   }
   
   // MARK: Row
   
   init(row: Row) throws {
-    hash = try row.get(Keys.hash)
-    photo = try row.get(Keys.photo)
+    base64 = try row.get(Keys.base64)
     userId = try row.get(Keys.userId)
   }
   
   func makeRow() throws -> Row {
     var row = Row()
-    try row.set(Keys.hash, hash)
-    try row.set(Keys.photo, photo)
+    try row.set(Keys.base64, base64)
     try row.set(Keys.userId, userId)
     return row
   }
@@ -53,13 +46,8 @@ extension Photo: Preparation {
     try database.create(self) {
       builder in
       builder.id()
-      builder.varchar(
-        Keys.hash,
-        length: 255,
-        optional: false,
-        unique: true)
-      builder.bytes(
-        Keys.photo,
+      builder.longText(
+        Keys.base64,
         optional: false,
         unique: false)
       builder.foreignId(
@@ -90,16 +78,14 @@ extension Photo {
 extension Photo: JSONConvertible {
   
   convenience init(json: JSON) throws {
-    self.init(hash: try json.get(Keys.hash),
-              photo: try json.get(Keys.photo),
+    self.init(base64: try json.get(Keys.base64),
               userId: try json.get(Keys.userId))
   }
   
   func makeJSON() throws -> JSON {
     var json = JSON()
     try json.set(Keys.id, id)
-    try json.set(Keys.hash, hash)
-    try json.set(Keys.photo, photo)
+    try json.set(Keys.base64, base64)
     try json.set(Keys.userId, userId)
     return json
   }

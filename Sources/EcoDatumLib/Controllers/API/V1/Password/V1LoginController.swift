@@ -16,6 +16,7 @@ final class V1LoginController: ResourceRepresentable {
     drop.log.debug("Logging in as user: \(user.name)")
     let token = try Token.generate(for: user)
     try token.save()
+    
     return token
   
   }

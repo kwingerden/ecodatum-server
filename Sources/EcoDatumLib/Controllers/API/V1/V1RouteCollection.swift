@@ -38,6 +38,11 @@ final class V1RouteCollection: RouteCollection {
       builder in
       builder.resource("logout", V1LogoutController(drop))
       builder.resource("me", V1MeController(drop))
+      do {
+        builder.resource("photos", try V1PhotosController(drop))
+      } catch {
+        drop.log.error("Failed to create V1PhotosController")
+      }
       builder.resource("organizations", V1OrganizationsController(drop))
       builder.resource("users", V1UsersController(drop))
     }
