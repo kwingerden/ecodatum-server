@@ -5,7 +5,7 @@ import Sockets
 @testable import Vapor
 @testable import EcoDatumLib
 
-class HTMLPostControllerTests: TestCase {
+class HTMLPostControllerTest: TestCase {
 
   let drop = try! Droplet.testable()
   
@@ -29,12 +29,10 @@ class HTMLPostControllerTests: TestCase {
 
 // MARK: Manifest
 
-extension HTMLPostControllerTests {
+extension HTMLPostControllerTest {
   
-  // Needed for Linux tests. Make sure to update MainLinux.swift when new tests are added.
   static let allTests = [
     ("testIndex", testIndex),
-    ("testShow", testShow),
-    ]
+    ("testShow", testShow)]
   
 }

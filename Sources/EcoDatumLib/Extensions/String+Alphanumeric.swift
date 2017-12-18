@@ -1,8 +1,5 @@
 import Foundation
-
-#if os(Linux)
-  srandom(UInt32(time(nil)))
-#endif
+import Random
 
 extension String {
 
@@ -10,14 +7,11 @@ extension String {
     let alphaNumericChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     var value = ""
     for _ in 0..<length {
-      #if os(Linux)
-        let randomIndex = Int(random() % alphaNumericChars.count)
-      #else
-        let randomIndex = arc4random_uniform(UInt32(alphaNumericChars.count))
-      #endif
+      let randomIndex = makeRandom(min: 0, max: alphaNumericChars.count - 1)
+      //let randomIndex = arc4random_uniform(UInt32(alphaNumericChars.count))
       let index = alphaNumericChars.index(
         alphaNumericChars.startIndex,
-        offsetBy: Int(randomIndex))
+        offsetBy: randomIndex)
       value.append(alphaNumericChars[index])
     }
     self.init(value)

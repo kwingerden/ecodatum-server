@@ -37,4 +37,12 @@ class V1APIOrganizationTest: TestCase {
   
 }
 
+// MARK: Manifest
+
+extension V1APIOrganizationTest {
+  
+  static let allTests = [("test", test)]
+  
+}
+
 

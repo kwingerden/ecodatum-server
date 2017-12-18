@@ -20,5 +20,14 @@ class V1APIPhotoTest: TestCase {
   
 }
 
+// MARK: Manifest
+
+extension V1APIPhotoTest {
+  
+  static let allTests = [("test", test)]
+  
+}
+
+
 
 

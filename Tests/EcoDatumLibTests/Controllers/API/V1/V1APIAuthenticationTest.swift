@@ -26,3 +26,11 @@ class V1APIAuthenticationTest: TestCase {
   
 }
 
+// MARK: Manifest
+
+extension V1APIAuthenticationTest {
+  
+  static let allTests = [("test", test)]
+  
+}
+
