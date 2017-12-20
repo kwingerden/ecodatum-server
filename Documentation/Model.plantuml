@@ -1,0 +1,65 @@
+@startuml
+
+enum AbioticFactor {
+  AIR
+  SOIL
+  WATER
+}
+
+enum MeasurementType {
+  CO2_GAS (parts per million 0 to 100,000)
+  TEMPERATURE (degrees Celcius –40 to 135°C)
+  PH (values 0 to 14)
+  LUX (values 0 to 150,000)
+}
+
+class Location {
+  latitude: Double
+  longitude: Double
+  altitude: Double
+  horizontalAccuracy: Double
+  verticalAccuracy: Double
+  timestamp: Date
+}
+
+class Measurement {
+  abioticFactor: AbioticFactor
+  value: Double
+  type: MeasurementType
+  date: Date
+}
+
+class Note {
+  note: String
+}
+
+class Organization {
+  name: String
+  code: String
+}
+
+class Photo {
+  base64: String
+}
+
+class Site {
+  name: String
+  description: String
+}
+
+class User {
+  name: String
+  email: String
+  password: String
+  isAdmin: Bool
+}
+
+User "0" o-- "*" Site : creates
+User "1" o-- "*" Organization : belongs
+
+Site "1" *-- "1" Location
+Site "0" *-- "*" Note
+Site "1" *-- "*" Photo
+Site "1" *-- "*" Measurement
+
+@enduml
