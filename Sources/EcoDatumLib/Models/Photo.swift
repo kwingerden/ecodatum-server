@@ -36,6 +36,7 @@ final class Photo: Model {
     try row.set(Keys.userId, userId)
     return row
   }
+  
 }
 
 // MARK: Preparation

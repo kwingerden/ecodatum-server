@@ -19,7 +19,6 @@ class Location {
   altitude: Double
   horizontalAccuracy: Double
   verticalAccuracy: Double
-  timestamp: Date
 }
 
 class Measurement {

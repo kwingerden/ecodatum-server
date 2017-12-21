@@ -27,8 +27,10 @@ extension Config {
     // The order of the following preparations matters!!
     preparations.append(User.self)
     
+    preparations.append(Location.self)
     preparations.append(Photo.self)
     preparations.append(Organization.self)
+    preparations.append(Site.self)
     preparations.append(Token.self)
   
   }
