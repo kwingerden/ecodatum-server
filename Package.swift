@@ -15,9 +15,9 @@ let DEPENDENCIES = [
   "LeafProvider": (
     majorVersion: 1,
     url: "https://github.com/vapor/leaf-provider.git"),
-  "MySQLProvider": (
+  "PostgreSQLProvider": (
     majorVersion: 2,
-    url: "https://github.com/vapor/mysql-provider.git"),
+    url: "https://github.com/vapor-community/postgresql-provider.git"),
   "AwaitKit": (
     majorVersion: 3,
     url: "https://github.com/kwingerden/AwaitKit.git")

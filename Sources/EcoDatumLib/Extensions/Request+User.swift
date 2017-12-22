@@ -44,12 +44,12 @@ extension Request {
     }
   }
   
-  func checkUserOwnsPhoto(_ photo: Photo) throws -> Bool {
-    return try user().id == photo.userId
+  func checkUserOwnsImage(_ image: Image) throws -> Bool {
+    return try user().id == image.userId
   }
   
-  func assertUserOwnsPhoto(_ photo: Photo) throws {
-    if try !checkUserOwnsPhoto(photo) {
+  func assertUserOwnsImage(_ image: Image) throws {
+    if try !checkUserOwnsImage(image) {
       throw Abort(.unauthorized)
     }
   }

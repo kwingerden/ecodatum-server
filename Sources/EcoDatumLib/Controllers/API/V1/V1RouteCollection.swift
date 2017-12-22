@@ -17,14 +17,15 @@ final class V1RouteCollection: RouteCollection {
     
     let `public` = builder.grouped("public")
     `public`.group(middleware: []) {
-        builder in
-        builder.resource("organization", V1OrganizationCodeController(drop))
+      builder in
+      builder.resource("organization", V1OrganizationCodeController(drop))
     }
     
     // MARK: Password Protected Contollers
     
     v1.group(middleware: [
-      PasswordAuthenticationMiddleware(User.self)]) {
+      PasswordAuthenticationMiddleware(User.self)
+    ]) {
       builder in
       builder.resource("login", V1LoginController(drop))
     }
@@ -34,15 +35,12 @@ final class V1RouteCollection: RouteCollection {
     let exirationSeconds = drop.config["app", "token-expiration-seconds"]?.int ?? 86400
     v1.group(middleware: [
       TokenExpirationMiddleware(exirationSeconds),
-      TokenAuthenticationMiddleware(User.self)]) {
+      TokenAuthenticationMiddleware(User.self)
+    ]) {
       builder in
       builder.resource("logout", V1LogoutController(drop))
       builder.resource("me", V1MeController(drop))
-      do {
-        builder.resource("photos", try V1PhotosController(drop))
-      } catch {
-        drop.log.error("Failed to create V1PhotosController")
-      }
+      builder.resource("images", V1ImagesController(drop))
       builder.resource("organizations", V1OrganizationsController(drop))
       builder.resource("users", V1UsersController(drop))
     }

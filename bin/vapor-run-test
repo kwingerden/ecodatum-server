@@ -2,5 +2,6 @@
 
 ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 pushd $ROOT_DIR
+mkdir -p .images
 vapor run --debug serve --env=test
 popd

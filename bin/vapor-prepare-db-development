@@ -3,14 +3,4 @@
 ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 pushd $ROOT_DIR
 vapor run prepare --env=development
-. .env
-mysql -uroot -h 0.0.0.0 -p$MYSQL_ROOT_PASSWORD $MYSQL_DATABASE -t<<eof
-DROP INDEX idx_spatial_point ON locations;
-CREATE SPATIAL INDEX idx_spatial_point 
-  ON locations (point);
-DROP TRIGGER IF EXISTS insert_location_point;
-CREATE TRIGGER insert_location_point
-  BEFORE INSERT ON locations
-  FOR EACH ROW SET NEW.point = POINT(NEW.latitude, NEWlongitude);
-eof
 popd

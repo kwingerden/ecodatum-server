@@ -60,13 +60,14 @@ extension Site: Preparation {
     try database.create(self) {
       builder in
       builder.id()
-      builder.varchar(
+      builder.string(
         Keys.name,
-        length: 255,
+        length: 250,
         optional: false,
         unique: true)
-      builder.text(
+      builder.string(
         Keys.description,
+        length: 500,
         optional: true,
         unique: false)
       builder.foreignId(

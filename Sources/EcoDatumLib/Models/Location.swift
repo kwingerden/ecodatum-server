@@ -1,6 +1,5 @@
 import FluentProvider
 import Foundation
-import MySQLDriver
 import Vapor
 
 final class Location: Model {
@@ -24,7 +23,6 @@ final class Location: Model {
     static let altitude = "altitude"
     static let horizontalAccuracy = "horizontal_accuracy"
     static let verticalAccuracy = "vertical_accuracy"
-    static let __point__ = "point"
   }
   
   init(latitude: Double,
@@ -75,7 +73,6 @@ extension Location: Preparation {
       builder.double(Keys.altitude)
       builder.double(Keys.horizontalAccuracy)
       builder.double(Keys.verticalAccuracy)
-      builder.custom(Keys.__point__, type: "POINT")
     }
     
   }

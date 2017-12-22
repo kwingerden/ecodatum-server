@@ -17,8 +17,8 @@ fileprivate let PASSES_IS_STRING = {
 
 typealias TestUser = (id: Int, name: String, email: String, isAdmin: Bool)
 typealias TestOrganization = (id: Int, name: String, code: String, userId: String)
-typealias TestLitePhoto = (id: Int, userId: String)
-typealias TestFullPhoto = (id: Int, base64: String, userId: String)
+typealias TestImageLite = (id: Int, uuid: String, imageType: Int, userId: String)
+typealias TestImageFull = (id: Int, base64Encoded: String, uuid: String, imageType: Int, userId: String)
 
 extension Droplet {
   
@@ -233,18 +233,21 @@ extension Droplet {
     
   }
   
-  func uploadPhoto(_ token: String, _ base64: String) throws -> TestLitePhoto {
+  func uploadImage(_ token: String,
+                   _ base64Encoded: String,
+                   _ imageType: Image.ImageType) throws -> TestImageLite {
     
     let response = try testResponse(
       to: .post,
-      at: "/api/v1/photos",
+      at: "/api/v1/images",
       headers: [
         Constants.AUTHORIZATION_HEADER_KEY: token.bearerAuthorization(),
         Constants.CONTENT_TYPE_HEADER_KEY : Constants.JSON_CONTENT_TYPE
       ],
       body: JSON(node: [
-        Photo.Keys.base64: base64
-        ]))
+        Image.Keys.base64Encoded: base64Encoded,
+        Image.Keys.imageType: imageType.rawValue,
+      ]))
       .assertStatus(is: .ok)
 
     guard let json = response.json else {
@@ -252,16 +255,18 @@ extension Droplet {
       throw Abort(.badRequest)
     }
     
-    return (id: try json.get(Photo.Keys.id),
-            userId: try json.get(Photo.Keys.userId))
+    return (id: try json.get(Image.Keys.id),
+            uuid: try json.get(Image.Keys.uuid),
+            imageType: try json.get(Image.Keys.imageType),
+            userId: try json.get(Image.Keys.userId))
     
   }
   
-  func getPhoto(_ token: String, _ id: Int) throws -> TestFullPhoto {
+  func getImage(_ token: String, _ id: Int) throws -> TestImageFull {
     
     let response = try testResponse(
       to: .get,
-      at: "/api/v1/photos/\(id)",
+      at: "/api/v1/images/\(id)",
       headers: [
         Constants.AUTHORIZATION_HEADER_KEY: token.bearerAuthorization(),
         ])
@@ -271,9 +276,11 @@ extension Droplet {
         throw Abort(.badRequest)
     }
     
-    return (id: try json.get(Photo.Keys.id),
-            base64: try json.get(Photo.Keys.base64),
-            userId: try json.get(Organization.Keys.userId))
+    return (id: try json.get(Image.Keys.id),
+            base64Encoded: try json.get(Image.Keys.base64Encoded),
+            uuid: try json.get(Image.Keys.uuid),
+            imageType: try json.get(Image.Keys.imageType),
+            userId: try json.get(Image.Keys.userId))
     
   }
   

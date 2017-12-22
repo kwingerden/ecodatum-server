@@ -20,19 +20,17 @@ services:
       - ecodatum-database
 
   ecodatum-database:
-    image: mysql:5.7.20
-    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    image: mdillon/postgis:10
     networks:
       - private-network
     ports:
-      - "3306:3306"
+      - "5432:5432"
     environment:
-      - MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
-      - MYSQL_DATABASE=$MYSQL_DATABASE
-      - MYSQL_USER=$MYSQL_USER
-      - MYSQL_PASSWORD=$MYSQL_PASSWORD
+      - POSTGRES_DB=$POSTGRES_DB
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
     volumes:
-      - ecodatum-database:/var/lib/mysql
+      - ecodatum-database:/var/lib/postgresql/data
       - shared-volume:/shared-volume
     restart: always
 

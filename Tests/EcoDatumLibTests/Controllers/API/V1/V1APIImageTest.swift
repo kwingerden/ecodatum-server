@@ -5,16 +5,16 @@ import HTTP
 @testable import Vapor
 @testable import EcoDatumLib
 
-class V1APIPhotoTest: TestCase {
+class V1APIImageTest: TestCase {
   
   let drop = try! Droplet.testable()
   
   func test() throws {
     
     let rootUserToken = try drop.loginRootUser()
-    let rootUserPhoto1 = try drop.uploadPhoto(rootUserToken, TEST_BASE64_PHOTO_1)
-    let getPhoto = try drop.getPhoto(rootUserToken, rootUserPhoto1.id)
-    XCTAssertTrue(getPhoto.base64 == TEST_BASE64_PHOTO_1)
+    let rootUserImage1 = try drop.uploadImage(rootUserToken, TEST_BASE64_ENCODED_IMAGE_1, .jpg)
+    let image = try drop.getImage(rootUserToken, rootUserImage1.id)
+    XCTAssertTrue(image.base64Encoded == TEST_BASE64_ENCODED_IMAGE_1)
     
   }
   
@@ -22,7 +22,7 @@ class V1APIPhotoTest: TestCase {
 
 // MARK: Manifest
 
-extension V1APIPhotoTest {
+extension V1APIImageTest {
   
   static let allTests = [("test", test)]
   

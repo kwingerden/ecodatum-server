@@ -1,7 +1,7 @@
 import AuthProvider
 import FluentProvider
 import LeafProvider
-import MySQLProvider
+import PostgreSQLProvider
 
 extension Config {
   
@@ -18,7 +18,7 @@ extension Config {
     try addProvider(AuthProvider.Provider.self)
     try addProvider(FluentProvider.Provider.self)
     try addProvider(LeafProvider.Provider.self)
-    try addProvider(MySQLProvider.Provider.self)
+    try addProvider(PostgreSQLProvider.Provider.self)
   
   }
   
@@ -27,8 +27,8 @@ extension Config {
     // The order of the following preparations matters!!
     preparations.append(User.self)
     
+    preparations.append(Image.self)
     preparations.append(Location.self)
-    preparations.append(Photo.self)
     preparations.append(Organization.self)
     preparations.append(Site.self)
     preparations.append(Token.self)

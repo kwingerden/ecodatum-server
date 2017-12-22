@@ -3,5 +3,7 @@
 ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 pushd $ROOT_DIR
 vapor clean -y
+rm -rf .images
+mkdir -p .images
 rm -rf ecodatum-server.xcodeproj
 popd

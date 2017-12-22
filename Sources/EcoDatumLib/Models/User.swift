@@ -65,8 +65,9 @@ extension User: Preparation {
       builder in
       builder.id()
       builder.string(Keys.name)
-      builder.varchar(
+      builder.string(
         Keys.email,
+        length: 255,
         unique: true)
       builder.string(Keys.password)
       builder.bool(Keys.isAdmin)

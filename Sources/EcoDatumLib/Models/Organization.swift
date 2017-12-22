@@ -55,12 +55,12 @@ extension Organization: Preparation {
     try database.create(self) {
       builder in
       builder.id()
-      builder.varchar(
+      builder.string(
         Keys.name,
         length: 255,
         optional: false,
         unique: false)
-      builder.char(
+      builder.string(
         Keys.code,
         length: 6,
         optional: false,
