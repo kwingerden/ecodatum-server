@@ -1,42 +1,8 @@
 import FluentProvider
 import Foundation
+import MySQLDriver
 import Vapor
 
-/*
- Reference:
- https://www.percona.com/blog/2013/10/21/using-the-new-mysql-spatial-functions-5-6-for-geo-enabled-applications/
- 
- USE ecodatum;
- 
- SET @lat= 37.615223;
- SET @lon = -122.389979;
- SET @dist = 10;
- --  degree of latitude ~= 69 miles
- -- 1 degree of longitude ~= cos(latitude)*69 miles
- SET @rlon1 = @lon-@dist/abs(cos(radians(@lat))*69);
- SET @rlon2 = @lon+@dist/abs(cos(radians(@lat))*69);
- SET @rlat1 = @lat-(@dist/69);
- SET @rlat2 = @lat+(@dist/69);
- 
- DROP TABLE points;
- CREATE TABLE points (
- id INT PRIMARY KEY AUTO_INCREMENT,
- point POINT NOT NULL);
- CREATE SPATIAL INDEX `idx_points_point_spatial`  ON `ecodatum`.`points` (point);
- INSERT INTO points (point) VALUES (ST_GeomFromText('POINT(1 1)'));
- INSERT INTO points (point) VALUES (POINT(-122.3890954, -100));
- INSERT INTO points (point) VALUES (POINT(@lon, @lat));
- 
- SELECT ST_AsText(ST_Envelope(LineString(Point(@rlon1, @rlat1), Point(@rlon2, @rlat2))));
- 
- SELECT
- ST_X(point) as latitude,
- ST_Y(point) as longitude
- FROM points
- WHERE
- ST_Within(point, ST_Envelope(LineString(Point(@rlon1, @rlat1), Point(@rlon2, @rlat2))));
- 
-*/
 final class Location: Model {
   
   let storage = Storage()
@@ -58,6 +24,7 @@ final class Location: Model {
     static let altitude = "altitude"
     static let horizontalAccuracy = "horizontal_accuracy"
     static let verticalAccuracy = "vertical_accuracy"
+    static let __point__ = "point"
   }
   
   init(latitude: Double,
@@ -98,7 +65,8 @@ final class Location: Model {
 
 extension Location: Preparation {
   
-  static func prepare(_ database: Database) throws {
+  static func prepare(_ database: FluentProvider.Database) throws {
+    
     try database.create(self) {
       builder in
       builder.id()
@@ -107,10 +75,12 @@ extension Location: Preparation {
       builder.double(Keys.altitude)
       builder.double(Keys.horizontalAccuracy)
       builder.double(Keys.verticalAccuracy)
+      builder.custom(Keys.__point__, type: "POINT")
     }
+    
   }
   
-  static func revert(_ database: Database) throws {
+  static func revert(_ database: FluentProvider.Database) throws {
     try database.delete(self)
   }
   
@@ -152,69 +122,3 @@ extension Location: Timestampable { }
 // MARK: DELETE
 
 extension Location: SoftDeletable { }
-
-
-  /*
-  private struct SQL {
-    static let CREATE_TABLE = """
-      CREATE TABLE points (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        point POINT NOT NULL)
-      """
-    static let CREATE_POINT_INDEX = """
-      CREATE SPATIAL INDEX
-        idx_points_point_spatial ON
-          ecodatum.points (point)
-      """
-    static func INSERT_POINT(_ latitude: Double, _ longitude: Double) -> String {
-      return """
-      INSERT INTO points (point)
-      VALUES (POINT(\(latitude), \(longitude)))
-      """
-    }
-    static let DROP_TABLE = "DROP TABLE points"
-    static let LAST_INSERT_ID = "SELECT LAST_INSERT_ID() as id"
-    static func SELECT_POINT_BY_ID(_ id: Int) -> String {
-      return """
-      SELECT
-        id,
-        ST_X(point) as latitude,
-        ST_Y(point) as longitude
-      FROM points
-      WHERE id = \(id)
-      """
-    }
-  }
-  
-  let id: Int
-  
-  let latitude: Double
-  
-  let longitude: Double
-  
-  static func createTable(_ connection: Connection) throws {
-    try connection.raw(SQL.CREATE_TABLE)
-  }
-  
-  static func createIndices(_ connection: Connection) throws {
-    try connection.raw(SQL.CREATE_POINT_INDEX)
-  }
-  
-  static func dropTable(_ connection: Connection) throws {
-    try connection.raw(SQL.DROP_TABLE)
-  }
-  
-  static func insertPoint(_ connection: Connection,
-                          latitude: Double,
-                          longitude: Double) throws -> Point {
-    try connection.raw(SQL.INSERT_POINT(latitude, longitude))
-    let result = try connection.raw(SQL.LAST_INSERT_ID)
-    return Point(id: 1, latitude: latitude, longitude: longitude)
-  }
-  
-  static func selectPoint(_ connection: Connection, byId: Int) throws -> Point {
-    let result = try connection.raw(SQL.SELECT_POINT_BY_ID(byId))
-    return Point(id: 1, latitude: 1.0, longitude: 1.0)
-  }
-  */
-
