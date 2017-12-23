@@ -31,6 +31,7 @@ extension Config {
     preparations.append(Organization.self)
     preparations.append(Role.self)
     preparations.append(Site.self)
+    preparations.append(Survey.self)
     preparations.append(Token.self)
     preparations.append(UserOrganizationRole.self)
   
