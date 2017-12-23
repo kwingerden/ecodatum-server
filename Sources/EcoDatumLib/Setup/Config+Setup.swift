@@ -27,7 +27,9 @@ extension Config {
     // The order of the following preparations matters!!
     preparations.append(User.self)
     
+    preparations.append(AbioticFactor.self)
     preparations.append(Image.self)
+    preparations.append(MeasurementUnit.self)
     preparations.append(Organization.self)
     preparations.append(Role.self)
     preparations.append(Site.self)

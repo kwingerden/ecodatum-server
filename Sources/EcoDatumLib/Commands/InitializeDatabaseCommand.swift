@@ -52,14 +52,25 @@ public final class InitializeDatabaseCommand: Command {
 
     }
 
-    // Set the organization roles
-    try [
-      Role.RoleType.ADMINISTRATOR,
-      Role.RoleType.MEMBER
-      ].forEach {
-        let role = Role(roleId: $0.rawValue, roleType: $0)
+    // Abiotic Factors
+    try AbioticFactor.Name.all.forEach {
+        let abioticFactor = AbioticFactor(name: $0)
+        try abioticFactor.save()
+        console.print("Successfully created abiotic factor \($0).")
+    }
+
+    // Measurement Units
+    try MeasurementUnit.Name.all.forEach {
+        let measurementUnit = MeasurementUnit(name: $0)
+        try measurementUnit.save()
+        console.print("Successfully created measurement unit \($0).")
+    }
+
+    // Roles
+    try Role.Name.all.forEach {
+        let role = Role(name: $0)
         try role.save()
-        console.print("Successfully create role \($0).")
+        console.print("Successfully created role \($0).")
     }
     
   }

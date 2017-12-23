@@ -2,14 +2,18 @@ import Vapor
 import FluentProvider
 import HTTP
 
-final class Role: Model {
+final class MeasurementUnit: Model {
   
   enum Name: String {
-    case ADMINISTRATOR
-    case MEMBER
+    case ACIDITY_PH
+    case CARBON_DIOXIDE_PPM
+    case LIGHT_INTENSITY_LUX
+    case TEMPERATURE_CELCIUS
     static let all: [Name] = [
-      .ADMINISTRATOR,
-      .MEMBER
+      .ACIDITY_PH,
+      .CARBON_DIOXIDE_PPM,
+      .LIGHT_INTENSITY_LUX,
+      .TEMPERATURE_CELCIUS
     ]
   }
   
@@ -44,7 +48,7 @@ final class Role: Model {
 
 // MARK: Preparation
 
-extension Role: Preparation {
+extension MeasurementUnit: Preparation {
   
   static func prepare(_ database: Database) throws {
     try database.create(self) {
@@ -65,7 +69,7 @@ extension Role: Preparation {
 
 // MARK: JSON
 
-extension Role: JSONConvertible {
+extension MeasurementUnit: JSONConvertible {
   
   convenience init(json: JSON) throws {
     guard let name = Name(rawValue: try json.get(Keys.name)) else {
@@ -85,7 +89,7 @@ extension Role: JSONConvertible {
 
 // MARK: HTTP
 
-extension Role: ResponseRepresentable { }
+extension MeasurementUnit: ResponseRepresentable { }
 
 
 

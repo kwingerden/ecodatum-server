@@ -2,14 +2,16 @@ import Vapor
 import FluentProvider
 import HTTP
 
-final class Role: Model {
+final class AbioticFactor: Model {
   
   enum Name: String {
-    case ADMINISTRATOR
-    case MEMBER
+    case AIR
+    case SOIL
+    case WATER
     static let all: [Name] = [
-      .ADMINISTRATOR,
-      .MEMBER
+      .AIR,
+      .SOIL,
+      .WATER
     ]
   }
   
@@ -44,7 +46,7 @@ final class Role: Model {
 
 // MARK: Preparation
 
-extension Role: Preparation {
+extension AbioticFactor: Preparation {
   
   static func prepare(_ database: Database) throws {
     try database.create(self) {
@@ -65,7 +67,7 @@ extension Role: Preparation {
 
 // MARK: JSON
 
-extension Role: JSONConvertible {
+extension AbioticFactor: JSONConvertible {
   
   convenience init(json: JSON) throws {
     guard let name = Name(rawValue: try json.get(Keys.name)) else {
@@ -85,7 +87,7 @@ extension Role: JSONConvertible {
 
 // MARK: HTTP
 
-extension Role: ResponseRepresentable { }
+extension AbioticFactor: ResponseRepresentable { }
 
 
 
