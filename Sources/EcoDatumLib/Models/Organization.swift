@@ -12,22 +12,16 @@ final class Organization: Model {
   // The unique alphanumeric code assigned to the organization
   let code: String
   
-  // The identifier of the user to which this organization belongs
-  let userId: Identifier
-  
   struct Keys {
     static let id = "id"
     static let name = "name"
     static let code = "code"
-    static let userId = User.foreignIdKey
   }
   
   init(name: String,
-       code: String,
-       userId: Identifier) {
+       code: String) {
     self.name = name
     self.code = code
-    self.userId = userId
   }
   
   // MARK: Row
@@ -35,14 +29,12 @@ final class Organization: Model {
   init(row: Row) throws {
     name = try row.get(Keys.name)
     code = try row.get(Keys.code)
-    userId = try row.get(Keys.userId)
   }
   
   func makeRow() throws -> Row {
     var row = Row()
     try row.set(Keys.name, name)
     try row.set(Keys.code, code)
-    try row.set(Keys.userId, userId)
     return row
   }
 }
@@ -65,25 +57,11 @@ extension Organization: Preparation {
         length: 6,
         optional: false,
         unique: true)
-      builder.foreignId(
-        for: User.self,
-        optional: false,
-        unique: false)
     }
   }
   
   static func revert(_ database: Database) throws {
     try database.delete(self)
-  }
-  
-}
-
-// MARK: Relations
-
-extension Organization {
-  
-  var user: Parent<Organization, User> {
-    return parent(id: userId)
   }
   
 }
@@ -94,8 +72,7 @@ extension Organization: JSONConvertible {
   
   convenience init(json: JSON) throws {
     self.init(name: try json.get(Keys.name),
-              code: try json.get(Keys.code),
-              userId: try json.get(Keys.userId))
+              code: try json.get(Keys.code))
   }
   
   func makeJSON() throws -> JSON {
@@ -103,7 +80,6 @@ extension Organization: JSONConvertible {
     try json.set(Keys.id, id)
     try json.set(Keys.name, name)
     try json.set(Keys.code, code)
-    try json.set(Keys.userId, userId)
     return json
   }
   
@@ -132,7 +108,4 @@ extension Organization: Updateable {
   
 }
 
-// MARK: DELETE
-
-extension Organization: SoftDeletable { }
 

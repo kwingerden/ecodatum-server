@@ -10,26 +10,46 @@ final class Site: Model {
   
   let description: String?
   
-  let userId: Identifier
+  let latitude: Double
   
-  let locationId: Identifier
+  let longitude: Double
+  
+  let altitude: Double?
+  
+  let horizontalAccuracy: Double?
+  
+  let verticalAccuracy: Double?
+  
+  let organizationId: Identifier
   
   struct Keys {
     static let id = "id"
     static let name = "name"
     static let description = "description"
-    static let userId = User.foreignIdKey
-    static let locationId = Location.foreignIdKey
+    static let latitude = "latitude"
+    static let longitude = "longitude"
+    static let altitude = "altitude"
+    static let horizontalAccuracy = "horizontal_accuracy"
+    static let verticalAccuracy = "vertical_accuracy"
+    static let organizationId = Organization.foreignIdKey
   }
   
   init(name: String,
        description: String? = nil,
-       userId: Identifier,
-       locationId: Identifier) {
+       latitude: Double,
+       longitude: Double,
+       altitude: Double?,
+       horizontalAccuracy: Double?,
+       verticalAccuracy: Double?,
+       organizationId: Identifier) {
     self.name = name
     self.description = description
-    self.userId = userId
-    self.locationId = locationId
+    self.latitude = latitude
+    self.longitude = longitude
+    self.altitude = altitude
+    self.horizontalAccuracy = horizontalAccuracy
+    self.verticalAccuracy = verticalAccuracy
+    self.organizationId = organizationId
   }
   
   // MARK: Row
@@ -37,16 +57,24 @@ final class Site: Model {
   init(row: Row) throws {
     name = try row.get(Keys.name)
     description = try row.get(Keys.description)
-    userId = try row.get(Keys.userId)
-    locationId = try row.get(Keys.locationId)
+    latitude = try row.get(Keys.latitude)
+    longitude = try row.get(Keys.longitude)
+    altitude = try row.get(Keys.altitude)
+    horizontalAccuracy = try row.get(Keys.horizontalAccuracy)
+    verticalAccuracy = try row.get(Keys.verticalAccuracy)
+    organizationId = try row.get(Keys.organizationId)
   }
   
   func makeRow() throws -> Row {
     var row = Row()
     try row.set(Keys.name, name)
     try row.set(Keys.description, description)
-    try row.set(Keys.userId, userId)
-    try row.set(Keys.locationId, locationId)
+    try row.set(Keys.latitude, latitude)
+    try row.set(Keys.longitude, longitude)
+    try row.set(Keys.altitude, altitude)
+    try row.set(Keys.horizontalAccuracy, horizontalAccuracy)
+    try row.set(Keys.verticalAccuracy, verticalAccuracy)
+    try row.set(Keys.organizationId, organizationId)
     return row
   }
 
@@ -70,12 +98,28 @@ extension Site: Preparation {
         length: 500,
         optional: true,
         unique: false)
-      builder.foreignId(
-        for: User.self,
+      builder.double(
+        Keys.latitude,
         optional: false,
         unique: false)
+      builder.double(
+        Keys.longitude,
+        optional: false,
+        unique: false)
+      builder.double(
+        Keys.altitude,
+        optional: true,
+        unique: false)
+      builder.double(
+        Keys.horizontalAccuracy,
+        optional: true,
+        unique: false)
+      builder.double(
+        Keys.verticalAccuracy,
+        optional: true,
+        unique: false)
       builder.foreignId(
-        for: Location.self,
+        for: Organization.self,
         optional: false,
         unique: false)
     }
@@ -91,12 +135,8 @@ extension Site: Preparation {
 
 extension Site {
   
-  var user: Parent<Site, User> {
-    return parent(id: userId)
-  }
-  
-  var location: Parent<Site, Location> {
-    return parent(id: locationId)
+  var organization: Parent<Site, Organization> {
+    return parent(id: organizationId)
   }
   
 }
@@ -108,8 +148,12 @@ extension Site: JSONConvertible {
   convenience init(json: JSON) throws {
     self.init(name: try json.get(Keys.name),
               description: try json.get(Keys.description),
-              userId: try json.get(Keys.userId),
-              locationId: try json.get(Keys.locationId))
+              latitude: try json.get(Keys.latitude),
+              longitude: try json.get(Keys.longitude),
+              altitude: try json.get(Keys.altitude),
+              horizontalAccuracy: try json.get(Keys.horizontalAccuracy),
+              verticalAccuracy: try json.get(Keys.verticalAccuracy),
+              organizationId: try json.get(Keys.organizationId))
   }
   
   func makeJSON() throws -> JSON {
@@ -117,8 +161,12 @@ extension Site: JSONConvertible {
     try json.set(Keys.id, id)
     try json.set(Keys.name, name)
     try json.set(Keys.description, description)
-    try json.set(Keys.userId, userId)
-    try json.set(Keys.locationId, locationId)
+    try json.set(Keys.latitude, latitude)
+    try json.set(Keys.longitude, longitude)
+    try json.set(Keys.altitude, altitude)
+    try json.set(Keys.horizontalAccuracy, horizontalAccuracy)
+    try json.set(Keys.verticalAccuracy, verticalAccuracy)
+    try json.set(Keys.organizationId, organizationId)
     return json
   }
   
@@ -132,9 +180,6 @@ extension Site: ResponseRepresentable { }
 
 extension Site: Timestampable { }
 
-// MARK: SoftDeletable
-
-extension Site: SoftDeletable { }
 
 
 

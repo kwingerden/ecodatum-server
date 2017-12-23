@@ -97,8 +97,5 @@ extension Role: ResponseRepresentable { }
 
 extension Role: Timestampable { }
 
-// MARK: DELETE
-
-extension Role: SoftDeletable { }
 
 

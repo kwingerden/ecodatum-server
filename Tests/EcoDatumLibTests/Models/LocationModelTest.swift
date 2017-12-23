@@ -11,13 +11,15 @@ class LocationModelTest: TestCase {
   
   func test() throws {
     
+    /*
     let location = Location(latitude: 1.2,
                             longitude: 4.5,
                             altitude: 100.4,
                             horizontalAccuracy: 3.0,
                             verticalAccuracy: 5.0)
     try location.save()
-    
+    */
+ 
   }
   
 }

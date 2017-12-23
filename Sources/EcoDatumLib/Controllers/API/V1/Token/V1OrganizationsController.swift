@@ -12,6 +12,8 @@ final class V1OrganizationsController: ResourceRepresentable {
   // GET /organizations
   func index(_ request: Request) throws -> ResponseRepresentable {
     
+    return try Organization.all().makeJSON()
+    /*
     if try request.checkRootUser() {
       return try Organization.all().makeJSON()
     } else {
@@ -21,6 +23,7 @@ final class V1OrganizationsController: ResourceRepresentable {
         .all()
         .makeJSON()
     }
+ */
     
   }
   
@@ -42,8 +45,7 @@ final class V1OrganizationsController: ResourceRepresentable {
     
     let userId = try request.user().assertExists()
     let organization = Organization(name: name,
-                                    code: String(randomUpperCaseAlphaNumericLength: 6),
-                                    userId: userId)
+                                    code: String(randomUpperCaseAlphaNumericLength: 6))
     try organization.save()
     
     return organization

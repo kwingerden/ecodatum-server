@@ -127,8 +127,5 @@ extension Image: ResponseRepresentable { }
 
 extension Image: Timestampable { }
 
-// MARK: SoftDeletable
-
-extension Image: SoftDeletable { }
 
 
