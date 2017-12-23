@@ -25,18 +25,24 @@ extension Config {
   private func setupPreparations() throws {
     
     // The order of the following preparations matters!!
+    preparations.append(Organization.self)
+    preparations.append(Site.self)
+    preparations.append(Survey.self)
     preparations.append(User.self)
     
     preparations.append(AbioticFactor.self)
-    preparations.append(Image.self)
+    preparations.append(ImageType.self)
     preparations.append(MeasurementUnit.self)
-    preparations.append(Organization.self)
     preparations.append(Role.self)
-    preparations.append(Site.self)
-    preparations.append(Survey.self)
+    
+    preparations.append(Image.self)
+    preparations.append(Note.self)
     preparations.append(Token.self)
     preparations.append(UserOrganizationRole.self)
   
+    // The order of the following preparations matters!!
+    preparations.append(Measurement.self)
+    
   }
   
 }

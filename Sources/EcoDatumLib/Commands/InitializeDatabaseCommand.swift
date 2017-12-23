@@ -65,6 +65,13 @@ public final class InitializeDatabaseCommand: Command {
         try measurementUnit.save()
         console.print("Successfully created measurement unit \($0).")
     }
+    
+    // Image Types
+    try ImageType.Name.all.forEach {
+      let imageType = ImageType(name: $0)
+      try imageType.save()
+      console.print("Successfully created image type \($0).")
+    }
 
     // Roles
     try Role.Name.all.forEach {

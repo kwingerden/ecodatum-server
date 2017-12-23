@@ -6,17 +6,17 @@ enum AbioticFactor {
   WATER
 }
 
-enum MeasurementType {
-  CO2_GAS (parts per million 0 to 100,000)
-  TEMPERATURE (degrees Celcius –40 to 135°C)
-  PH (values 0 to 14)
-  LUX (values 0 to 150,000)
+enum MeasurementUnit {
+  ACIDITY_PH (0..14)
+  CARBON_DIOXIDE_PPM (0..100,000)
+  LIGHT_INTENSITY_LUX (0..150,000)
+  TEMPERATURE_CELCIUS (-270..1000)
 }
 
 class Measurement {
   abioticFactor: AbioticFactor
   value: Double
-  type: MeasurementType
+  type: MeasurementUnit
 }
 
 class Note {
@@ -48,6 +48,8 @@ class Site {
   latitude: Double
   longitude: Double
   altitude: Double
+  horizontalAccuracy: Double
+  verticalAccuracy: Double
 }
 
 class User {
@@ -61,7 +63,7 @@ User ..> Site: defines
 User ..> Survey: takes
 
 Measurement -- AbioticFactor
-Measurement -- MeasurementType
+Measurement -- MeasurementUnit
 
 User "0" o-- "*" Organization: belongs
 (User, Organization) .. Role

@@ -43,7 +43,7 @@ final class V1OrganizationsController: ResourceRepresentable {
       throw Abort(.badRequest, reason: "Organization must have a name.")
     }
     
-    let userId = try request.user().assertExists()
+    //let userId = try request.user().assertExists()
     let organization = Organization(name: name,
                                     code: String(randomUpperCaseAlphaNumericLength: 6))
     try organization.save()

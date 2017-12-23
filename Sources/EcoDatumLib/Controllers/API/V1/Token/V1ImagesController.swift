@@ -14,6 +14,9 @@ final class V1ImagesController: ResourceRepresentable {
   // GET /images
   func index(_ request: Request) throws -> ResponseRepresentable {
     
+    return try Image.all().makeJSON()
+    
+    /*
     if try request.checkRootUser() {
       return try Image.all().makeJSON()
     } else {
@@ -23,6 +26,7 @@ final class V1ImagesController: ResourceRepresentable {
         .all()
         .makeJSON()
     }
+    */
     
   }
   
@@ -30,17 +34,21 @@ final class V1ImagesController: ResourceRepresentable {
   func show(_ request: Request,
             _ image: Image) throws -> ResponseRepresentable {
     
+    /*
     try assertUserOwnsImageOrIsAdmin(request, image)
     let base64Encoded = try loadImage(image.uuid, image.imageType)
     var json = try image.makeJSON()
     try json.set(Image.Keys.base64Encoded, base64Encoded)
     return json
+    */
+    return JSON()
     
   }
   
   // POST /images
   func store(_ request: Request) throws -> ResponseRepresentable {
     
+    /*
     let json = try request.assertJson()
     guard let base64Encoded: String = try json.get(Image.Keys.base64Encoded),
       let imageTypeInt: Int = try json.get(Image.Keys.imageType),
@@ -54,6 +62,8 @@ final class V1ImagesController: ResourceRepresentable {
     try image.save()
     
     return image
+    */
+    return JSON()
     
   }
   
@@ -76,6 +86,7 @@ final class V1ImagesController: ResourceRepresentable {
     
   }
   
+  /*
   private func saveImage(_ base64Encoded: String,
                          _ imageType: Image.ImageType) throws -> String {
     
@@ -110,6 +121,7 @@ final class V1ImagesController: ResourceRepresentable {
     }
   
   }
+ */
   
 }
 

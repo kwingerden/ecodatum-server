@@ -1,45 +1,37 @@
-import FluentProvider
-import Foundation
-import HTTP
 import Vapor
+import FluentProvider
+import HTTP
 
-final class Image: Model {
+final class Note: Model {
   
   let storage = Storage()
   
-  let base64Encoded: String
-  
-  let imageTypeId: Identifier
+  var note: String
   
   let surveyId: Identifier
   
   struct Keys {
     static let id = "id"
-    static let base64Encoded = "base64_encoded"
-    static let imageTypeId = ImageType.foreignIdKey
+    static let note = "note"
     static let surveyId = Survey.foreignIdKey
   }
   
-  init(base64Encoded: String,
-       imageTypeId: Identifier,
+  init(note: String,
        surveyId: Identifier) {
-    self.base64Encoded = base64Encoded
-    self.imageTypeId = imageTypeId
+    self.note = note
     self.surveyId = surveyId
   }
   
   // MARK: Row
   
   init(row: Row) throws {
-    base64Encoded = try row.get(Keys.base64Encoded)
-    imageTypeId = try row.get(Keys.imageTypeId)
+    note = try row.get(Keys.note)
     surveyId = try row.get(Keys.surveyId)
   }
   
   func makeRow() throws -> Row {
     var row = Row()
-    try row.set(Keys.base64Encoded, base64Encoded)
-    try row.set(Keys.imageTypeId, imageTypeId)
+    try row.set(Keys.note, note)
     try row.set(Keys.surveyId, surveyId)
     return row
   }
@@ -48,19 +40,15 @@ final class Image: Model {
 
 // MARK: Preparation
 
-extension Image: Preparation {
+extension Note: Preparation {
   
   static func prepare(_ database: Database) throws {
     try database.create(self) {
       builder in
       builder.id()
       builder.custom(
-        Keys.base64Encoded,
+        Keys.note,
         type: "TEXT",
-        optional: false,
-        unique: false)
-      builder.foreignId(
-        for: ImageType.self,
         optional: false,
         unique: false)
       builder.foreignId(
@@ -78,46 +66,42 @@ extension Image: Preparation {
 
 // MARK: Relations
 
-extension Image {
+extension Note {
   
-  var imageType: Parent<Image, ImageType> {
-    return parent(id: imageTypeId)
-  }
-  
-  var survey: Parent<Image, Survey> {
+  var survey: Parent<Note, Survey> {
     return parent(id: surveyId)
   }
   
 }
 
+
 // MARK: JSONConvertible
 
-extension Image: JSONConvertible {
+extension Note: JSONConvertible {
   
   convenience init(json: JSON) throws {
-    self.init(base64Encoded: try json.get(Keys.base64Encoded),
-              imageTypeId: try json.get(Keys.imageTypeId),
+    self.init(note: try json.get(Keys.note),
               surveyId: try json.get(Keys.surveyId))
   }
   
   func makeJSON() throws -> JSON {
     var json = JSON()
     try json.set(Keys.id, id)
-    try json.set(Keys.base64Encoded, base64Encoded)
-    try json.set(Keys.imageTypeId, imageTypeId)
+    try json.set(Keys.note, note)
     try json.set(Keys.surveyId, surveyId)
     return json
   }
   
 }
 
-// MARK: ResponseRepresentable
+// MARK: HTTP
 
-extension Image: ResponseRepresentable { }
+extension Note: ResponseRepresentable { }
 
-// MARK: Timestampable
+// MARK: TIMESTAMP
 
-extension Image: Timestampable { }
+extension Note: Timestampable { }
+
 
 
 
