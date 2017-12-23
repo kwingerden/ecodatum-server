@@ -12,7 +12,7 @@
     "file"
   ],
   "commands": [
-    "create-root-user",
+    "initialize-database",
     "prepare"
   ]
 }

@@ -2,5 +2,6 @@
 
 ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 pushd $ROOT_DIR
-vapor run create-root-user --env=development
+vapor run prepare --env=test
+vapor run initialize-database --env=test
 popd
