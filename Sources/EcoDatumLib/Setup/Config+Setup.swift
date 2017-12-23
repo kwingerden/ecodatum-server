@@ -30,6 +30,7 @@ extension Config {
     preparations.append(Image.self)
     preparations.append(Location.self)
     preparations.append(Organization.self)
+    preparations.append(Role.self)
     preparations.append(Site.self)
     preparations.append(Token.self)
   
