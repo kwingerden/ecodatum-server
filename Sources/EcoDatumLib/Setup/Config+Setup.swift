@@ -33,6 +33,7 @@ extension Config {
     preparations.append(Role.self)
     preparations.append(Site.self)
     preparations.append(Token.self)
+    preparations.append(UserOrganizationRole.self)
   
   }
   
