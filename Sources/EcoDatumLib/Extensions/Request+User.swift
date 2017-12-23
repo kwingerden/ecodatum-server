@@ -14,22 +14,22 @@ extension Request {
     return try auth.assertAuthenticated()
   }
   
-  func checkUserIsAdmin() throws -> Bool {
-    return try user().isAdmin
+  func checkRootUser() throws -> Bool {
+    return try user().id?.int == Constants.ROOT_USER_ID
   }
   
-  func assertUserIsAdmin() throws {
-    if try !checkUserIsAdmin() {
+  func assertRootUser() throws {
+    if try !checkRootUser() {
       throw Abort(.unauthorized)
     }
   }
   
-  func checktRequestUserIsUser(_ user: User) throws -> Bool {
+  func checktUserRequest(_ user: User) throws -> Bool {
     return try self.user().id == user.id
   }
   
-  func assertRequestUserIsUser(_ user: User) throws {
-    if try !checktRequestUserIsUser(user) {
+  func assertUserRequest(_ user: User) throws {
+    if try !checktUserRequest(user) {
       throw Abort(.unauthorized)
     }
   }

@@ -32,11 +32,9 @@ public final class CreateRootUserCommand: Command {
       return
     }
     
-    let user = User(name: name,
-                    email: email,
-                    password: password,
-                    isAdmin: true)
+    let user = User(name: name, email: email, password: password)
     try user.save()
+    
     console.print("Successfully create the root user.")
     
   }

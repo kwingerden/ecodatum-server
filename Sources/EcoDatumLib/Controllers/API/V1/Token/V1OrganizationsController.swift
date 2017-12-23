@@ -12,7 +12,7 @@ final class V1OrganizationsController: ResourceRepresentable {
   // GET /organizations
   func index(_ request: Request) throws -> ResponseRepresentable {
     
-    if try request.checkUserIsAdmin() {
+    if try request.checkRootUser() {
       return try Organization.all().makeJSON()
     } else {
       return try Organization
@@ -76,7 +76,7 @@ final class V1OrganizationsController: ResourceRepresentable {
   // DELETE /organizations
   func clear(_ request: Request) throws -> ResponseRepresentable {
     
-    try request.assertUserIsAdmin()
+    try request.assertRootUser()
     try Organization.makeQuery().delete()
     
     return Response(status: .ok)
@@ -98,8 +98,8 @@ final class V1OrganizationsController: ResourceRepresentable {
     _ organization: Organization) throws {
     
     let userOwnsOrganization = try request.checkUserOwnsOrganization(organization)
-    let userIsAdmin = try request.checkUserIsAdmin()
-    if userOwnsOrganization || userIsAdmin {
+    let isRootUser = try request.checkRootUser()
+    if userOwnsOrganization || isRootUser {
       // Do nothing
     } else {
       throw Abort(.unauthorized)

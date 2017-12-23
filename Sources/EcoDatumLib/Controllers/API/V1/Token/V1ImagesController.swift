@@ -14,7 +14,7 @@ final class V1ImagesController: ResourceRepresentable {
   // GET /images
   func index(_ request: Request) throws -> ResponseRepresentable {
     
-    if try request.checkUserIsAdmin() {
+    if try request.checkRootUser() {
       return try Image.all().makeJSON()
     } else {
       return try Image
@@ -67,8 +67,8 @@ final class V1ImagesController: ResourceRepresentable {
   private func assertUserOwnsImageOrIsAdmin(_ request: Request, _ image: Image) throws {
     
     let userOwnsImage = try request.checkUserOwnsImage(image)
-    let userIsAdmin = try request.checkUserIsAdmin()
-    if userOwnsImage || userIsAdmin {
+    let isRootUser = try request.checkRootUser()
+    if userOwnsImage || isRootUser {
       // Do nothing
     } else {
       throw Abort(.unauthorized)

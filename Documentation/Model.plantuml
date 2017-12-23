@@ -13,19 +13,10 @@ enum MeasurementType {
   LUX (values 0 to 150,000)
 }
 
-class Location {
-  latitude: Double
-  longitude: Double
-  altitude: Double
-  horizontalAccuracy: Double
-  verticalAccuracy: Double
-}
-
 class Measurement {
   abioticFactor: AbioticFactor
   value: Double
   type: MeasurementType
-  date: Date
 }
 
 class Note {
@@ -34,6 +25,7 @@ class Note {
 
 class Organization {
   name: String
+  description: String
   code: String
 }
 
@@ -41,24 +33,44 @@ class Photo {
   base64: String
 }
 
+enum Role {
+  OWNER
+  MEMBER
+}
+
+class Survey {
+  date: Date 
+}
+
 class Site {
   name: String
   description: String
+  latitude: Double
+  longitude: Double
+  altitude: Double
 }
 
 class User {
   name: String
   email: String
   password: String
-  isAdmin: Bool
 }
 
-User "0" o-- "*" Site : creates
-User "1" o-- "*" Organization : belongs
+User ..> Organization: creates
+User ..> Site: defines
+User ..> Survey: takes
 
-Site "1" *-- "1" Location
-Site "0" *-- "*" Note
-Site "1" *-- "*" Photo
-Site "1" *-- "*" Measurement
+Measurement -- AbioticFactor
+Measurement -- MeasurementType
+
+User "0" o-- "*" Organization: belongs
+(User, Organization) .. Role
+Organization "0" *-- "*" Site
+
+Site "0" *-- "*" Survey
+
+Survey "0" *-- "*" Note
+Survey "0" *-- "*" Photo
+Survey "0" *-- "*" Measurement
 
 @enduml

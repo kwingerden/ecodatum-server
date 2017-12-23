@@ -2,6 +2,8 @@ import HTTP
 
 struct Constants {
   
+  static let ROOT_USER_ID = 1
+  
   static let AUTHORIZATION_HEADER_KEY: HeaderKey = HeaderKey("Authorization")
   static let CONTENT_TYPE_HEADER_KEY: HeaderKey = HeaderKey("Content-Type")
   

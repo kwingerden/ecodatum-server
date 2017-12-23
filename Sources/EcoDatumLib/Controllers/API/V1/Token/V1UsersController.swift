@@ -12,7 +12,7 @@ final class V1UsersController: ResourceRepresentable {
   // GET /users
   func index(_ request: Request) throws -> ResponseRepresentable {
     
-    try request.assertUserIsAdmin()
+    try request.assertRootUser()
     return try User.all().makeJSON()
   
   }
@@ -29,7 +29,7 @@ final class V1UsersController: ResourceRepresentable {
   // POST /users
   func store(_ request: Request) throws -> ResponseRepresentable {
     
-    try request.assertUserIsAdmin()
+    try request.assertRootUser()
     
     let user = try User(json: try request.assertJson())
     user.password = try drop.hash.make(user.password.makeBytes()).makeString()
@@ -47,9 +47,9 @@ final class V1UsersController: ResourceRepresentable {
   
   private func assertRequestUserIsUserOrIsAdmin(_ request: Request, _ user: User) throws {
     
-    let requestUserIsUser = try request.checktRequestUserIsUser(user)
-    let userIsAdmin = try request.checkUserIsAdmin()
-    if requestUserIsUser || userIsAdmin {
+    let requestUserIsUser = try request.checktUserRequest(user)
+    let isRootUser = try request.checkRootUser()
+    if requestUserIsUser || isRootUser {
       // Do nothing
     } else {
       throw Abort(.unauthorized)
