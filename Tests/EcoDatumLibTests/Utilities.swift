@@ -13,14 +13,14 @@ extension Droplet {
     try config.setup()
     
     config.addConfigurable(
-      command: CreateRootUserCommand.init,
-      name: "create-root-user")
+      command: InitializeDatabaseCommand.init,
+      name: "initialize-database")
     
     let drop = try Droplet(config)
     try drop.setup()
     drop.log.info("Testable Droplet has been initialized.")
     
-    try CreateRootUserCommand(config: config).run(arguments: [])
+    try InitializeDatabaseCommand(config: config).run(arguments: [])
     
     return drop
   
@@ -47,4 +47,42 @@ class TestCase: XCTestCase {
   }
   
 }
+
+func createTestUser(_ modelManager: ModelManager) throws -> User {
+  
+  let randomString = String(randomUpperCaseAlphaNumericLength: 10)
+  return try modelManager.createUser(
+    name: "TestUser-\(randomString)",
+    email: "test.\(randomString)@test.com",
+    password: randomString)
+
+}
+
+func createTestOrganization(_ modelManager: ModelManager, _ user: User) throws -> Organization {
+  
+  let randomString = String(randomUpperCaseAlphaNumericLength: 10)
+  return try modelManager.createOrganization(
+    user: user,
+    name: randomString,
+    code: String(randomUpperCaseAlphaNumericLength: Organization.CODE_LENGTH))
+
+}
+
+func createTestSite(_ modelManager: ModelManager,
+                    _ user: User,
+                    _ organization: Organization) throws -> Site {
+  
+  let randomString = String(randomUpperCaseAlphaNumericLength: 10)
+  return try modelManager.createSite(
+    name: randomString,
+    latitude: 3.455,
+    longitude: -234.22,
+    altitude: 45.22,
+    horizontalAccuracy: 23.5,
+    verticalAccuracy: 3.6,
+    user: user,
+    organization: organization)
+
+}
+
 

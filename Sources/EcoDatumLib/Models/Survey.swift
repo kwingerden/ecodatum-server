@@ -9,17 +9,22 @@ final class Survey: Model {
   let date: Date
   
   let siteId: Identifier
+
+  let userId: Identifier
  
   struct Keys {
     static let id = "id"
     static let date = "date"
     static let siteId = Site.foreignIdKey
+    static let userId = User.foreignIdKey
   }
   
   init(date: Date,
-       siteId: Identifier) {
+       siteId: Identifier,
+       userId: Identifier) {
     self.date = date
     self.siteId = siteId
+    self.userId = userId
   }
   
   // MARK: Row
@@ -27,12 +32,14 @@ final class Survey: Model {
   init(row: Row) throws {
     date = try row.get(Keys.date)
     siteId = try row.get(Keys.siteId)
+    userId = try row.get(Keys.userId)
   }
   
   func makeRow() throws -> Row {
     var row = Row()
     try row.set(Keys.date, date)
     try row.set(Keys.siteId, siteId)
+    try row.set(Keys.userId, userId)
     return row
   }
   
@@ -54,6 +61,10 @@ extension Survey: Preparation {
         for: Site.self,
         optional: false,
         unique: false)
+      builder.foreignId(
+        for: User.self,
+        optional: false,
+        unique: false)
     }
   }
   
@@ -67,6 +78,10 @@ extension Survey: Preparation {
 
 extension Survey {
   
+  var user: Parent<Survey,User> {
+    return parent(id: userId)
+  }
+
   var site: Parent<Survey, Site> {
     return parent(id: siteId)
   }
@@ -91,7 +106,8 @@ extension Survey: JSONConvertible {
   
   convenience init(json: JSON) throws {
     self.init(date: try json.get(Keys.date),
-              siteId: try json.get(Keys.siteId))
+              siteId: try json.get(Keys.siteId),
+              userId: try json.get(Keys.userId))
   }
   
   func makeJSON() throws -> JSON {
@@ -99,6 +115,7 @@ extension Survey: JSONConvertible {
     try json.set(Keys.id, id)
     try json.set(Keys.date, date)
     try json.set(Keys.siteId, siteId)
+    try json.set(Keys.userId, userId)
     return json
   }
   

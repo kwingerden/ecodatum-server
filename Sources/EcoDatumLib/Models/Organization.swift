@@ -4,6 +4,8 @@ import HTTP
 
 final class Organization: Model {
   
+  static let CODE_LENGTH = 6
+  
   let storage = Storage()
   
   // The name of the organization
@@ -66,7 +68,7 @@ extension Organization: Preparation {
         unique: false)
       builder.string(
         Keys.code,
-        length: 6,
+        length: CODE_LENGTH,
         optional: false,
         unique: true)
     }

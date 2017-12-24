@@ -70,10 +70,6 @@ class User {
   password: String
 }
 
-User ..> Organization: creates
-User ..> Site: defines
-User ..> Survey: takes
-
 Measurement -- AbioticFactor
 Measurement -- MeasurementUnit
 
@@ -81,7 +77,9 @@ Image -- ImageType
 
 User "0" o-- "*" Organization: belongs
 (User, Organization) .. Role
-User "0" *-- "*" Token
+User "0" *-- "*" Token: authenticates
+User "0" *-- "*" Site: defines
+User "0" *-- "*" Survey: takes
 
 Organization "0" *-- "*" Site
 

@@ -103,6 +103,14 @@ extension User {
   var userOrganizationRoles: Children<User, UserOrganizationRole> {
     return children()
   }
+  
+  var sites: Children<User, Site> {
+    return children()
+  }
+  
+  var surveys: Children<User, Survey> {
+    return children()
+  }
 
 }
 

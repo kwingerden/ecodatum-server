@@ -22,6 +22,7 @@ typealias TestImageFull = (id: Int, base64Encoded: String, uuid: String, imageTy
 
 extension Droplet {
   
+  /*
   func loginRootUser() throws -> String {
     
     guard let rootUser = config.wrapped.object?["app"]?["root-user"],
@@ -283,5 +284,6 @@ extension Droplet {
             userId: try json.get(Image.Keys.userId))
     
   }
+  */
   
 }

@@ -21,6 +21,8 @@ final class Site: Model {
   let verticalAccuracy: Double?
   
   let organizationId: Identifier
+
+  let userId: Identifier
   
   struct Keys {
     static let id = "id"
@@ -32,6 +34,7 @@ final class Site: Model {
     static let horizontalAccuracy = "horizontal_accuracy"
     static let verticalAccuracy = "vertical_accuracy"
     static let organizationId = Organization.foreignIdKey
+    static let userId = User.foreignIdKey
   }
   
   init(name: String,
@@ -41,7 +44,8 @@ final class Site: Model {
        altitude: Double?,
        horizontalAccuracy: Double?,
        verticalAccuracy: Double?,
-       organizationId: Identifier) {
+       organizationId: Identifier,
+       userId: Identifier) {
     self.name = name
     self.description = description
     self.latitude = latitude
@@ -50,6 +54,7 @@ final class Site: Model {
     self.horizontalAccuracy = horizontalAccuracy
     self.verticalAccuracy = verticalAccuracy
     self.organizationId = organizationId
+    self.userId = userId
   }
   
   // MARK: Row
@@ -63,6 +68,7 @@ final class Site: Model {
     horizontalAccuracy = try row.get(Keys.horizontalAccuracy)
     verticalAccuracy = try row.get(Keys.verticalAccuracy)
     organizationId = try row.get(Keys.organizationId)
+    userId = try row.get(Keys.userId)
   }
   
   func makeRow() throws -> Row {
@@ -75,6 +81,7 @@ final class Site: Model {
     try row.set(Keys.horizontalAccuracy, horizontalAccuracy)
     try row.set(Keys.verticalAccuracy, verticalAccuracy)
     try row.set(Keys.organizationId, organizationId)
+    try row.set(Keys.userId, userId)
     return row
   }
 
@@ -122,6 +129,10 @@ extension Site: Preparation {
         for: Organization.self,
         optional: false,
         unique: false)
+      builder.foreignId(
+        for: User.self,
+        optional: false,
+        unique: false)
     }
   }
   
@@ -135,6 +146,10 @@ extension Site: Preparation {
 
 extension Site {
   
+  var user: Parent<Site, User> {
+    return parent(id: userId)
+  }
+
   var organization: Parent<Site, Organization> {
     return parent(id: organizationId)
   }
@@ -157,7 +172,8 @@ extension Site: JSONConvertible {
               altitude: try json.get(Keys.altitude),
               horizontalAccuracy: try json.get(Keys.horizontalAccuracy),
               verticalAccuracy: try json.get(Keys.verticalAccuracy),
-              organizationId: try json.get(Keys.organizationId))
+              organizationId: try json.get(Keys.organizationId),
+              userId: try json.get(Keys.userId))
   }
   
   func makeJSON() throws -> JSON {
@@ -171,6 +187,7 @@ extension Site: JSONConvertible {
     try json.set(Keys.horizontalAccuracy, horizontalAccuracy)
     try json.set(Keys.verticalAccuracy, verticalAccuracy)
     try json.set(Keys.organizationId, organizationId)
+    try json.set(Keys.userId, userId)
     return json
   }
   
