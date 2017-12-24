@@ -139,6 +139,10 @@ extension Site {
     return parent(id: organizationId)
   }
   
+  var surveys: Children<Site, Survey> {
+    return children()
+  }
+
 }
 
 // MARK: JSONRepresentable

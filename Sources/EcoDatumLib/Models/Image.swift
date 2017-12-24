@@ -8,6 +8,8 @@ final class Image: Model {
   let storage = Storage()
   
   let base64Encoded: String
+
+  let description: String?
   
   let imageTypeId: Identifier
   
@@ -16,14 +18,17 @@ final class Image: Model {
   struct Keys {
     static let id = "id"
     static let base64Encoded = "base64_encoded"
+    static let description = "description"
     static let imageTypeId = ImageType.foreignIdKey
     static let surveyId = Survey.foreignIdKey
   }
   
   init(base64Encoded: String,
+       description: String? = nil,
        imageTypeId: Identifier,
        surveyId: Identifier) {
     self.base64Encoded = base64Encoded
+    self.description = description
     self.imageTypeId = imageTypeId
     self.surveyId = surveyId
   }
@@ -32,6 +37,7 @@ final class Image: Model {
   
   init(row: Row) throws {
     base64Encoded = try row.get(Keys.base64Encoded)
+    description = try row.get(Keys.description)
     imageTypeId = try row.get(Keys.imageTypeId)
     surveyId = try row.get(Keys.surveyId)
   }
@@ -39,6 +45,7 @@ final class Image: Model {
   func makeRow() throws -> Row {
     var row = Row()
     try row.set(Keys.base64Encoded, base64Encoded)
+    try row.set(Keys.description, description)
     try row.set(Keys.imageTypeId, imageTypeId)
     try row.set(Keys.surveyId, surveyId)
     return row
@@ -58,6 +65,11 @@ extension Image: Preparation {
         Keys.base64Encoded,
         type: "TEXT",
         optional: false,
+        unique: false)
+      builder.string(
+        Keys.description,
+        length: 500,
+        optional: true,
         unique: false)
       builder.foreignId(
         for: ImageType.self,
@@ -96,6 +108,7 @@ extension Image: JSONConvertible {
   
   convenience init(json: JSON) throws {
     self.init(base64Encoded: try json.get(Keys.base64Encoded),
+              description: try json.get(Keys.description),
               imageTypeId: try json.get(Keys.imageTypeId),
               surveyId: try json.get(Keys.surveyId))
   }
@@ -104,6 +117,7 @@ extension Image: JSONConvertible {
     var json = JSON()
     try json.set(Keys.id, id)
     try json.set(Keys.base64Encoded, base64Encoded)
+    try json.set(Keys.description, description)
     try json.set(Keys.imageTypeId, imageTypeId)
     try json.set(Keys.surveyId, surveyId)
     return json

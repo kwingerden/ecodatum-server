@@ -1,21 +1,27 @@
 @startuml
 
 enum AbioticFactor {
-  AIR
-  SOIL
-  WATER
+  AIR = 1
+  SOIL = 2
+  WATER = 3
+}
+
+enum ImageType {
+  GIF = 1
+  JPEG = 2
+  PNG = 3
 }
 
 enum MeasurementUnit {
-  ACIDITY_PH (0..14)
-  CARBON_DIOXIDE_PPM (0..100,000)
-  LIGHT_INTENSITY_LUX (0..150,000)
-  TEMPERATURE_CELCIUS (-270..1000)
+  ACIDITY_PH (0..14) = 1
+  CARBON_DIOXIDE_PPM (0..100,000) = 2
+  LIGHT_INTENSITY_LUX (0..150,000) = 3
+  TEMPERATURE_CELCIUS (-270..1000) = 4
 }
 
 class Measurement {
-  abioticFactor: AbioticFactor
   value: Double
+  abioticFactor: AbioticFactor
   type: MeasurementUnit
 }
 
@@ -29,8 +35,10 @@ class Organization {
   code: String
 }
 
-class Photo {
-  base64: String
+class Image {
+  base64Encoded: String
+  description: String
+  imageType: ImageType
 }
 
 enum Role {
@@ -52,6 +60,10 @@ class Site {
   verticalAccuracy: Double
 }
 
+class Token {
+  token: String 
+}
+
 class User {
   name: String
   email: String
@@ -65,14 +77,18 @@ User ..> Survey: takes
 Measurement -- AbioticFactor
 Measurement -- MeasurementUnit
 
+Image -- ImageType
+
 User "0" o-- "*" Organization: belongs
 (User, Organization) .. Role
+User "0" *-- "*" Token
+
 Organization "0" *-- "*" Site
 
 Site "0" *-- "*" Survey
 
 Survey "0" *-- "*" Note
-Survey "0" *-- "*" Photo
+Survey "0" *-- "*" Image
 Survey "0" *-- "*" Measurement
 
 @enduml

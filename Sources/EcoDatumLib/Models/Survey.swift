@@ -71,9 +71,21 @@ extension Survey {
     return parent(id: siteId)
   }
   
+  var measurements: Children<Survey, Measurement> {
+    return children()
+  }
+
+  var notes: Children<Survey, Note> {
+    return children()
+  }
+
+  var images: Children<Survey, Image> {
+    return children()
+  }
+
 }
 
-// MARK: JSONRepresentable
+// MARK: JSONConvertible
 
 extension Survey: JSONConvertible {
   

@@ -57,12 +57,21 @@ extension User: Preparation {
     try database.create(self) {
       builder in
       builder.id()
-      builder.string(Keys.name)
+      builder.string(
+        Keys.name,
+        length: 30,
+        optional: false,
+        unique: false)
       builder.string(
         Keys.email,
         length: 255,
+        optional: false,
         unique: true)
-      builder.string(Keys.password)
+      builder.string(
+        Keys.password,
+        length: 255,
+        optional: false,
+        unique: false)
     }
   }
   
@@ -70,6 +79,31 @@ extension User: Preparation {
     try database.delete(self)
   }
   
+}
+
+// MARK: UPDATE
+
+extension User: Updateable {
+  
+  static var updateableKeys: [UpdateableKey<User>] {
+    return [
+      UpdateableKey(User.Keys.email, String.self) {
+        user, email in
+        user.email = email
+      }
+    ]
+  }
+  
+}
+
+// MARK: Relations
+
+extension User {
+  
+  var userOrganizationRoles: Children<User, UserOrganizationRole> {
+    return children()
+  }
+
 }
 
 // MARK: JSON
@@ -119,10 +153,6 @@ private var _userPasswordVerifier: PasswordVerifier? = nil
 // MARK: TIMESTAMP
 
 extension User: Timestampable { }
-
-// MARK: DELETE
-
-extension User: SoftDeletable { }
 
 // MARK: Token
 
