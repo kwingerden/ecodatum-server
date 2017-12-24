@@ -6,11 +6,11 @@ class ModelManager {
   
   let drop: Droplet
   
-  let rootUser: User
-  
   init(_ drop: Droplet) throws {
-    
     self.drop = drop
+  }
+  
+  func getRootUser() throws -> User {
     
     guard let rootUserConfig = drop.config.wrapped.object?["app"]?["root-user"],
       let rootUserName = rootUserConfig["name"]?.string,
@@ -23,15 +23,47 @@ class ModelManager {
         throw Abort(.expectationFailed)
     }
     
-    self.rootUser = rootUser
+    return rootUser
     
   }
   
   func getRole(_ connection: Connection? = nil,
                name: Role.Name) throws -> Role {
-    return try Role.makeQuery(connection)
+    
+    guard let role = try Role.makeQuery(connection)
       .filter(Role.Keys.name, .equals, name.rawValue)
-      .first()!
+      .first() else {
+        throw Abort(.expectationFailed)
+    }
+    
+    return role
+    
+  }
+  
+  func getAbioticFactor(_ connection: Connection? = nil,
+                        name: AbioticFactor.Name) throws -> AbioticFactor {
+    
+    guard let abioticFactor = try AbioticFactor.makeQuery(connection)
+      .filter(AbioticFactor.Keys.name, .equals, name.rawValue)
+      .first() else {
+        throw Abort(.expectationFailed)
+    }
+    
+    return abioticFactor
+    
+  }
+  
+  func getMeasurementUnit(_ connection: Connection? = nil,
+                          name: MeasurementUnit.Name) throws -> MeasurementUnit {
+    
+    guard let measurementUnit = try MeasurementUnit.makeQuery(connection)
+      .filter(MeasurementUnit.Keys.name, .equals, name.rawValue)
+      .first() else {
+        throw Abort(.expectationFailed)
+    }
+    
+    return measurementUnit
+    
   }
   
   func createUser(_ connection: Connection? = nil,
@@ -108,7 +140,7 @@ class ModelManager {
       .first() else {
         throw Abort(.expectationFailed)
     }
-
+    
     let site = Site(name: name,
                     latitude: latitude,
                     longitude: longitude,
@@ -120,6 +152,62 @@ class ModelManager {
     try Site.makeQuery(connection).save(site)
     
     return site
+    
+  }
+  
+  func createSurvey(_ connection: Connection? = nil,
+                    date: Date,
+                    site: Site,
+                    user: User) throws -> Survey {
+    
+    guard let userId = user.id,
+      let siteId = site.id else {
+        throw Abort(.expectationFailed)
+    }
+    
+    guard let _ = try UserOrganizationRole.makeQuery(connection)
+      .filter(UserOrganizationRole.Keys.organizationId, .equals, site.organizationId)
+      .filter(UserOrganizationRole.Keys.userId, .equals, userId)
+      .first() else {
+        throw Abort(.expectationFailed)
+    }
+    
+    let survey = Survey(date: date, siteId: siteId, userId: userId)
+    try Survey.makeQuery(connection).save(survey)
+    
+    return survey
+    
+  }
+  
+  func createMeaurement(_ connection: Connection? = nil,
+                        value: Double,
+                        abioticFactor: AbioticFactor.Name,
+                        measurementUnit: MeasurementUnit.Name,
+                        survey: Survey) throws -> Measurement {
+    
+    guard let abioticFactorId = try getAbioticFactor(name: abioticFactor).id,
+      let measurementUnitId = try getMeasurementUnit(name: measurementUnit).id,
+      let surveyId = survey.id,
+      let userId = try survey.user.get()?.id,
+      let organizationId = try survey.site.get()?.organization.get()?.id else {
+        throw Abort(.expectationFailed)
+    }
+    
+    guard let _ = try UserOrganizationRole.makeQuery(connection)
+      .filter(UserOrganizationRole.Keys.organizationId, .equals, organizationId)
+      .filter(UserOrganizationRole.Keys.userId, .equals, userId)
+      .first() else {
+        throw Abort(.expectationFailed)
+    }
+    
+    let measurement = Measurement(
+      value: value,
+      abioticFactorId: abioticFactorId,
+      measurementUnitId: measurementUnitId,
+      surveyId: surveyId)
+    try Measurement.makeQuery(connection).save(measurement)
+    
+    return measurement
     
   }
   

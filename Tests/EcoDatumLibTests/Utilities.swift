@@ -63,7 +63,7 @@ func createTestOrganization(_ modelManager: ModelManager, _ user: User) throws -
   let randomString = String(randomUpperCaseAlphaNumericLength: 10)
   return try modelManager.createOrganization(
     user: user,
-    name: randomString,
+    name: "Test Organization-\(randomString)",
     code: String(randomUpperCaseAlphaNumericLength: Organization.CODE_LENGTH))
 
 }
@@ -74,7 +74,7 @@ func createTestSite(_ modelManager: ModelManager,
   
   let randomString = String(randomUpperCaseAlphaNumericLength: 10)
   return try modelManager.createSite(
-    name: randomString,
+    name: "Test Site-\(randomString)",
     latitude: 3.455,
     longitude: -234.22,
     altitude: 45.22,
