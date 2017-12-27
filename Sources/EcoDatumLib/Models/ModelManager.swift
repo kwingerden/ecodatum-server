@@ -1,3 +1,4 @@
+import Bits
 import Foundation
 import Fluent
 import FluentProvider
@@ -113,7 +114,7 @@ class ModelManager {
   }
   
   func isRequestUser(_ userId: Int, _ user: User) throws -> Bool {
-    return user == (try findUser(byUserId: Identifier(userId)))
+    return user == (try findUser(byId: Identifier(userId)))
   }
   
   func assertRequestUser(_ userId: Int, _ user: User) throws {
@@ -159,13 +160,13 @@ class ModelManager {
   }
   
   func findUser(_ connection: Connection? = nil,
-                byUserId: Identifier) throws -> User? {
-    return try User.makeQuery(connection).find(byUserId)
+                byId: Identifier) throws -> User? {
+    return try User.makeQuery(connection).find(byId)
   }
   
   func getUser(_ connection: Connection? = nil,
-               byUserId: Identifier) throws -> User {
-    guard let user = try findUser(byUserId: byUserId) else {
+               byId: Identifier) throws -> User {
+    guard let user = try findUser(byId: byId) else {
       throw Abort(.notFound)
     }
     return user
@@ -284,8 +285,8 @@ class ModelManager {
   }
   
   func findOrganization(_ connection: Connection? = nil,
-                        byOrganizationId: Identifier) throws -> Organization? {
-    return try Organization.makeQuery(connection).find(byOrganizationId)
+                        byId: Identifier) throws -> Organization? {
+    return try Organization.makeQuery(connection).find(byId)
   }
   
   func findOrganization(_ connection: Connection? = nil,
@@ -296,18 +297,18 @@ class ModelManager {
   }
   
   func findOrganization(_ connection: Connection? = nil,
-                        site: Site) throws -> Organization? {
-    try site.assertExists()
-    return try findOrganization(connection, byOrganizationId: site.organizationId)
+                        bySite: Site) throws -> Organization? {
+    try bySite.assertExists()
+    return try findOrganization(connection, byId: bySite.organizationId)
   }
   
   func findOrganization(_ connection: Connection? = nil,
-                        survey: Survey) throws -> Organization? {
-    try survey.assertExists()
-    guard let site = try survey.site.get() else {
+                        bySurvey: Survey) throws -> Organization? {
+    try bySurvey.assertExists()
+    guard let site = try bySurvey.site.get() else {
       throw Abort(.expectationFailed)
     }
-    return try findOrganization(connection, site: site)
+    return try findOrganization(connection, bySite: site)
   }
   
   func getAllOrganizations(_ connection: Connection? = nil) throws -> [Organization] {
@@ -378,14 +379,14 @@ class ModelManager {
   }
   
   func findSite(_ connection: Connection? = nil,
-                siteId: Identifier) throws -> Site? {
-    return try Site.makeQuery(connection).find(siteId)
+                byId: Identifier) throws -> Site? {
+    return try Site.makeQuery(connection).find(byId)
   }
   
   func findSite(_ connection: Connection? = nil,
-                survey: Survey) throws -> Site? {
-    try survey.assertExists()
-    return try findSite(connection, siteId: survey.siteId)
+                bySurvey: Survey) throws -> Site? {
+    try bySurvey.assertExists()
+    return try findSite(connection, byId: bySurvey.siteId)
   }
   
   func updateSite(_ connection: Connection? = nil,
@@ -462,8 +463,8 @@ class ModelManager {
   }
   
   func findSurvey(_ connection: Connection? = nil,
-                  surveyId: Identifier) throws -> Survey? {
-    return try Survey.makeQuery(connection).find(surveyId)
+                  byId: Identifier) throws -> Survey? {
+    return try Survey.makeQuery(connection).find(byId)
   }
   
   func deleteSurvey(_ connection: Connection? = nil,
@@ -482,7 +483,7 @@ class ModelManager {
     let measurementUnitId = try measurementUnit.assertExists()
     let surveyId = try survey.assertExists()
     
-    guard let organizationId = try findOrganization(connection, survey: survey)?.id,
+    guard let organizationId = try findOrganization(connection, bySurvey: survey)?.id,
       let _ = try UserOrganizationRole.makeQuery(connection)
         .filter(UserOrganizationRole.Keys.organizationId, .equals, organizationId)
         .filter(UserOrganizationRole.Keys.userId, .equals, survey.userId)
@@ -517,8 +518,8 @@ class ModelManager {
   }
   
   func findMeasurement(_ connection: Connection? = nil,
-                       measurementId: Identifier) throws -> Measurement? {
-    return try Measurement.makeQuery(connection).find(measurementId)
+                       byId: Identifier) throws -> Measurement? {
+    return try Measurement.makeQuery(connection).find(byId)
   }
   
   func updateMeasurement(_ connection: Connection? = nil,
@@ -559,7 +560,7 @@ class ModelManager {
     
     let surveyId = try survey.assertExists()
     
-    guard let organizationId = try findOrganization(connection, survey: survey)?.id,
+    guard let organizationId = try findOrganization(connection, bySurvey: survey)?.id,
       let _ = try UserOrganizationRole.makeQuery(connection)
         .filter(UserOrganizationRole.Keys.organizationId, .equals, organizationId)
         .filter(UserOrganizationRole.Keys.userId, .equals, survey.userId)
@@ -575,8 +576,8 @@ class ModelManager {
   }
   
   func findNote(_ connection: Connection? = nil,
-                noteId: Identifier) throws -> Note? {
-    return try Note.makeQuery(connection).find(noteId)
+                byId: Identifier) throws -> Note? {
+    return try Note.makeQuery(connection).find(byId)
   }
   
   func updateNote(_ connection: Connection? = nil,
@@ -599,7 +600,7 @@ class ModelManager {
   }
   
   func createImage(_ connection: Connection? = nil,
-                   base64Encoded: String,
+                   bytes: Bytes,
                    description: String? = nil,
                    imageType: ImageType,
                    survey: Survey) throws -> Image {
@@ -607,7 +608,7 @@ class ModelManager {
     let imageTypeId = try imageType.assertExists()
     let surveyId = try survey.assertExists()
     
-    guard let organizationId = try findOrganization(connection, survey: survey)?.id,
+    guard let organizationId = try findOrganization(connection, bySurvey: survey)?.id,
       let _ = try UserOrganizationRole.makeQuery(connection)
         .filter(UserOrganizationRole.Keys.organizationId, .equals, organizationId)
         .filter(UserOrganizationRole.Keys.userId, .equals, survey.userId)
@@ -617,7 +618,7 @@ class ModelManager {
     
     let code = String(randomUpperCaseAlphaNumericLength: Image.CODE_LENGTH)
     let image = Image(
-      base64Encoded: base64Encoded,
+      image: Blob(bytes: bytes),
       code: code,
       description: description,
       imageTypeId: imageTypeId,
@@ -629,14 +630,14 @@ class ModelManager {
   }
   
   func createImage(_ connection: Connection? = nil,
-                   base64Encoded: String,
+                   bytes: Bytes,
                    description: String? = nil,
                    imageType imageTypeName: ImageType.Name,
                    survey: Survey) throws -> Image {
   
     return try createImage(
       connection,
-      base64Encoded: base64Encoded,
+      bytes: bytes,
       description: description,
       imageType: try getImageType(name: imageTypeName),
       survey: survey)
@@ -644,20 +645,27 @@ class ModelManager {
   }
   
   func findImage(_ connection: Connection? = nil,
-                 imageId: Int) throws -> Image? {
-    return try Image.makeQuery(connection).find(imageId)
+                 byId: Int) throws -> Image? {
+    return try Image.makeQuery(connection).find(byId)
+  }
+  
+  func findImage(_ connection: Connection? = nil,
+                 byCode: String) throws -> Image? {
+    return try Image.makeQuery(connection)
+      .filter(Image.Keys.code, .equals, byCode)
+      .first()
   }
   
   func updateImage(_ connection: Connection? = nil,
                    image: Image,
-                   newBase64Encoded: String? = nil,
+                   newBytes: Bytes? = nil,
                    newDescription: String? = nil,
                    newImageType: ImageType? = nil) throws -> Image? {
     
     try image.assertExists()
     
-    if let base64Encoded = newBase64Encoded {
-      image.base64Encoded = base64Encoded
+    if let bytes = newBytes {
+      image.image = Blob(bytes: bytes)
     }
   
     if let description = newDescription {

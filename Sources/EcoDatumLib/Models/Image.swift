@@ -1,15 +1,16 @@
+import Bits
 import FluentProvider
 import Foundation
 import HTTP
 import Vapor
 
-final class Image: Model {
+final class Image: EquatableModel {
   
   static let CODE_LENGTH = 10
   
   let storage = Storage()
   
-  var base64Encoded: String
+  var image: Blob?
   
   let code: String
 
@@ -21,19 +22,19 @@ final class Image: Model {
   
   struct Keys {
     static let id = "id"
-    static let base64Encoded = "base64_encoded"
+    static let image = "image"
     static let code = "code"
     static let description = "description"
     static let imageTypeId = ImageType.foreignIdKey
     static let surveyId = Survey.foreignIdKey
   }
   
-  init(base64Encoded: String,
+  init(image: Blob? = nil,
        code: String,
        description: String? = nil,
        imageTypeId: Identifier,
        surveyId: Identifier) {
-    self.base64Encoded = base64Encoded
+    self.image = image
     self.code = code
     self.description = description
     self.imageTypeId = imageTypeId
@@ -43,7 +44,7 @@ final class Image: Model {
   // MARK: Row
   
   init(row: Row) throws {
-    base64Encoded = try row.get(Keys.base64Encoded)
+    image = try row.get(Keys.image)
     code = try row.get(Keys.code)
     description = try row.get(Keys.description)
     imageTypeId = try row.get(Keys.imageTypeId)
@@ -52,7 +53,7 @@ final class Image: Model {
   
   func makeRow() throws -> Row {
     var row = Row()
-    try row.set(Keys.base64Encoded, base64Encoded)
+    try row.set(Keys.image, image)
     try row.set(Keys.code, code)
     try row.set(Keys.description, description)
     try row.set(Keys.imageTypeId, imageTypeId)
@@ -70,9 +71,8 @@ extension Image: Preparation {
     try database.create(self) {
       builder in
       builder.id()
-      builder.custom(
-        Keys.base64Encoded,
-        type: "TEXT",
+      builder.bytes(
+        Keys.image,
         optional: false,
         unique: false)
       builder.custom(
@@ -121,8 +121,7 @@ extension Image {
 extension Image: JSONConvertible {
   
   convenience init(json: JSON) throws {
-    self.init(base64Encoded: try json.get(Keys.base64Encoded),
-              code: try json.get(Keys.code),
+    self.init(code: try json.get(Keys.code),
               description: try json.get(Keys.description),
               imageTypeId: try json.get(Keys.imageTypeId),
               surveyId: try json.get(Keys.surveyId))
@@ -131,7 +130,6 @@ extension Image: JSONConvertible {
   func makeJSON() throws -> JSON {
     var json = JSON()
     try json.set(Keys.id, id)
-    try json.set(Keys.base64Encoded, base64Encoded)
     try json.set(Keys.code, code)
     try json.set(Keys.description, description)
     try json.set(Keys.imageTypeId, imageTypeId)

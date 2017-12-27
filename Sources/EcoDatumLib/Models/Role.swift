@@ -2,7 +2,7 @@ import Vapor
 import FluentProvider
 import HTTP
 
-final class Role: Model {
+final class Role: EquatableModel {
   
   enum Name: String {
     case ADMINISTRATOR

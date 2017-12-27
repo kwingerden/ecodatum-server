@@ -3,7 +3,7 @@ import AuthProvider
 import FluentProvider
 import Crypto
 
-final class Token: Model {
+final class Token: EquatableModel {
   
   let storage = Storage()
   

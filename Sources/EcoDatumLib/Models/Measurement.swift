@@ -2,7 +2,7 @@ import FluentProvider
 import Foundation
 import Vapor
 
-final class Measurement: Model {
+final class Measurement: EquatableModel {
   
   let storage = Storage()
   

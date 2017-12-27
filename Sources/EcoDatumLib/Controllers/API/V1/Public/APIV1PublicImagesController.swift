@@ -1,4 +1,7 @@
+import Bits
 import Crypto
+import Foundation
+import HTTP
 import Vapor
 
 final class APIV1PublicImagesController: ResourceRepresentable {
@@ -13,15 +16,32 @@ final class APIV1PublicImagesController: ResourceRepresentable {
     self.modelManager = modelManager
   }
   
-  // GET public/images/:hash
+  // GET /api/v1/public/images/:code
   func show(_ request: Request,
             _ code: String) throws -> ResponseRepresentable {
     
-    guard let organization = try modelManager.findOrganization(byCode: code) else {
+    guard let image = try modelManager.findImage(byCode: code),
+      let imageBytes = image.image?.bytes,
+      let imageType = try image.imageType.get() else {
       throw Abort(.notFound)
     }
     
-    return organization
+    var contentType = ""
+    switch imageType.name {
+    case .GIF:
+      contentType = "image/gif"
+    case .JPEG:
+      contentType = "image/jpeg"
+    case .PNG:
+      contentType = "image/png"
+    }
+    
+    return Response(
+      status: .ok,
+      headers: [
+        HeaderKey("Content-Type") : contentType
+      ],
+      body: .data(imageBytes))
     
   }
   

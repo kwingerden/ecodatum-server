@@ -2,7 +2,7 @@ import FluentProvider
 import Foundation
 import Vapor
 
-final class Survey: Model {
+final class Survey: EquatableModel {
   
   let storage = Storage()
 

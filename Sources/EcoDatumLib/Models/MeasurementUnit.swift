@@ -2,7 +2,7 @@ import Vapor
 import FluentProvider
 import HTTP
 
-final class MeasurementUnit: Model {
+final class MeasurementUnit: EquatableModel {
   
   enum Name: String {
     case ACIDITY_PH

@@ -2,7 +2,7 @@ import FluentProvider
 import Foundation
 import Vapor
 
-final class Site: Model {
+final class Site: EquatableModel {
   
   let storage = Storage()
   

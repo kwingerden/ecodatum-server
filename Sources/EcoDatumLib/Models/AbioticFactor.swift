@@ -2,7 +2,7 @@ import Vapor
 import FluentProvider
 import HTTP
 
-final class AbioticFactor: Model {
+final class AbioticFactor: EquatableModel {
   
   enum Name: String {
     case AIR

@@ -2,7 +2,7 @@ import Vapor
 import FluentProvider
 import HTTP
 
-final class Note: Model {
+final class Note: EquatableModel {
   
   let storage = Storage()
   

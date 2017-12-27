@@ -26,7 +26,7 @@ final class APIV1TokenUsersController: ResourceRepresentable {
             _ userId: Int) throws -> ResponseRepresentable {
     
     try modelManager.assertRootOrRequestUser(userId, request.user())
-    return try modelManager.getUser(byUserId: Identifier(userId))
+    return try modelManager.getUser(byId: Identifier(userId))
     
   }
 

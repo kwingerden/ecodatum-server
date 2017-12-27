@@ -86,7 +86,7 @@ class FullModelTest: TestCase {
       survey: site1User1Organization1Survey1)
     
     let site1User1Survey1Image1 = try modelManager.createImage(
-      base64Encoded: BASE64_ENCODED_JPEG_IMAGE_1,
+      bytes: try drop.readFileFully("\(drop.config.workDir)/Tests/EcoDatumLibTests/image1.jpg"),
       imageType: .JPEG,
       survey: site1User1Organization1Survey1)
     
@@ -101,20 +101,29 @@ class FullModelTest: TestCase {
       survey: site2User4Organization2Survey3)
     
     let site2User4Organization2Survey3Image1 = try modelManager.createImage(
-      base64Encoded: BASE64_ENCODED_PNG_IMAGE_1,
+      bytes: try drop.readFileFully("\(drop.config.workDir)/Tests/EcoDatumLibTests/image2.png"),
       imageType: .PNG,
       survey: site2User4Organization2Survey3)
+    
+    guard let findImage = try modelManager.findImage(byCode: site2User4Organization2Survey3Image1.code) else {
+      XCTFail()
+      return
+    }
+    XCTAssert(findImage == site2User4Organization2Survey3Image1)
+    XCTAssert(findImage != site1User1Survey1Image1)
     
     let testUser1OrganizationRoles = try user1.userOrganizationRoles.makeQuery().all()
     XCTAssert(testUser1OrganizationRoles.count == 1)
     XCTAssert(try testUser1OrganizationRoles[0].organization.get()?.id == organization1.id)
     XCTAssert(try testUser1OrganizationRoles[0].role.get()?.name == .ADMINISTRATOR)
     
+    /*
     try modelManager.deleteImage(image: site2User4Organization2Survey3Image1)
     try modelManager.deleteMeasurement(measurement: site2User4Organization2Survey3Measurement1)
     try modelManager.deleteNote(note: site2User4Organization2Survey3Note1)
     try modelManager.deleteSurvey(survey: site2User4Organization2Survey3)
     try modelManager.deleteUser(user: user4)
+    */
     
   }
   

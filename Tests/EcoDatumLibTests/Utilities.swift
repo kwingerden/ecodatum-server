@@ -1,4 +1,5 @@
 import Foundation
+import HTTP
 @testable import EcoDatumLib
 @testable import Vapor
 import XCTest
@@ -32,6 +33,34 @@ extension Droplet {
       try! self.run()
     }
     console.wait(seconds: 0.5)
+  
+  }
+  
+  func readFileFully(_ path: String) throws -> Bytes {
+    
+    guard let file = fopen(path, "r") else {
+      throw Abort(.expectationFailed)
+    }
+    
+    let chunkSize = 2048
+    var array: [Bytes] = []
+    var buffer = Array(repeating: 0, count: chunkSize)
+    var bytesRead: size_t = 0
+    repeat {
+      bytesRead = fread(&buffer, 1, chunkSize, file)
+      if bytesRead > 0 {
+        let chunk = Array(UnsafeRawBufferPointer(
+          start: buffer,
+          count: bytesRead))
+        array.append(Bytes(chunk))
+      }
+    } while bytesRead == chunkSize
+    
+    let bytes = Bytes(array.joined().array)
+    
+    fclose(file)
+    
+    return bytes
   
   }
   

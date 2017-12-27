@@ -2,7 +2,7 @@ import Vapor
 import FluentProvider
 import HTTP
 
-final class ImageType: Model {
+final class ImageType: EquatableModel {
   
   enum Name: String {
     case GIF

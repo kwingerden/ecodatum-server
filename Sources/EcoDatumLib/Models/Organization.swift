@@ -2,7 +2,7 @@ import Vapor
 import FluentProvider
 import HTTP
 
-final class Organization: Model {
+final class Organization: EquatableModel {
   
   static let CODE_LENGTH = 6
   

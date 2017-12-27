@@ -2,7 +2,7 @@ import Vapor
 import FluentProvider
 import HTTP
 
-final class UserOrganizationRole: Model {
+final class UserOrganizationRole: EquatableModel {
   
   let storage = Storage()
 
