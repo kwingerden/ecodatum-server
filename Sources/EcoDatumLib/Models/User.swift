@@ -3,7 +3,7 @@ import FluentProvider
 import AuthProvider
 import HTTP
 
-final class User: Model {
+final class User: EquatableModel {
   
   let storage = Storage()
   
@@ -81,29 +81,6 @@ extension User: Preparation {
   
 }
 
-// MARK: UPDATE
-
-extension User: Updateable {
-  
-  static var updateableKeys: [UpdateableKey<User>] {
-    return [
-      UpdateableKey(User.Keys.name, String.self) {
-        user, name in
-        user.name = name
-      },
-      UpdateableKey(User.Keys.email, String.self) {
-        user, email in
-        user.email = email
-      },
-      UpdateableKey(User.Keys.password, String.self) {
-        user, password in
-        user.password = password
-      }
-    ]
-  }
-  
-}
-
 // MARK: Relations
 
 extension User {
@@ -177,4 +154,5 @@ extension User: TokenAuthenticatable {
   typealias TokenType = Token
 
 }
+
 

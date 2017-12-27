@@ -1,21 +1,23 @@
 import Crypto
 import Vapor
 
-final class V1OrganizationCodeController: ResourceRepresentable {
+final class APIV1PublicImagesController: ResourceRepresentable {
   
   let drop: Droplet
   
-  init(_ drop: Droplet) {
+  let modelManager: ModelManager
+  
+  init(drop: Droplet,
+       modelManager: ModelManager) {
     self.drop = drop
+    self.modelManager = modelManager
   }
   
-  // GET /organization/:code
+  // GET public/images/:hash
   func show(_ request: Request,
             _ code: String) throws -> ResponseRepresentable {
     
-    guard let organization = try Organization.makeQuery()
-      .filter(Organization.Keys.code, .equals, code)
-      .first() else {
+    guard let organization = try modelManager.findOrganization(byCode: code) else {
       throw Abort(.notFound)
     }
     
@@ -28,6 +30,7 @@ final class V1OrganizationCodeController: ResourceRepresentable {
   }
   
 }
+
 
 
 

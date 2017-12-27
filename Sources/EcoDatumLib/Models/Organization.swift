@@ -66,9 +66,9 @@ extension Organization: Preparation {
         length: 1024,
         optional: true,
         unique: false)
-      builder.string(
+      builder.custom(
         Keys.code,
-        length: CODE_LENGTH,
+        type: "CHARACTER(\(CODE_LENGTH))",
         optional: false,
         unique: true)
     }
@@ -76,25 +76,6 @@ extension Organization: Preparation {
   
   static func revert(_ database: Database) throws {
     try database.delete(self)
-  }
-  
-}
-
-// MARK: UPDATE
-
-extension Organization: Updateable {
-  
-  public static var updateableKeys: [UpdateableKey<Organization>] {
-    return [
-      UpdateableKey(Organization.Keys.name, String.self) {
-        organization, name in
-        organization.name = name
-      },
-      UpdateableKey(Organization.Keys.description, String.self) {
-        organization, description in
-        organization.description = description
-      }
-    ]
   }
   
 }

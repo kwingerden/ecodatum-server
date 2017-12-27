@@ -5,14 +5,18 @@ final class APIRouteCollection: RouteCollection {
   
   let drop: Droplet
   
-  init(_ drop: Droplet) {
+  let modelManager: ModelManager
+  
+  init(_ drop: Droplet,
+       modelManager: ModelManager) {
     self.drop = drop
+    self.modelManager = modelManager
   }
   
   func build(_ builder: RouteBuilder) throws {
     
     let api = builder.grouped("api")
-    try V1RouteCollection(drop).build(api)
+    try APIV1RouteCollection(drop: drop, modelManager: modelManager).build(api)
   
   }
   

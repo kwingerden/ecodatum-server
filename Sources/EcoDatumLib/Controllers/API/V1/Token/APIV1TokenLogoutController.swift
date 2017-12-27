@@ -1,12 +1,16 @@
 import Vapor
 import HTTP
 
-final class V1LogoutController: ResourceRepresentable {
+final class APIV1TokenLogoutController: ResourceRepresentable {
   
   let drop: Droplet
   
-  init(_ drop: Droplet) {
+  let modelManager: ModelManager
+  
+  init(drop: Droplet,
+       modelManager: ModelManager) {
     self.drop = drop
+    self.modelManager = modelManager
   }
   
   // GET /logout

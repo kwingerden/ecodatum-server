@@ -20,10 +20,12 @@ extension Droplet {
   
   private func setupControllers() throws {
     
+    let modelManager = try ModelManager(self)
+    
     let html = HTMLRouteCollection(self)
     try collection(html)
     
-    let api = APIRouteCollection(self)
+    let api = APIRouteCollection(self, modelManager: modelManager)
     try collection(api)
     
   }

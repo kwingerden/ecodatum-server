@@ -1,5 +1,6 @@
 import Foundation
 import Fluent
+import FluentProvider
 import Vapor
 
 class ModelManager {
@@ -80,6 +81,57 @@ class ModelManager {
     
   }
   
+  func generateToken(_ connection: Connection? = nil,
+                     for: User) throws -> Token {
+  
+    let userId = try `for`.assertExists()
+    if let token = try Token.makeQuery(connection)
+      .filter(Token.Keys.userId, .equals, userId)
+      .first() {
+  
+      return token
+    
+    } else {
+    
+      let token = try Token.generate(for: `for`)
+      try token.save()
+    
+      return token
+    
+    }
+    
+  }
+  
+  func isRootUser(_ user: User) throws -> Bool {
+    return user == (try getRootUser())
+  }
+  
+  func assertRootUser(_ user: User) throws {
+    if !(try isRootUser(user)) {
+      throw Abort(.forbidden)
+    }
+  }
+  
+  func isRequestUser(_ userId: Int, _ user: User) throws -> Bool {
+    return user == (try findUser(byUserId: Identifier(userId)))
+  }
+  
+  func assertRequestUser(_ userId: Int, _ user: User) throws {
+    if !(try isRequestUser(userId, user)) {
+      throw Abort(.forbidden)
+    }
+  }
+  
+  func isRootOrRequestUser(_ userId: Int, _ user: User) throws -> Bool {
+    return try isRootUser(user) || (try isRequestUser(userId, user))
+  }
+  
+  func assertRootOrRequestUser(_ userId: Int, _ user: User) throws {
+    if !(try isRootOrRequestUser(userId, user)) {
+      throw Abort(.forbidden)
+    }
+  }
+  
   func createUser(_ connection: Connection? = nil,
                   name: String,
                   email: String,
@@ -95,9 +147,28 @@ class ModelManager {
     
   }
   
+  func createUser(_ connection: Connection? = nil,
+                  json: JSON) throws -> User {
+    
+    let user = try User(json: json)
+    user.password = try hashPassword(user.password)
+    try user.save()
+  
+    return user
+    
+  }
+  
   func findUser(_ connection: Connection? = nil,
                 byUserId: Identifier) throws -> User? {
     return try User.makeQuery(connection).find(byUserId)
+  }
+  
+  func getUser(_ connection: Connection? = nil,
+               byUserId: Identifier) throws -> User {
+    guard let user = try findUser(byUserId: byUserId) else {
+      throw Abort(.notFound)
+    }
+    return user
   }
   
   func findUser(_ connection: Connection? = nil,
@@ -122,6 +193,10 @@ class ModelManager {
         throw Abort(.expectationFailed)
     }
     return user
+  }
+  
+  func getAllUsers(_ connection: Connection? = nil) throws -> [User] {
+    return try User.makeQuery(connection).all()
   }
   
   func updateUser(_ connection: Connection? = nil,
@@ -159,13 +234,9 @@ class ModelManager {
   func createOrganization(_ connection: Connection? = nil,
                           user: User,
                           name: String,
-                          description: String? = nil,
-                          code: String) throws -> Organization {
+                          description: String? = nil) throws -> Organization {
     
-    guard code.utf8.count == Organization.CODE_LENGTH else {
-      throw Abort(.expectationFailed)
-    }
-    
+    let code = String(randomUpperCaseAlphaNumericLength: Organization.CODE_LENGTH)
     let organization = Organization(
       name: name,
       description: description,
@@ -213,14 +284,21 @@ class ModelManager {
   }
   
   func findOrganization(_ connection: Connection? = nil,
-                        organizationId: Identifier) throws -> Organization? {
-    return try Organization.makeQuery(connection).find(organizationId)
+                        byOrganizationId: Identifier) throws -> Organization? {
+    return try Organization.makeQuery(connection).find(byOrganizationId)
+  }
+  
+  func findOrganization(_ connection: Connection? = nil,
+                        byCode: String) throws -> Organization? {
+    return try Organization.makeQuery(connection)
+      .filter(Organization.Keys.code, .equals, byCode)
+      .first()
   }
   
   func findOrganization(_ connection: Connection? = nil,
                         site: Site) throws -> Organization? {
     try site.assertExists()
-    return try findOrganization(connection, organizationId: site.organizationId)
+    return try findOrganization(connection, byOrganizationId: site.organizationId)
   }
   
   func findOrganization(_ connection: Connection? = nil,
@@ -230,6 +308,10 @@ class ModelManager {
       throw Abort(.expectationFailed)
     }
     return try findOrganization(connection, site: site)
+  }
+  
+  func getAllOrganizations(_ connection: Connection? = nil) throws -> [Organization] {
+    return try Organization.makeQuery(connection).all()
   }
   
   func updateOrganization(_ connection: Connection? = nil,
@@ -533,8 +615,10 @@ class ModelManager {
           throw Abort(.expectationFailed)
     }
     
+    let code = String(randomUpperCaseAlphaNumericLength: Image.CODE_LENGTH)
     let image = Image(
       base64Encoded: base64Encoded,
+      code: code,
       description: description,
       imageTypeId: imageTypeId,
       surveyId: surveyId)

@@ -1,29 +1,23 @@
 import Crypto
 import Vapor
 
-final class V1OrganizationsController: ResourceRepresentable {
+final class APIV1TokenOrganizationsController: ResourceRepresentable {
   
   let drop: Droplet
   
-  init(_ drop: Droplet) {
+  let modelManager: ModelManager
+  
+  init(drop: Droplet,
+       modelManager: ModelManager) {
     self.drop = drop
+    self.modelManager = modelManager
   }
   
   // GET /organizations
   func index(_ request: Request) throws -> ResponseRepresentable {
     
-    return try Organization.all().makeJSON()
-    /*
-    if try request.checkRootUser() {
-      return try Organization.all().makeJSON()
-    } else {
-      return try Organization
-        .makeQuery()
-        .filter(Organization.Keys.userId, .equals, request.user().id)
-        .all()
-        .makeJSON()
-    }
- */
+    try modelManager.assertRootUser(request.user())
+    return try modelManager.getAllOrganizations().makeJSON()
     
   }
   
@@ -31,7 +25,7 @@ final class V1OrganizationsController: ResourceRepresentable {
   func show(_ request: Request,
             _ organization: Organization) throws -> ResponseRepresentable {
     
-    try assertUserOwnsOrganizationOrIsAdmin(request, organization)
+    //try assertUserOwnsOrganizationOrIsAdmin(request, organization)
     return organization
     
   }
@@ -56,8 +50,8 @@ final class V1OrganizationsController: ResourceRepresentable {
   func update(_ request: Request,
               organization: Organization) throws -> ResponseRepresentable {
     
-    try assertUserOwnsOrganizationOrIsAdmin(request, organization)
-    try organization.update(for: request)
+    //try assertUserOwnsOrganizationOrIsAdmin(request, organization)
+    //try organization.update(for: request)
     try organization.save()
     
     return organization
@@ -68,7 +62,7 @@ final class V1OrganizationsController: ResourceRepresentable {
   func destroy(_ request: Request,
                organization: Organization) throws -> ResponseRepresentable {
     
-    try assertUserOwnsOrganizationOrIsAdmin(request, organization)
+    //try assertUserOwnsOrganizationOrIsAdmin(request, organization)
     try organization.delete()
     
     return Response(status: .ok)
@@ -78,7 +72,7 @@ final class V1OrganizationsController: ResourceRepresentable {
   // DELETE /organizations
   func clear(_ request: Request) throws -> ResponseRepresentable {
     
-    try request.assertRootUser()
+    //try request.assertRootUser()
     try Organization.makeQuery().delete()
     
     return Response(status: .ok)
@@ -93,20 +87,6 @@ final class V1OrganizationsController: ResourceRepresentable {
       update: update,
       destroy: destroy,
       clear: clear)
-  }
-  
-  private func assertUserOwnsOrganizationOrIsAdmin(
-    _ request: Request,
-    _ organization: Organization) throws {
-    
-    let userOwnsOrganization = try request.checkUserOwnsOrganization(organization)
-    let isRootUser = try request.checkRootUser()
-    if userOwnsOrganization || isRootUser {
-      // Do nothing
-    } else {
-      throw Abort(.unauthorized)
-    }
-    
   }
   
 }

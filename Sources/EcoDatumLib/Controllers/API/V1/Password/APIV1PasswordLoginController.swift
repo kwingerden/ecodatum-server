@@ -1,12 +1,16 @@
 import Vapor
 import HTTP
 
-final class V1LoginController: ResourceRepresentable {
+final class APIV1PasswordLoginController: ResourceRepresentable {
   
   let drop: Droplet
   
-  init(_ drop: Droplet) {
+  let modelManager: ModelManager
+  
+  init(drop: Droplet,
+       modelManager: ModelManager) {
     self.drop = drop
+    self.modelManager = modelManager
   }
   
   // POST /login
@@ -14,10 +18,7 @@ final class V1LoginController: ResourceRepresentable {
     
     let user = try request.user()
     drop.log.debug("Logging in as user: \(user.name)")
-    let token = try Token.generate(for: user)
-    try token.save()
-    
-    return token
+    return try modelManager.generateToken(for: user)
   
   }
   

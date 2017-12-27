@@ -63,8 +63,7 @@ func createTestOrganization(_ modelManager: ModelManager, _ user: User) throws -
   let randomString = String(randomUpperCaseAlphaNumericLength: 10)
   return try modelManager.createOrganization(
     user: user,
-    name: "Test Organization-\(randomString)",
-    code: String(randomUpperCaseAlphaNumericLength: Organization.CODE_LENGTH))
+    name: "Test Organization-\(randomString)")
 
 }
 

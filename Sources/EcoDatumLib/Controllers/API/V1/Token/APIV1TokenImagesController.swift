@@ -1,14 +1,18 @@
 import Foundation
 import Vapor
 
-final class V1ImagesController: ResourceRepresentable {
-  
-  let drop: Droplet
+final class APIV1TokenImagesController: ResourceRepresentable {
   
   private let IMAGES_DIRECTORY_NAME = ".images"
   
-  init(_ drop: Droplet) {
+  let drop: Droplet
+  
+  let modelManager: ModelManager
+  
+  init(drop: Droplet,
+       modelManager: ModelManager) {
     self.drop = drop
+    self.modelManager = modelManager
   }
   
   // GET /images
@@ -74,6 +78,7 @@ final class V1ImagesController: ResourceRepresentable {
       show: show)
   }
   
+  /*
   private func assertUserOwnsImageOrIsAdmin(_ request: Request, _ image: Image) throws {
     
     let userOwnsImage = try request.checkUserOwnsImage(image)
@@ -85,6 +90,7 @@ final class V1ImagesController: ResourceRepresentable {
     }
     
   }
+ */
   
   /*
   private func saveImage(_ base64Encoded: String,
