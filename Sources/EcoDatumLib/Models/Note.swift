@@ -6,32 +6,32 @@ final class Note: Model {
   
   let storage = Storage()
   
-  var note: String
+  var text: String
   
   let surveyId: Identifier
   
   struct Keys {
     static let id = "id"
-    static let note = "note"
+    static let text = "text"
     static let surveyId = Survey.foreignIdKey
   }
   
-  init(note: String,
+  init(text: String,
        surveyId: Identifier) {
-    self.note = note
+    self.text = text
     self.surveyId = surveyId
   }
   
   // MARK: Row
   
   init(row: Row) throws {
-    note = try row.get(Keys.note)
+    text = try row.get(Keys.text)
     surveyId = try row.get(Keys.surveyId)
   }
   
   func makeRow() throws -> Row {
     var row = Row()
-    try row.set(Keys.note, note)
+    try row.set(Keys.text, text)
     try row.set(Keys.surveyId, surveyId)
     return row
   }
@@ -47,7 +47,7 @@ extension Note: Preparation {
       builder in
       builder.id()
       builder.custom(
-        Keys.note,
+        Keys.text,
         type: "TEXT",
         optional: false,
         unique: false)
@@ -80,14 +80,14 @@ extension Note {
 extension Note: JSONConvertible {
   
   convenience init(json: JSON) throws {
-    self.init(note: try json.get(Keys.note),
+    self.init(text: try json.get(Keys.text),
               surveyId: try json.get(Keys.surveyId))
   }
   
   func makeJSON() throws -> JSON {
     var json = JSON()
     try json.set(Keys.id, id)
-    try json.set(Keys.note, note)
+    try json.set(Keys.text, text)
     try json.set(Keys.surveyId, surveyId)
     return json
   }
@@ -101,7 +101,5 @@ extension Note: ResponseRepresentable { }
 // MARK: TIMESTAMP
 
 extension Note: Timestampable { }
-
-
 
 

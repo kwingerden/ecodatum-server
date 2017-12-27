@@ -6,11 +6,11 @@ final class Measurement: Model {
   
   let storage = Storage()
   
-  let value: Double
+  var value: Double
   
-  let abioticFactorId: Identifier
+  var abioticFactorId: Identifier
   
-  let measurementUnitId: Identifier
+  var measurementUnitId: Identifier
   
   let surveyId: Identifier
   
@@ -133,9 +133,5 @@ extension Measurement: ResponseRepresentable { }
 // MARK: Timestampable
 
 extension Measurement: Timestampable { }
-
-
-
-
 
 

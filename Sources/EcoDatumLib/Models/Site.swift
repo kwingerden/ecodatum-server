@@ -6,19 +6,19 @@ final class Site: Model {
   
   let storage = Storage()
   
-  let name: String
+  var name: String
   
-  let description: String?
+  var description: String?
   
-  let latitude: Double
+  var latitude: Double
   
-  let longitude: Double
+  var longitude: Double
   
-  let altitude: Double?
+  var altitude: Double?
   
-  let horizontalAccuracy: Double?
+  var horizontalAccuracy: Double?
   
-  let verticalAccuracy: Double?
+  var verticalAccuracy: Double?
   
   let organizationId: Identifier
 
@@ -200,8 +200,5 @@ extension Site: ResponseRepresentable { }
 // MARK: Timestampable
 
 extension Site: Timestampable { }
-
-
-
 
 

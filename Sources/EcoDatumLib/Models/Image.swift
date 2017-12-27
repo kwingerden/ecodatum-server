@@ -7,11 +7,11 @@ final class Image: Model {
   
   let storage = Storage()
   
-  let base64Encoded: String
+  var base64Encoded: String
 
-  let description: String?
+  var description: String?
   
-  let imageTypeId: Identifier
+  var imageTypeId: Identifier
   
   let surveyId: Identifier
   

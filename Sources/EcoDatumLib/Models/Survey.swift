@@ -128,8 +128,3 @@ extension Survey: ResponseRepresentable { }
 // MARK: Timestampable
 
 extension Survey: Timestampable { }
-
-
-
-
-

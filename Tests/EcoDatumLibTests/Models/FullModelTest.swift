@@ -20,9 +20,13 @@ class FullModelTest: TestCase {
     let user3 = try createTestUser(modelManager)
     let user4 = try createTestUser(modelManager)
   
+    try modelManager.updateUser(
+      user: user2,
+      newName: "new name")
+    
     let organization1 = try createTestOrganization(modelManager, user1)
     let organization2 = try createTestOrganization(modelManager, user2)
-    
+  
     let user3Organization1Member = try modelManager.addUserToOrganization(
       user: user3,
       organization: organization1,
@@ -36,13 +40,13 @@ class FullModelTest: TestCase {
     let site1Organization1 = try createTestSite(modelManager, user1, organization1)
     let site2Organization2 = try createTestSite(modelManager, user2, organization2)
     
-    let site1User1Survey1 = try modelManager.createSurvey(
+    let site1User1Organization1Survey1 = try modelManager.createSurvey(
       date: Date(),
       site: site1Organization1,
       user: user1)
     
     do {
-      try modelManager.createSurvey(
+      let _ = try modelManager.createSurvey(
         date: Date(),
         site: site2Organization2,
         user: user1)
@@ -51,13 +55,13 @@ class FullModelTest: TestCase {
       // success
     }
     
-    let site1User3Survey2 = try modelManager.createSurvey(
+    let site1User3Organization1Survey2 = try modelManager.createSurvey(
       date: Date(),
       site: site1Organization1,
       user: user3)
     
     do {
-      try modelManager.createSurvey(
+      let _ = try modelManager.createSurvey(
         date: Date(),
         site: site1Organization1,
         user: user4)
@@ -66,16 +70,51 @@ class FullModelTest: TestCase {
       // success
     }
     
-    let site1User1Survey1Measurement1 = try modelManager.createMeaurement(
+    let site2User4Organization2Survey3 = try modelManager.createSurvey(
+      date: Date(),
+      site: site2Organization2,
+      user: user4)
+    
+    let site1User1Survey1Measurement1 = try modelManager.createMeasurement(
       value: 4.5,
       abioticFactor: .AIR,
       measurementUnit: .TEMPERATURE_CELCIUS,
-      survey: site1User1Survey1)
+      survey: site1User1Organization1Survey1)
+    
+    let site1User1Survey1Note1 = try modelManager.createNote(
+      text: LOREM_IPSUM_NOTE_1,
+      survey: site1User1Organization1Survey1)
+    
+    let site1User1Survey1Image1 = try modelManager.createImage(
+      base64Encoded: BASE64_ENCODED_JPEG_IMAGE_1,
+      imageType: .JPEG,
+      survey: site1User1Organization1Survey1)
+    
+    let site2User4Organization2Survey3Measurement1 = try modelManager.createMeasurement(
+      value: 324.5,
+      abioticFactor: .WATER,
+      measurementUnit: .ACIDITY_PH,
+      survey: site2User4Organization2Survey3)
+    
+    let site2User4Organization2Survey3Note1 = try modelManager.createNote(
+      text: LOREM_IPSUM_NOTE_1,
+      survey: site2User4Organization2Survey3)
+    
+    let site2User4Organization2Survey3Image1 = try modelManager.createImage(
+      base64Encoded: BASE64_ENCODED_PNG_IMAGE_1,
+      imageType: .PNG,
+      survey: site2User4Organization2Survey3)
     
     let testUser1OrganizationRoles = try user1.userOrganizationRoles.makeQuery().all()
     XCTAssert(testUser1OrganizationRoles.count == 1)
     XCTAssert(try testUser1OrganizationRoles[0].organization.get()?.id == organization1.id)
     XCTAssert(try testUser1OrganizationRoles[0].role.get()?.name == .ADMINISTRATOR)
+    
+    try modelManager.deleteImage(image: site2User4Organization2Survey3Image1)
+    try modelManager.deleteMeasurement(measurement: site2User4Organization2Survey3Measurement1)
+    try modelManager.deleteNote(note: site2User4Organization2Survey3Note1)
+    try modelManager.deleteSurvey(survey: site2User4Organization2Survey3)
+    try modelManager.deleteUser(user: user4)
     
   }
   

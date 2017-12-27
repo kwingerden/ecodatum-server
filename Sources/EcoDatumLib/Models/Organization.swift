@@ -142,4 +142,3 @@ extension Organization: ResponseRepresentable { }
 
 extension Organization: Timestampable { }
 
-

@@ -87,9 +87,17 @@ extension User: Updateable {
   
   static var updateableKeys: [UpdateableKey<User>] {
     return [
+      UpdateableKey(User.Keys.name, String.self) {
+        user, name in
+        user.name = name
+      },
       UpdateableKey(User.Keys.email, String.self) {
         user, email in
         user.email = email
+      },
+      UpdateableKey(User.Keys.password, String.self) {
+        user, password in
+        user.password = password
       }
     ]
   }
@@ -114,7 +122,7 @@ extension User {
 
 }
 
-// MARK: JSON
+// MARK: JSONConvertible
 
 extension User: JSONConvertible {
   
