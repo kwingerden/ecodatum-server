@@ -1,7 +1,6 @@
 import Bits
 import FluentProvider
 import Foundation
-import HTTP
 import Vapor
 
 final class Image: EquatableModel {
@@ -115,33 +114,6 @@ extension Image {
   }
   
 }
-
-// MARK: JSONConvertible
-
-extension Image: JSONConvertible {
-  
-  convenience init(json: JSON) throws {
-    self.init(code: try json.get(Keys.code),
-              description: try json.get(Keys.description),
-              imageTypeId: try json.get(Keys.imageTypeId),
-              surveyId: try json.get(Keys.surveyId))
-  }
-  
-  func makeJSON() throws -> JSON {
-    var json = JSON()
-    try json.set(Keys.id, id)
-    try json.set(Keys.code, code)
-    try json.set(Keys.description, description)
-    try json.set(Keys.imageTypeId, imageTypeId)
-    try json.set(Keys.surveyId, surveyId)
-    return json
-  }
-  
-}
-
-// MARK: ResponseRepresentable
-
-extension Image: ResponseRepresentable { }
 
 // MARK: Timestampable
 

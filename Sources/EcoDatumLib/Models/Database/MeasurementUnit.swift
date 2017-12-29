@@ -2,16 +2,18 @@ import Vapor
 import FluentProvider
 import HTTP
 
-final class ImageType: EquatableModel {
+final class MeasurementUnit: EquatableModel {
   
   enum Name: String {
-    case GIF
-    case JPEG
-    case PNG
+    case ACIDITY_PH
+    case CARBON_DIOXIDE_PPM
+    case LIGHT_INTENSITY_LUX
+    case TEMPERATURE_CELCIUS
     static let all: [Name] = [
-      .GIF,
-      .JPEG,
-      .PNG
+      .ACIDITY_PH,
+      .CARBON_DIOXIDE_PPM,
+      .LIGHT_INTENSITY_LUX,
+      .TEMPERATURE_CELCIUS
     ]
   }
   
@@ -46,7 +48,7 @@ final class ImageType: EquatableModel {
 
 // MARK: Preparation
 
-extension ImageType: Preparation {
+extension MeasurementUnit: Preparation {
   
   static func prepare(_ database: Database) throws {
     try database.create(self) {
@@ -64,32 +66,6 @@ extension ImageType: Preparation {
   }
   
 }
-
-// MARK: JSON
-
-extension ImageType: JSONConvertible {
-  
-  convenience init(json: JSON) throws {
-    guard let name = Name(rawValue: try json.get(Keys.name)) else {
-      throw Abort(.internalServerError)
-    }
-    self.init(name: name)
-  }
-  
-  func makeJSON() throws -> JSON {
-    var json = JSON()
-    try json.set(Keys.id, id)
-    try json.set(Keys.name, name.rawValue)
-    return json
-  }
-  
-}
-
-// MARK: HTTP
-
-extension ImageType: ResponseRepresentable { }
-
-
 
 
 

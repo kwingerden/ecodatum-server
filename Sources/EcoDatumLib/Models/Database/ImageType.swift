@@ -1,15 +1,16 @@
-import Vapor
 import FluentProvider
-import HTTP
+import Vapor
 
-final class Role: EquatableModel {
+final class ImageType: EquatableModel {
   
   enum Name: String {
-    case ADMINISTRATOR
-    case MEMBER
+    case GIF
+    case JPEG
+    case PNG
     static let all: [Name] = [
-      .ADMINISTRATOR,
-      .MEMBER
+      .GIF,
+      .JPEG,
+      .PNG
     ]
   }
   
@@ -44,7 +45,7 @@ final class Role: EquatableModel {
 
 // MARK: Preparation
 
-extension Role: Preparation {
+extension ImageType: Preparation {
   
   static func prepare(_ database: Database) throws {
     try database.create(self) {
@@ -62,30 +63,6 @@ extension Role: Preparation {
   }
   
 }
-
-// MARK: JSON
-
-extension Role: JSONConvertible {
-  
-  convenience init(json: JSON) throws {
-    guard let name = Name(rawValue: try json.get(Keys.name)) else {
-      throw Abort(.internalServerError)
-    }
-    self.init(name: name)
-  }
-  
-  func makeJSON() throws -> JSON {
-    var json = JSON()
-    try json.set(Keys.id, id)
-    try json.set(Keys.name, name.rawValue)
-    return json
-  }
-  
-}
-
-// MARK: HTTP
-
-extension Role: ResponseRepresentable { }
 
 
 

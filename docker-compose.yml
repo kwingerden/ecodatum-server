@@ -32,7 +32,6 @@ services:
     volumes:
       - ecodatum-database:/var/lib/postgresql/data
       - shared-volume:/shared-volume
-    restart: always
 
 volumes:
 

@@ -10,7 +10,7 @@ RUN apt-get update && \
     apt-get -y install curl && \
     curl -sL https://apt.vapor.sh | bash && \
     apt-get update && \
-    apt-get -y install libghc-postgresql-libpq-dev vapor && \
+    apt-get -y install postgresql postgresql-client postgresql-contrib libpq-dev vapor && \
     rm -r /var/lib/apt/lists/*;
 
 WORKDIR /ecodatum-server

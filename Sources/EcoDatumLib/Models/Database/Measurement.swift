@@ -103,33 +103,6 @@ extension Measurement {
   
 }
 
-// MARK: JSONConvertible
-
-extension Measurement: JSONConvertible {
-  
-  convenience init(json: JSON) throws {
-    self.init(value: try json.get(Keys.value),
-              abioticFactorId: try json.get(Keys.abioticFactorId),
-              measurementUnitId: try json.get(Keys.measurementUnitId),
-              surveyId: try json.get(Keys.surveyId))
-  }
-  
-  func makeJSON() throws -> JSON {
-    var json = JSON()
-    try json.set(Keys.id, id)
-    try json.set(Keys.value, value)
-    try json.set(Keys.abioticFactorId, abioticFactorId)
-    try json.set(Keys.measurementUnitId, measurementUnitId)
-    try json.set(Keys.surveyId, surveyId)
-    return json
-  }
-  
-}
-
-// MARK: ResponseRepresentable
-
-extension Measurement: ResponseRepresentable { }
-
 // MARK: Timestampable
 
 extension Measurement: Timestampable { }

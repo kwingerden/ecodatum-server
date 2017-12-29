@@ -1,7 +1,6 @@
-import Vapor
 import FluentProvider
 import AuthProvider
-import HTTP
+import Vapor
 
 final class User: EquatableModel {
   
@@ -99,60 +98,8 @@ extension User {
 
 }
 
-// MARK: JSONConvertible
-
-extension User: JSONConvertible {
-  
-  convenience init(json: JSON) throws {
-    self.init(name: try json.get(Keys.name),
-              email: try json.get(Keys.email),
-              password: try json.get(Keys.password))
-  }
-  
-  func makeJSON() throws -> JSON {
-    var json = JSON()
-    try json.set(Keys.id, id)
-    try json.set(Keys.name, name)
-    try json.set(Keys.email, email)
-    return json
-  }
-  
-}
-
-// MARK: HTTP
-
-extension User: ResponseRepresentable { }
-
-// MARK: Password
-
-extension User: PasswordAuthenticatable {
-
-  var hashedPassword: String? {
-    return password
-  }
-  
-  public static var passwordVerifier: PasswordVerifier? {
-    get {
-      return _userPasswordVerifier
-    }
-    set {
-      _userPasswordVerifier = newValue
-    }
-  }
-  
-}
-private var _userPasswordVerifier: PasswordVerifier? = nil
-
 // MARK: TIMESTAMP
 
 extension User: Timestampable { }
-
-// MARK: Token
-
-extension User: TokenAuthenticatable {
-
-  typealias TokenType = Token
-
-}
 
 

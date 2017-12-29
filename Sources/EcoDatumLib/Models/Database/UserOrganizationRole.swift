@@ -1,6 +1,5 @@
-import Vapor
 import FluentProvider
-import HTTP
+import Vapor
 
 final class UserOrganizationRole: EquatableModel {
   

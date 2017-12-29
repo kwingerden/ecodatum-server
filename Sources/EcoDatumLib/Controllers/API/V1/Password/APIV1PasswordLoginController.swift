@@ -18,6 +18,7 @@ final class APIV1PasswordLoginController: ResourceRepresentable {
     
     let user = try request.user()
     drop.log.debug("Logging in as user: \(user.name)")
+    
     return try modelManager.generateToken(for: user)
   
   }

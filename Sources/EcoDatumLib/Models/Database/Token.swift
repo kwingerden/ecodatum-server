@@ -1,7 +1,5 @@
 import Vapor
-import AuthProvider
 import FluentProvider
-import Crypto
 
 final class Token: EquatableModel {
   
@@ -40,19 +38,6 @@ final class Token: EquatableModel {
   }
 }
 
-// MARK: Convenience
-
-extension Token {
-
-  static func generate(for user: User) throws -> Token {
-    let random = try Crypto.Random.bytes(count: 16)
-    return try Token(
-      token: random.base64Encoded.makeString(),
-      userId: user.assertExists())
-  }
-  
-}
-
 // MARK: Relations
 
 extension Token {
@@ -81,30 +66,6 @@ extension Token: Preparation {
   }
   
 }
-
-// MARK: JSON
-
-extension Token: JSONConvertible {
-  
-  convenience init(json: JSON) throws {
-    self.init(token: try json.get(Keys.token),
-              userId: try json.get(Keys.userId))
-  }
-  
-  func makeJSON() throws -> JSON {
-    var json = JSON()
-    try json.set(Keys.id, id)
-    try json.set(Keys.token, token)
-    try json.set(Keys.userId, userId)
-    return json
-  }
-  
-}
-
-// MARK: HTTP
-
-extension Token: ResponseRepresentable { }
-
 
 // MARK: TIMESTAMP
 

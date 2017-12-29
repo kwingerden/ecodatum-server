@@ -1,19 +1,14 @@
-import Vapor
 import FluentProvider
-import HTTP
+import Vapor
 
-final class MeasurementUnit: EquatableModel {
+final class Role: EquatableModel {
   
   enum Name: String {
-    case ACIDITY_PH
-    case CARBON_DIOXIDE_PPM
-    case LIGHT_INTENSITY_LUX
-    case TEMPERATURE_CELCIUS
+    case ADMINISTRATOR
+    case MEMBER
     static let all: [Name] = [
-      .ACIDITY_PH,
-      .CARBON_DIOXIDE_PPM,
-      .LIGHT_INTENSITY_LUX,
-      .TEMPERATURE_CELCIUS
+      .ADMINISTRATOR,
+      .MEMBER
     ]
   }
   
@@ -48,7 +43,7 @@ final class MeasurementUnit: EquatableModel {
 
 // MARK: Preparation
 
-extension MeasurementUnit: Preparation {
+extension Role: Preparation {
   
   static func prepare(_ database: Database) throws {
     try database.create(self) {
@@ -66,30 +61,6 @@ extension MeasurementUnit: Preparation {
   }
   
 }
-
-// MARK: JSON
-
-extension MeasurementUnit: JSONConvertible {
-  
-  convenience init(json: JSON) throws {
-    guard let name = Name(rawValue: try json.get(Keys.name)) else {
-      throw Abort(.internalServerError)
-    }
-    self.init(name: name)
-  }
-  
-  func makeJSON() throws -> JSON {
-    var json = JSON()
-    try json.set(Keys.id, id)
-    try json.set(Keys.name, name.rawValue)
-    return json
-  }
-  
-}
-
-// MARK: HTTP
-
-extension MeasurementUnit: ResponseRepresentable { }
 
 
 

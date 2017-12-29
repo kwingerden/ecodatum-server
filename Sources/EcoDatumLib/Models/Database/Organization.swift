@@ -1,6 +1,5 @@
-import Vapor
 import FluentProvider
-import HTTP
+import Vapor
 
 final class Organization: EquatableModel {
   
@@ -93,31 +92,6 @@ extension Organization {
   }
 
 }
-
-// MARK: JSON
-
-extension Organization: JSONConvertible {
-  
-  convenience init(json: JSON) throws {
-    self.init(name: try json.get(Keys.name),
-              description: try json.get(Keys.description),
-              code: try json.get(Keys.code))
-  }
-  
-  func makeJSON() throws -> JSON {
-    var json = JSON()
-    try json.set(Keys.id, id)
-    try json.set(Keys.name, name)
-    try json.set(Keys.description, description)
-    try json.set(Keys.code, code)
-    return json
-  }
-  
-}
-
-// MARK: HTTP
-
-extension Organization: ResponseRepresentable { }
 
 // MARK: TIMESTAMP
 

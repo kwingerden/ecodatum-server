@@ -1,6 +1,5 @@
-import Vapor
 import FluentProvider
-import HTTP
+import Vapor
 
 final class AbioticFactor: EquatableModel {
   
@@ -64,30 +63,6 @@ extension AbioticFactor: Preparation {
   }
   
 }
-
-// MARK: JSON
-
-extension AbioticFactor: JSONConvertible {
-  
-  convenience init(json: JSON) throws {
-    guard let name = Name(rawValue: try json.get(Keys.name)) else {
-      throw Abort(.internalServerError)
-    }
-    self.init(name: name)
-  }
-  
-  func makeJSON() throws -> JSON {
-    var json = JSON()
-    try json.set(Keys.id, id)
-    try json.set(Keys.name, name.rawValue)
-    return json
-  }
-  
-}
-
-// MARK: HTTP
-
-extension AbioticFactor: ResponseRepresentable { }
 
 
 

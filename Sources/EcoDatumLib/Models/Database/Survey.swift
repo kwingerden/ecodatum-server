@@ -100,31 +100,6 @@ extension Survey {
 
 }
 
-// MARK: JSONConvertible
-
-extension Survey: JSONConvertible {
-  
-  convenience init(json: JSON) throws {
-    self.init(date: try json.get(Keys.date),
-              siteId: try json.get(Keys.siteId),
-              userId: try json.get(Keys.userId))
-  }
-  
-  func makeJSON() throws -> JSON {
-    var json = JSON()
-    try json.set(Keys.id, id)
-    try json.set(Keys.date, date)
-    try json.set(Keys.siteId, siteId)
-    try json.set(Keys.userId, userId)
-    return json
-  }
-  
-}
-
-// MARK: ResponseRepresentable
-
-extension Survey: ResponseRepresentable { }
-
 // MARK: Timestampable
 
 extension Survey: Timestampable { }

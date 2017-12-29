@@ -160,43 +160,6 @@ extension Site {
 
 }
 
-// MARK: JSONRepresentable
-
-extension Site: JSONConvertible {
-  
-  convenience init(json: JSON) throws {
-    self.init(name: try json.get(Keys.name),
-              description: try json.get(Keys.description),
-              latitude: try json.get(Keys.latitude),
-              longitude: try json.get(Keys.longitude),
-              altitude: try json.get(Keys.altitude),
-              horizontalAccuracy: try json.get(Keys.horizontalAccuracy),
-              verticalAccuracy: try json.get(Keys.verticalAccuracy),
-              organizationId: try json.get(Keys.organizationId),
-              userId: try json.get(Keys.userId))
-  }
-  
-  func makeJSON() throws -> JSON {
-    var json = JSON()
-    try json.set(Keys.id, id)
-    try json.set(Keys.name, name)
-    try json.set(Keys.description, description)
-    try json.set(Keys.latitude, latitude)
-    try json.set(Keys.longitude, longitude)
-    try json.set(Keys.altitude, altitude)
-    try json.set(Keys.horizontalAccuracy, horizontalAccuracy)
-    try json.set(Keys.verticalAccuracy, verticalAccuracy)
-    try json.set(Keys.organizationId, organizationId)
-    try json.set(Keys.userId, userId)
-    return json
-  }
-  
-}
-
-// MARK: ResponseRepresentable
-
-extension Site: ResponseRepresentable { }
-
 // MARK: Timestampable
 
 extension Site: Timestampable { }
