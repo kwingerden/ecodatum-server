@@ -28,6 +28,9 @@ final class APIV1RouteCollection: RouteCollection {
       builder.resource(
         "organizations", 
         APIV1PublicOrganizationsController(drop: drop, modelManager: modelManager))
+      builder.resource(
+        "users",
+        APIV1PublicUsersController(drop: drop, modelManager: modelManager))
     }
     
     // MARK: Password Protected Contollers
