@@ -6,13 +6,13 @@ extension User: JSONConvertible {
   
   struct Json {
     static let id = Keys.id
-    static let name = Keys.name
+    static let fullName = "fullName"
     static let email = Keys.email
     static let password = Keys.password
   }
   
   convenience init(json: JSON) throws {
-    self.init(name: try json.get(Json.name),
+    self.init(fullName: try json.get(Json.fullName),
               email: try json.get(Json.email),
               password: try json.get(Json.password))
   }
@@ -20,7 +20,7 @@ extension User: JSONConvertible {
   func makeJSON() throws -> JSON {
     var json = JSON()
     try json.set(Json.id, id)
-    try json.set(Json.name, name)
+    try json.set(Json.fullName, fullName)
     try json.set(Json.email, email)
     return json
   }

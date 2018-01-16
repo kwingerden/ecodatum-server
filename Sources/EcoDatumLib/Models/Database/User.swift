@@ -7,7 +7,7 @@ final class User: EquatableModel {
   let storage = Storage()
   
   /// The name of the user
-  var name: String
+  var fullName: String
   
   /// The user's email
   var email: String
@@ -17,15 +17,15 @@ final class User: EquatableModel {
   
   struct Keys {
     static let id = "id"
-    static let name = "name"
+    static let fullName = "full_name"
     static let email = "email"
     static let password = "password"
   }
   
-  init(name: String,
+  init(fullName: String,
        email: String,
        password: String) {
-    self.name = name
+    self.fullName = fullName
     self.email = email
     self.password = password
   }
@@ -33,14 +33,14 @@ final class User: EquatableModel {
   // MARK: Row
   
   init(row: Row) throws {
-    name = try row.get(Keys.name)
+    fullName = try row.get(Keys.fullName)
     email = try row.get(Keys.email)
     password = try row.get(Keys.password)
   }
   
   func makeRow() throws -> Row {
     var row = Row()
-    try row.set(Keys.name, name)
+    try row.set(Keys.fullName, fullName)
     try row.set(Keys.email, email)
     try row.set(Keys.password, password)
     return row
@@ -57,8 +57,8 @@ extension User: Preparation {
       builder in
       builder.id()
       builder.string(
-        Keys.name,
-        length: 30,
+        Keys.fullName,
+        length: 50,
         optional: false,
         unique: false)
       builder.string(

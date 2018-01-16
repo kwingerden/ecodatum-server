@@ -13,36 +13,43 @@ final class APIV1PublicUsersController: ResourceRepresentable {
     self.modelManager = modelManager
   }
   
-  // POST public/users?code=:code
+  // POST public/users
   func store(_ request: Request) throws -> ResponseRepresentable {
     
-    guard let organizationCode = request.query?["code"]?.string else {
-      throw Abort(.badRequest, reason: "Must supply organization code query parameter.")
+    guard let json = request.json,
+      let organizationCode: String = try json.get("organizationCode"),
+      let email: String = try json.get("email"),
+      let password: String = try json.get("password") else {
+        throw Abort(.badRequest, reason: "Invalid JSON")
     }
     
-    guard let _organization = try? modelManager.findOrganization(byCode: organizationCode),
-      let organization = _organization else {
-      throw Abort(.notFound, reason: "Unable to find organization with code: \(organizationCode)")
+    if password.count < Constants.MIN_PASSWORD_COUNT {
+      throw Abort(
+        .preconditionFailed,
+        reason: "A minimum of \(Constants.MIN_PASSWORD_COUNT) characters are required for the password.")
     }
     
-    guard let json = request.json else {
-      throw Abort(.badRequest, reason: "Invalid JSON")
+    guard let organization = try modelManager.findOrganization(byCode: organizationCode) else {
+      throw Abort(
+        .preconditionFailed,
+        reason: "Unable to find organization with code: \(organizationCode)")
+    }
+    
+    if let _ = try modelManager.findUser(byEmail: email) {
+      throw Abort(
+        .preconditionFailed,
+        reason: "User already has an account: \(email)")
     }
     
     guard let user = try? modelManager.createUser(json: json) else {
-      throw Abort(.internalServerError, reason: "Failed to create user")
+      throw Abort(.internalServerError, reason: "Failed to create user: \(email)")
     }
     
-    guard let role = try? modelManager.getRole(name: .MEMBER) else {
-      throw Abort(.internalServerError, reason: "Failed to get Role")
-    }
-    
-    guard let _ = try? modelManager.addUserToOrganization(
+    let role = try modelManager.getRole(name: .MEMBER)
+    let _  = try modelManager.addUserToOrganization(
       user: user,
       organization: organization,
-      role: role) else {
-      throw Abort(.internalServerError, reason: "Failed to get Role")
-    }
+      role: role)
     
     return user
     

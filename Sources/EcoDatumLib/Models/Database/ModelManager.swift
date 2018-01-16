@@ -21,7 +21,7 @@ class ModelManager {
     }
     
     guard let rootUser = try User.find(Constants.ROOT_USER_ID),
-      rootUser.name == rootUserName,
+      rootUser.fullName == rootUserName,
       rootUser.email == rootUserEmail else {
         throw Abort(.expectationFailed)
     }
@@ -139,8 +139,8 @@ class ModelManager {
                   password: String) throws -> User {
     
     let user = User(
-      name: name,
-      email: email,
+      fullName: name,
+      email: email.lowercased(),
       password: try hashPassword(password))
     try User.makeQuery(connection).save(user)
     
@@ -175,7 +175,7 @@ class ModelManager {
   func findUser(_ connection: Connection? = nil,
                 byEmail: String) throws -> User? {
     return try User.makeQuery(connection)
-      .filter(User.Keys.email, .equals, byEmail)
+      .filter(User.Keys.email, .equals, byEmail.lowercased())
       .first()
   }
   
@@ -209,7 +209,7 @@ class ModelManager {
     try user.assertExists()
     
     if let name = newName {
-      user.name = name
+      user.fullName = name
     }
     
     if let email = newEmail {
@@ -292,7 +292,7 @@ class ModelManager {
   func findOrganization(_ connection: Connection? = nil,
                         byCode: String) throws -> Organization? {
     return try Organization.makeQuery(connection)
-      .filter(Organization.Keys.code, .equals, byCode)
+      .filter(Organization.Keys.code, .equals, byCode.uppercased())
       .first()
   }
   
@@ -652,7 +652,7 @@ class ModelManager {
   func findImage(_ connection: Connection? = nil,
                  byCode: String) throws -> Image? {
     return try Image.makeQuery(connection)
-      .filter(Image.Keys.code, .equals, byCode)
+      .filter(Image.Keys.code, .equals, byCode.uppercased())
       .first()
   }
   

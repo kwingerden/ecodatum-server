@@ -29,7 +29,7 @@ public final class InitializeDatabaseCommand: Command {
     // Create "root" user
     if let user = try User.find(Constants.ROOT_USER_ID) {
       
-      if user.name == rootUserName && user.email == rootUserEmail {
+      if user.fullName == rootUserName && user.email == rootUserEmail {
         console.print("Root user '\(rootUserName)' already exists.")
       } else {
         throw Abort(.internalServerError,
@@ -38,7 +38,7 @@ public final class InitializeDatabaseCommand: Command {
       
     } else {
       
-      let user = User(name: rootUserName, 
+      let user = User(fullName: rootUserName, 
                       email: rootUserEmail, 
                       password: rootUserPassword)
       try user.save()

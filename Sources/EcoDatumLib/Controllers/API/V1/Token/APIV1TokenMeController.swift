@@ -16,7 +16,7 @@ final class APIV1TokenMeController: ResourceRepresentable {
   // GET /me
   func index(_ request: Request) throws -> ResponseRepresentable {
     let user = try request.user()
-    return "Hello, \(user.name)"
+    return "Hello, \(user.fullName)"
   }
   
   func makeResource() -> Resource<String> {
