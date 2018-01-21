@@ -16,8 +16,13 @@ final class APIV1TokenOrganizationsController: ResourceRepresentable {
   // GET /organizations
   func index(_ request: Request) throws -> ResponseRepresentable {
     
-    try modelManager.assertRootUser(request.user())
-    return try modelManager.getAllOrganizations().makeJSON()
+    if try modelManager.isRootUser(request.user()) {
+      return try modelManager.getAllOrganizations().makeJSON()
+    } else {
+      return try modelManager.findOrganizations(
+        byUser: request.user())
+        .makeJSON()
+    }
     
   }
   
@@ -25,55 +30,68 @@ final class APIV1TokenOrganizationsController: ResourceRepresentable {
   func show(_ request: Request,
             _ organization: Organization) throws -> ResponseRepresentable {
     
-    //try assertUserOwnsOrganizationOrIsAdmin(request, organization)
-    return organization
+    if try modelManager.isRootUser(request.user()) {
+      return organization
+    } else if try modelManager.doesUserBelongToOrganization(
+      user: request.user(),
+      organization: organization) {
+      return organization
+    } else {
+      throw Abort(.notFound)
+    }
     
   }
   
   // POST /organizations
   func store(_ request: Request) throws -> ResponseRepresentable {
     
-    guard let name: String = try request.assertJson().get(Organization.Keys.name) else {
+    guard let json = try? request.assertJson() else {
+      throw Abort(.badRequest, reason: "Expecting JSON.")
+    }
+    
+    guard let name: String = try? json.get(Organization.Keys.name) else {
       throw Abort(.badRequest, reason: "Organization must have a name.")
     }
     
-    //let userId = try request.user().assertExists()
-    let organization = Organization(name: name,
-                                    code: String(randomUpperCaseAlphaNumericLength: 6))
-    try organization.save()
+    var description: String? = nil
+    if let _description: String = try json.get(Organization.Keys.description),
+      !_description.isEmpty {
+      description = _description
+    }
     
-    return organization
-    
-  }
-  
-  // PATCH /organizations/:id
-  func update(_ request: Request,
-              organization: Organization) throws -> ResponseRepresentable {
-    
-    //try assertUserOwnsOrganizationOrIsAdmin(request, organization)
-    //try organization.update(for: request)
-    try organization.save()
-    
-    return organization
-    
+    return try modelManager.createOrganization(
+      user: try request.user(),
+      name: name,
+      description: description)
+
   }
   
   // DELETE /organizations/:id
   func destroy(_ request: Request,
                organization: Organization) throws -> ResponseRepresentable {
     
-    //try assertUserOwnsOrganizationOrIsAdmin(request, organization)
-    try organization.delete()
+    try modelManager.assertRootUser(request.user())
+    try modelManager.deleteOrganization(organization: organization)
     
-    return Response(status: .ok)
+    if try modelManager.isRootUser(request.user()) {
+      try modelManager.deleteOrganization(organization: organization)
+      return Response(status: .ok)
+    } else if try modelManager.doesUserBelongToOrganization(
+      user: request.user(),
+      organization: organization) {
+      try modelManager.deleteOrganization(organization: organization)
+      return Response(status: .ok)
+    } else {
+      throw Abort(.notFound)
+    }
     
   }
   
   // DELETE /organizations
   func clear(_ request: Request) throws -> ResponseRepresentable {
     
-    //try request.assertRootUser()
-    try Organization.makeQuery().delete()
+    try modelManager.assertRootUser(request.user())
+    try modelManager.deleteAllOrganizations()
     
     return Response(status: .ok)
     
@@ -84,7 +102,6 @@ final class APIV1TokenOrganizationsController: ResourceRepresentable {
       index: index,
       store: store,
       show: show,
-      update: update,
       destroy: destroy,
       clear: clear)
   }

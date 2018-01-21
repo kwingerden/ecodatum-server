@@ -311,6 +311,17 @@ class ModelManager {
     return try findOrganization(connection, bySite: site)
   }
   
+  func findOrganizations(_ connection: Connection? = nil,
+                         byUser: User) throws -> [Organization] {
+    return try UserOrganizationRole.makeQuery(connection)
+      .filter(UserOrganizationRole.Keys.userId, .equals, byUser.id)
+      .all()
+      .map {
+        userOrganizationRole in
+        try self.findOrganization(byId: userOrganizationRole.organizationId)!
+    }
+  }
+  
   func getAllOrganizations(_ connection: Connection? = nil) throws -> [Organization] {
     return try Organization.makeQuery(connection).all()
   }
@@ -340,6 +351,22 @@ class ModelManager {
                           organization: Organization) throws {
     try organization.assertExists()
     try Organization.makeQuery(connection).delete(organization)
+  }
+  
+  func deleteAllOrganizations(_ connection: Connection? = nil) throws {
+    try UserOrganizationRole.makeQuery(connection).delete()
+    try Organization.makeQuery(connection).delete()
+  }
+  
+  func doesUserBelongToOrganization(_ connection: Connection? = nil,
+                                    user: User,
+                                    organization: Organization) throws -> Bool {
+    let first = try UserOrganizationRole.makeQuery(connection)
+      .filter(UserOrganizationRole.Keys.userId, .equals, user.id)
+      .filter(UserOrganizationRole.Keys.organizationId, .equals, organization.id)
+      .all()
+      .first
+    return first != nil
   }
   
   func createSite(_ connection: Connection? = nil,

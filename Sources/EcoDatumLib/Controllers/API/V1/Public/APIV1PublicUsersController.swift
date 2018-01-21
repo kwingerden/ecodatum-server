@@ -18,8 +18,11 @@ final class APIV1PublicUsersController: ResourceRepresentable {
     
     guard let json = request.json,
       let organizationCode: String = try json.get("organizationCode"),
+      !organizationCode.isEmpty,
       let email: String = try json.get("email"),
-      let password: String = try json.get("password") else {
+      !email.isEmpty,
+      let password: String = try json.get("password"),
+      !password.isEmpty else {
         throw Abort(.badRequest, reason: "Invalid JSON")
     }
     
