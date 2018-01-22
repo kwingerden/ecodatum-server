@@ -76,5 +76,5 @@
     env FULL_NAME="Test User1" \
       EMAIL="test1@email.com" \
       PASSWORD="password" \
-      CODE="PZZTPK" \
+      CODE="PZZTPKx" \
       ./NewOrganizationUserAccount.sh

@@ -66,6 +66,9 @@ final class APIV1RouteCollection: RouteCollection {
         "organizations", 
         APIV1TokenOrganizationsController(drop: drop, modelManager: modelManager))
       builder.resource(
+        "sites",
+        APIV1TokenSitesController(drop: drop, modelManager: modelManager))
+      builder.resource(
         "users", 
         APIV1TokenUsersController(drop: drop, modelManager: modelManager))
     }

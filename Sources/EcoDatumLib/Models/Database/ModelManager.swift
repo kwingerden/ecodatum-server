@@ -43,45 +43,6 @@ class ModelManager {
     
   }
   
-  func getAbioticFactor(_ connection: Connection? = nil,
-                        name: AbioticFactor.Name) throws -> AbioticFactor {
-    
-    guard let abioticFactor = try AbioticFactor.makeQuery(connection)
-      .filter(AbioticFactor.Keys.name, .equals, name.rawValue)
-      .first() else {
-        throw Abort(.expectationFailed)
-    }
-    
-    return abioticFactor
-    
-  }
-  
-  func getMeasurementUnit(_ connection: Connection? = nil,
-                          name: MeasurementUnit.Name) throws -> MeasurementUnit {
-    
-    guard let measurementUnit = try MeasurementUnit.makeQuery(connection)
-      .filter(MeasurementUnit.Keys.name, .equals, name.rawValue)
-      .first() else {
-        throw Abort(.expectationFailed)
-    }
-    
-    return measurementUnit
-    
-  }
-  
-  func getImageType(_ connection: Connection? = nil,
-                    name: ImageType.Name) throws -> ImageType {
-    
-    guard let imageType = try ImageType.makeQuery(connection)
-      .filter(ImageType.Keys.name, .equals, name.rawValue)
-      .first() else {
-        throw Abort(.expectationFailed)
-    }
-    
-    return imageType
-    
-  }
-  
   func generateToken(_ connection: Connection? = nil,
                      for: User) throws -> Token {
   
@@ -133,6 +94,16 @@ class ModelManager {
     }
   }
   
+  private func hashPassword(_ password: String) throws -> String {
+    return try drop.hash.make(password.makeBytes()).makeString()
+  }
+  
+}
+
+// MARK: User Extension
+
+extension ModelManager {
+  
   func createUser(_ connection: Connection? = nil,
                   name: String,
                   email: String,
@@ -179,23 +150,6 @@ class ModelManager {
       .first()
   }
   
-  func findSurveyOwner(_ connection: Connection? = nil,
-                       survey: Survey) throws -> User? {
-    guard let user = try survey.user.get() else {
-      throw Abort(.expectationFailed)
-    }
-    return user
-  }
-  
-  func findMeasurementOwner(_ connection: Connection? = nil,
-                            measurement: Measurement) throws -> User? {
-    guard let survey = try measurement.survey.get(),
-      let user = try findSurveyOwner(connection, survey: survey) else {
-        throw Abort(.expectationFailed)
-    }
-    return user
-  }
-  
   func getAllUsers(_ connection: Connection? = nil) throws -> [User] {
     return try User.makeQuery(connection).all()
   }
@@ -231,6 +185,12 @@ class ModelManager {
     try user.assertExists()
     try User.makeQuery(connection).delete(user)
   }
+  
+}
+
+// MARK: Organization Extension
+
+extension ModelManager {
   
   func createOrganization(_ connection: Connection? = nil,
                           user: User,
@@ -364,41 +324,40 @@ class ModelManager {
     let first = try UserOrganizationRole.makeQuery(connection)
       .filter(UserOrganizationRole.Keys.userId, .equals, user.id)
       .filter(UserOrganizationRole.Keys.organizationId, .equals, organization.id)
-      .all()
-      .first
+      .first()
     return first != nil
   }
   
+}
+
+// MARK: Site Extension
+
+extension ModelManager {
+  
   func createSite(_ connection: Connection? = nil,
                   name: String,
+                  description: String? = nil,
                   latitude: Double,
                   longitude: Double,
-                  altitude: Double?,
-                  horizontalAccuracy: Double?,
-                  verticalAccuracy: Double?,
+                  altitude: Double? = nil,
+                  horizontalAccuracy: Double? = nil,
+                  verticalAccuracy: Double? = nil,
                   user: User,
                   organization: Organization) throws -> Site {
     
-    let userId = try user.assertExists()
-    let organizationId = try organization.assertExists()
-    let roleId = try getRole(connection, name: .ADMINISTRATOR).assertExists()
-    
-    guard let _ = try UserOrganizationRole.makeQuery(connection)
-      .filter(UserOrganizationRole.Keys.organizationId, .equals, organizationId)
-      .filter(UserOrganizationRole.Keys.roleId, .equals, roleId)
-      .filter(UserOrganizationRole.Keys.userId, .equals, userId)
-      .first() else {
-        throw Abort(.expectationFailed)
+    if try !doesUserBelongToOrganization(user: user, organization: organization) {
+      throw Abort(.forbidden)
     }
     
     let site = Site(name: name,
+                    description: description,
                     latitude: latitude,
                     longitude: longitude,
                     altitude: altitude,
                     horizontalAccuracy: horizontalAccuracy,
                     verticalAccuracy: verticalAccuracy,
-                    organizationId: organizationId,
-                    userId: userId)
+                    organizationId: try organization.assertExists(),
+                    userId: try user.assertExists())
     try Site.makeQuery(connection).save(site)
     
     return site
@@ -414,6 +373,17 @@ class ModelManager {
                 bySurvey: Survey) throws -> Site? {
     try bySurvey.assertExists()
     return try findSite(connection, byId: bySurvey.siteId)
+  }
+  
+  func findSites(_ connection: Connection? = nil,
+                 byUser: User) throws -> [Site] {
+    return try Site.makeQuery(connection)
+      .filter(Site.Keys.userId, .equals, byUser.id)
+      .all()
+  }
+  
+  func getAllSites(_ connection: Connection? = nil) throws -> [Site] {
+    return try Site.makeQuery(connection).all()
   }
   
   func updateSite(_ connection: Connection? = nil,
@@ -463,6 +433,12 @@ class ModelManager {
     try Site.makeQuery(connection).delete(site)
   }
   
+}
+
+// MARK: Survey Extension
+
+extension ModelManager {
+  
   func createSurvey(_ connection: Connection? = nil,
                     date: Date,
                     site: Site,
@@ -494,10 +470,50 @@ class ModelManager {
     return try Survey.makeQuery(connection).find(byId)
   }
   
+  func findSurveyOwner(_ connection: Connection? = nil,
+                       survey: Survey) throws -> User? {
+    guard let user = try survey.user.get() else {
+      throw Abort(.expectationFailed)
+    }
+    return user
+  }
+  
   func deleteSurvey(_ connection: Connection? = nil,
                     survey: Survey) throws {
     try survey.assertExists()
     try Survey.makeQuery(connection).delete(survey)
+  }
+  
+}
+
+// MARK: Measurement Extension
+
+extension ModelManager {
+  
+  func getAbioticFactor(_ connection: Connection? = nil,
+                        name: AbioticFactor.Name) throws -> AbioticFactor {
+    
+    guard let abioticFactor = try AbioticFactor.makeQuery(connection)
+      .filter(AbioticFactor.Keys.name, .equals, name.rawValue)
+      .first() else {
+        throw Abort(.expectationFailed)
+    }
+    
+    return abioticFactor
+    
+  }
+  
+  func getMeasurementUnit(_ connection: Connection? = nil,
+                          name: MeasurementUnit.Name) throws -> MeasurementUnit {
+    
+    guard let measurementUnit = try MeasurementUnit.makeQuery(connection)
+      .filter(MeasurementUnit.Keys.name, .equals, name.rawValue)
+      .first() else {
+        throw Abort(.expectationFailed)
+    }
+    
+    return measurementUnit
+    
   }
   
   func createMeasurement(_ connection: Connection? = nil,
@@ -549,6 +565,15 @@ class ModelManager {
     return try Measurement.makeQuery(connection).find(byId)
   }
   
+  func findMeasurementOwner(_ connection: Connection? = nil,
+                            measurement: Measurement) throws -> User? {
+    guard let survey = try measurement.survey.get(),
+      let user = try findSurveyOwner(connection, survey: survey) else {
+        throw Abort(.expectationFailed)
+    }
+    return user
+  }
+  
   func updateMeasurement(_ connection: Connection? = nil,
                          measurement: Measurement,
                          newValue: Double? = nil,
@@ -580,6 +605,12 @@ class ModelManager {
     try measurement.assertExists()
     try Measurement.makeQuery(connection).delete(measurement)
   }
+  
+}
+
+// MARK: Note Extension
+
+extension ModelManager {
   
   func createNote(_ connection: Connection? = nil,
                   text: String,
@@ -626,6 +657,12 @@ class ModelManager {
     try Note.makeQuery(connection).delete(note)
   }
   
+}
+
+// MARK: Image Extension
+
+extension ModelManager {
+  
   func createImage(_ connection: Connection? = nil,
                    bytes: Bytes,
                    description: String? = nil,
@@ -653,6 +690,19 @@ class ModelManager {
     try Image.makeQuery(connection).save(image)
     
     return image
+    
+  }
+  
+  func getImageType(_ connection: Connection? = nil,
+                    name: ImageType.Name) throws -> ImageType {
+    
+    guard let imageType = try ImageType.makeQuery(connection)
+      .filter(ImageType.Keys.name, .equals, name.rawValue)
+      .first() else {
+        throw Abort(.expectationFailed)
+    }
+    
+    return imageType
     
   }
   
@@ -715,9 +765,4 @@ class ModelManager {
     try Image.makeQuery(connection).delete(image)
   }
   
-  private func hashPassword(_ password: String) throws -> String {
-    return try drop.hash.make(password.makeBytes()).makeString()
-  }
-  
 }
-
