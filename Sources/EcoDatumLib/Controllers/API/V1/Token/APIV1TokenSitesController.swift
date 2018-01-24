@@ -47,9 +47,13 @@ final class APIV1TokenSitesController: ResourceRepresentable {
       throw Abort(.badRequest, reason: "Expecting JSON.")
     }
     
-    guard let name: String = try? json.get(Site.Json.name),
+    guard let name: String = try json.get(Site.Json.name),
       !name.isEmpty else {
       throw Abort(.badRequest, reason: "Site must have a name.")
+    }
+    
+    if let site = try modelManager.findSite(byName: name) {
+      throw Abort(.conflict, reason: "Site \(site.name) already exists.")
     }
     
     var description: String? = nil

@@ -370,6 +370,13 @@ extension ModelManager {
   }
   
   func findSite(_ connection: Connection? = nil,
+                byName: String) throws -> Site? {
+    return try Site.makeQuery(connection)
+      .filter(Site.Keys.name, .equals, byName)
+      .first()
+  }
+  
+  func findSite(_ connection: Connection? = nil,
                 bySurvey: Survey) throws -> Site? {
     try bySurvey.assertExists()
     return try findSite(connection, byId: bySurvey.siteId)
