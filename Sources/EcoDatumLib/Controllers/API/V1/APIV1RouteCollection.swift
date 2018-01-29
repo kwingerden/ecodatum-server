@@ -65,6 +65,11 @@ final class APIV1RouteCollection: RouteCollection {
       builder.resource(
         "organizations", 
         APIV1TokenOrganizationsController(drop: drop, modelManager: modelManager))
+      builder.get("organizations", Organization.parameter, "sites") {
+        request in
+        let organization = try request.parameters.next(Organization.self)
+        return try organization.sites.all().makeJSON()
+      }
       builder.resource(
         "sites",
         APIV1TokenSitesController(drop: drop, modelManager: modelManager))
