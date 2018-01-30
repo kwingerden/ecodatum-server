@@ -13,25 +13,11 @@ final class APIV1RouteCollection: RouteCollection {
     self.modelManager = modelManager
   }
   
-  func build(_ builder: RouteBuilder) throws {
+  func build(_ rb: RouteBuilder) throws {
     
-    let v1 = builder.grouped("v1")
+    let v1 = rb.grouped("v1")
     
-    // MARK: Public Controllers
-    
-    let `public` = v1.grouped("public")
-    `public`.group(middleware: []) {
-      builder in
-      builder.resource(
-        "images",
-        APIV1PublicImagesController(drop: drop, modelManager: modelManager))
-      builder.resource(
-        "organizations", 
-        APIV1PublicOrganizationsController(drop: drop, modelManager: modelManager))
-      builder.resource(
-        "users",
-        APIV1PublicUsersController(drop: drop, modelManager: modelManager))
-    }
+    makePublicRoutes(v1)
     
     // MARK: Password Protected Contollers
     
@@ -78,6 +64,28 @@ final class APIV1RouteCollection: RouteCollection {
         APIV1TokenUsersController(drop: drop, modelManager: modelManager))
     }
   }
+  
+  private func makePublicRoutes(_ routeBuilder: RouteBuilder) {
+    
+    let `public` = routeBuilder.grouped("public")
+  
+    APIV1PublicImagesRoutes(
+      drop: drop,
+      modelManager: modelManager)
+      .build(`public`.grouped("images"))
+    
+    APIV1PublicOrganizationsRoutes(
+      drop: drop,
+      modelManager: modelManager)
+      .build(`public`.grouped("organizations"))
+    
+    APIV1PublicUsersRoutes(
+      drop: drop,
+      modelManager: modelManager)
+      .build(`public`.grouped("users"))
+    
+  }
+  
   
 }
 
