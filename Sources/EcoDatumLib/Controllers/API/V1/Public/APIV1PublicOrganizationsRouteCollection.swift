@@ -1,7 +1,7 @@
 import Crypto
 import Vapor
 
-final class APIV1PublicOrganizationsRoutes {
+final class APIV1PublicOrganizationsRouteCollection: RouteCollection {
   
   let drop: Droplet
   
@@ -16,7 +16,7 @@ final class APIV1PublicOrganizationsRoutes {
   func build(_ routeBuilder: RouteBuilder) {
     
     routeBuilder.get(
-      ":code",
+      String.parameter,
       handler: getOrganizationByCodeRouteHandler)
     
   }

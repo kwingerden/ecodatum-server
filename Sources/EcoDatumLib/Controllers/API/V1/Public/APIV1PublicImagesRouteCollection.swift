@@ -4,7 +4,7 @@ import Foundation
 import HTTP
 import Vapor
 
-final class APIV1PublicImagesRoutes {
+final class APIV1PublicImagesRouteCollection: RouteCollection {
   
   let drop: Droplet
   
@@ -19,7 +19,7 @@ final class APIV1PublicImagesRoutes {
   func build(_ routeBuilder: RouteBuilder) {
     
     routeBuilder.get(
-      ":code",
+      String.parameter,
       handler: getImageByCodeRouteHandler)
     
   }

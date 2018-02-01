@@ -1,7 +1,7 @@
 import Vapor
 import HTTP
 
-final class APIV1PublicUsersRoutes {
+final class APIV1PublicUsersRouteCollection: RouteCollection {
   
   let drop: Droplet
   

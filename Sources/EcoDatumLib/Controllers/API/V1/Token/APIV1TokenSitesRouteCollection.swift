@@ -1,6 +1,6 @@
 import Vapor
 
-final class APIV1TokenSitesController: ResourceRepresentable {
+final class APIV1TokenSitesRouteCollection: RouteCollection {
   
   let drop: Droplet
   
@@ -12,8 +12,24 @@ final class APIV1TokenSitesController: ResourceRepresentable {
     self.modelManager = modelManager
   }
   
-  // GET /sites
-  func index(_ request: Request) throws -> ResponseRepresentable {
+  func build(_ routeBuilder: RouteBuilder) {
+    
+    // GET /sites
+    routeBuilder.get(
+      handler: getSitesByUser)
+    
+    // GET /sites/:id
+    routeBuilder.get(
+      Int.parameter,
+      handler: getSiteById)
+    
+    // POST /sites
+    routeBuilder.post(
+      handler: createNewSite)
+    
+  }
+  
+  private func getSitesByUser(_ request: Request) throws -> ResponseRepresentable {
     
     if try modelManager.isRootUser(request.user()) {
       return try modelManager.getAllSites().makeJSON()
@@ -23,9 +39,12 @@ final class APIV1TokenSitesController: ResourceRepresentable {
     
   }
   
-  // GET /sites/:id
-  func show(_ request: Request,
-            _ site: Site) throws -> ResponseRepresentable {
+  private func getSiteById(_ request: Request) throws -> ResponseRepresentable {
+    
+    guard let id = try? request.parameters.next(Int.self),
+      let site = try modelManager.findSite(byId: Identifier(id)) else {
+        throw Abort(.notFound)
+    }
     
     if try modelManager.isRootUser(request.user()) {
       return site
@@ -40,8 +59,7 @@ final class APIV1TokenSitesController: ResourceRepresentable {
     
   }
   
-  // POST /sites
-  func store(_ request: Request) throws -> ResponseRepresentable {
+  private func createNewSite(_ request: Request) throws -> ResponseRepresentable {
     
     guard let json = try? request.assertJson() else {
       throw Abort(.badRequest, reason: "Expecting JSON.")
@@ -83,13 +101,6 @@ final class APIV1TokenSitesController: ResourceRepresentable {
       user: try request.user(),
       organization: organization)
 
-  }
-  
-  func makeResource() -> Resource<Site> {
-    return Resource(
-      index: index,
-      store: store,
-      show: show)
   }
   
 }

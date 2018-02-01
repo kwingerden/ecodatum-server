@@ -18,74 +18,98 @@ final class APIV1RouteCollection: RouteCollection {
     let v1 = rb.grouped("v1")
     
     makePublicRoutes(v1)
+    makePasswordProtectedRoutes(v1)
+    makeTokenProtectedRoutes(v1)
     
-    // MARK: Password Protected Contollers
-    
-    v1.group(middleware: [
-      PasswordAuthenticationMiddleware(User.self)
-    ]) {
-      builder in
-      builder.resource(
-        "login", 
-        APIV1PasswordLoginController(drop: drop, modelManager: modelManager))
-    }
-    
-    // MARK: Token Protected Contollers
-    
-    let protected = v1.grouped("protected")
-    let exirationSeconds = drop.config["app", "token-expiration-seconds"]?.int ?? 86400
-    protected.group(middleware: [
-      TokenExpirationMiddleware(exirationSeconds),
-      TokenAuthenticationMiddleware(User.self)
-    ]) {
-      builder in
-      builder.resource(
-        "logout", 
-        APIV1TokenLogoutController(drop: drop, modelManager: modelManager))
-      builder.resource(
-        "me", 
-        APIV1TokenMeController(drop: drop, modelManager: modelManager))
-      builder.resource(
-        "images", 
-        APIV1TokenImagesController(drop: drop, modelManager: modelManager))
-      builder.resource(
-        "organizations", 
-        APIV1TokenOrganizationsController(drop: drop, modelManager: modelManager))
-      builder.get("organizations", Organization.parameter, "sites") {
-        request in
-        let organization = try request.parameters.next(Organization.self)
-        return try organization.sites.all().makeJSON()
-      }
-      builder.resource(
-        "sites",
-        APIV1TokenSitesController(drop: drop, modelManager: modelManager))
-      builder.resource(
-        "users", 
-        APIV1TokenUsersController(drop: drop, modelManager: modelManager))
-    }
   }
   
   private func makePublicRoutes(_ routeBuilder: RouteBuilder) {
     
     let `public` = routeBuilder.grouped("public")
   
-    APIV1PublicImagesRoutes(
+    // /public/abioticFactors
+    APIV1PublicAbioticFactorsRouteCollection(
+      drop: drop,
+      modelManager: modelManager)
+      .build(`public`.grouped("abioticFactors"))
+    
+    // /public/images
+    APIV1PublicImagesRouteCollection(
       drop: drop,
       modelManager: modelManager)
       .build(`public`.grouped("images"))
     
-    APIV1PublicOrganizationsRoutes(
+    // /public/measurementUnits
+    APIV1PublicMeasurementUnitsRouteCollection(
+      drop: drop,
+      modelManager: modelManager)
+      .build(`public`.grouped("measurementUnits"))
+    
+    // /public/organizations
+    APIV1PublicOrganizationsRouteCollection(
       drop: drop,
       modelManager: modelManager)
       .build(`public`.grouped("organizations"))
     
-    APIV1PublicUsersRoutes(
+    // /public/users
+    APIV1PublicUsersRouteCollection(
       drop: drop,
       modelManager: modelManager)
       .build(`public`.grouped("users"))
     
   }
   
+  private func makePasswordProtectedRoutes(_ routeBuilder: RouteBuilder) {
+    
+    let passwordProtected = routeBuilder.grouped(
+      [PasswordAuthenticationMiddleware(User.self)])
+    
+    // /login
+    APIV1PasswordLoginRouteCollection(
+      drop: drop,
+      modelManager: modelManager)
+      .build(passwordProtected.grouped("login"))
+    
+  }
   
+  private func makeTokenProtectedRoutes(_ routeBuilder: RouteBuilder) {
+    
+    let exirationSeconds = drop.config["app", "token-expiration-seconds"]?.int ?? 86400
+    let tokenProtected = routeBuilder.grouped("protected").grouped([
+      TokenExpirationMiddleware(exirationSeconds),
+      TokenAuthenticationMiddleware(User.self)])
+    
+    // /protected/logout
+    APIV1TokenLogoutRouteCollection(
+      drop: drop,
+      modelManager: modelManager)
+      .build(tokenProtected.grouped("logout"))
+    
+    // /protected/measurements
+    APIV1TokenMeasurementsRouteCollection(
+      drop: drop,
+      modelManager: modelManager)
+      .build(tokenProtected.grouped("measurements"))
+    
+    // /protected/organizations
+    APIV1TokenOrganizationsRouteCollection(
+      drop: drop,
+      modelManager: modelManager)
+      .build(tokenProtected.grouped("organizations"))
+    
+    // /protected/sites
+    APIV1TokenSitesRouteCollection(
+      drop: drop,
+      modelManager: modelManager)
+      .build(tokenProtected.grouped("sites"))
+    
+    // /protected/users
+    APIV1TokenUsersRouteCollection(
+      drop: drop,
+      modelManager: modelManager)
+      .build(tokenProtected.grouped("users"))
+  
+  }
+
 }
 

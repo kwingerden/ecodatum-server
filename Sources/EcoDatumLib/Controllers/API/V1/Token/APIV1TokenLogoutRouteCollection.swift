@@ -1,7 +1,7 @@
 import Vapor
 import HTTP
 
-final class APIV1TokenLogoutController: ResourceRepresentable {
+final class APIV1TokenLogoutRouteCollection: RouteCollection {
   
   let drop: Droplet
   
@@ -13,8 +13,13 @@ final class APIV1TokenLogoutController: ResourceRepresentable {
     self.modelManager = modelManager
   }
   
+  func build(_ routeBuilder: RouteBuilder) {
+    routeBuilder.get(handler: logout)
+  }
+  
   // GET /logout
-  func index(_ request: Request) throws -> ResponseRepresentable {
+  func logout(_ request: Request) throws -> ResponseRepresentable {
+    
     // Remove all tokens associated with the user
     try drop.database?.transaction {
       connection in
@@ -29,15 +34,12 @@ final class APIV1TokenLogoutController: ResourceRepresentable {
         try Token.makeQuery(connection).delete(token)
       }
     }
+    
     // Remove any cached authorization tokens
     try request.auth.unauthenticate()
+    
     return Response(status: .ok)
-  }
-  
-  func makeResource() -> Resource<String> {
-    return Resource(index: index)
+    
   }
   
 }
-
-

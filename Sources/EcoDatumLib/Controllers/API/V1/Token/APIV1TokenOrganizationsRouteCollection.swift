@@ -1,7 +1,7 @@
 import Crypto
 import Vapor
 
-final class APIV1TokenOrganizationsController: ResourceRepresentable {
+final class APIV1TokenOrganizationsRouteCollection: RouteCollection {
   
   let drop: Droplet
   
@@ -13,8 +13,33 @@ final class APIV1TokenOrganizationsController: ResourceRepresentable {
     self.modelManager = modelManager
   }
   
-  // GET /organizations
-  func index(_ request: Request) throws -> ResponseRepresentable {
+  func build(_ routeBuilder: RouteBuilder) {
+
+    // GET /organizations
+    routeBuilder.get(
+      handler: getOrganizationsByUser)
+    
+    // GET /organizations/:id/sites
+    routeBuilder.get(
+      Organization.parameter, "sites",
+      handler: getSitesByOrganization)
+    
+    // POST /organizations
+    routeBuilder.post(
+      handler: createNewOrganization)
+    
+    // DELETE /organizations
+    routeBuilder.delete(
+      handler: deleteAllOrganizations)
+    
+    // DELETE /organizations/:id
+    routeBuilder.delete(
+      Int.parameter,
+      handler: deleteOrganizationById)
+    
+  }
+  
+  private func getOrganizationsByUser(_ request: Request) throws -> ResponseRepresentable {
     
     if try modelManager.isRootUser(request.user()) {
       return try modelManager.getAllOrganizations().makeJSON()
@@ -26,9 +51,19 @@ final class APIV1TokenOrganizationsController: ResourceRepresentable {
     
   }
   
-  // GET /organizations/:id
-  func show(_ request: Request,
-            _ organization: Organization) throws -> ResponseRepresentable {
+  private func getSitesByOrganization(_ request: Request) throws -> ResponseRepresentable {
+    
+    let organization = try request.parameters.next(Organization.self)
+    return try organization.sites.all().makeJSON()
+    
+  }
+  
+  private func getOrganizationById(_ request: Request) throws -> ResponseRepresentable {
+    
+    guard let id = try? request.parameters.next(Int.self),
+      let organization = try modelManager.findOrganization(byId: Identifier(id)) else {
+        throw Abort(.notFound)
+    }
     
     if try modelManager.isRootUser(request.user()) {
       return organization
@@ -42,8 +77,7 @@ final class APIV1TokenOrganizationsController: ResourceRepresentable {
     
   }
   
-  // POST /organizations
-  func store(_ request: Request) throws -> ResponseRepresentable {
+  private func createNewOrganization(_ request: Request) throws -> ResponseRepresentable {
     
     guard let json = try? request.assertJson() else {
       throw Abort(.badRequest, reason: "Expecting JSON.")
@@ -66,12 +100,12 @@ final class APIV1TokenOrganizationsController: ResourceRepresentable {
 
   }
   
-  // DELETE /organizations/:id
-  func destroy(_ request: Request,
-               organization: Organization) throws -> ResponseRepresentable {
+  private func deleteOrganizationById(_ request: Request) throws -> ResponseRepresentable {
     
-    try modelManager.assertRootUser(request.user())
-    try modelManager.deleteOrganization(organization: organization)
+    guard let id = try? request.parameters.next(Int.self),
+      let organization = try modelManager.findOrganization(byId: Identifier(id)) else {
+        throw Abort(.notFound)
+    }
     
     if try modelManager.isRootUser(request.user()) {
       try modelManager.deleteOrganization(organization: organization)
@@ -87,23 +121,13 @@ final class APIV1TokenOrganizationsController: ResourceRepresentable {
     
   }
   
-  // DELETE /organizations
-  func clear(_ request: Request) throws -> ResponseRepresentable {
+  private func deleteAllOrganizations(_ request: Request) throws -> ResponseRepresentable {
     
     try modelManager.assertRootUser(request.user())
     try modelManager.deleteAllOrganizations()
     
     return Response(status: .ok)
     
-  }
-  
-  func makeResource() -> Resource<Organization> {
-    return Resource(
-      index: index,
-      store: store,
-      show: show,
-      destroy: destroy,
-      clear: clear)
   }
   
 }
