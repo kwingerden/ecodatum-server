@@ -328,6 +328,32 @@ extension ModelManager {
     return first != nil
   }
   
+  func isUserOrganizationAdministrator(_ connection: Connection? = nil,
+                                       user: User,
+                                       organization: Organization) throws -> Bool {
+    let role = try getRole(connection, name: .ADMINISTRATOR)
+    let first = try UserOrganizationRole.makeQuery(connection)
+      .filter(UserOrganizationRole.Keys.userId, .equals, user.id)
+      .filter(UserOrganizationRole.Keys.organizationId, .equals, organization.id)
+      .filter(UserOrganizationRole.Keys.roleId, .equals, role.id)
+      .first()
+    return first != nil
+  }
+  
+  func getOrganizationUsers(_ connection: Connection? = nil,
+                            organization: Organization,
+                            byRole: Role.Name? = nil) throws -> [User] {
+    let role = try getRole(connection, name: .ADMINISTRATOR)
+    return try UserOrganizationRole.makeQuery(connection)
+      .filter(UserOrganizationRole.Keys.organizationId, .equals, organization.id)
+      .filter(UserOrganizationRole.Keys.roleId, .equals, role.id)
+      .all()
+      .flatMap {
+        userOrganizationRole in
+        return try self.findUser(byId: userOrganizationRole.userId)
+      }
+  }
+  
 }
 
 // MARK: Site Extension
@@ -344,10 +370,6 @@ extension ModelManager {
                   verticalAccuracy: Double? = nil,
                   user: User,
                   organization: Organization) throws -> Site {
-    
-    if try !doesUserBelongToOrganization(user: user, organization: organization) {
-      throw Abort(.forbidden)
-    }
     
     let site = Site(name: name,
                     description: description,
@@ -477,12 +499,15 @@ extension ModelManager {
     return try Survey.makeQuery(connection).find(byId)
   }
   
-  func findSurveyOwner(_ connection: Connection? = nil,
-                       survey: Survey) throws -> User? {
-    guard let user = try survey.user.get() else {
-      throw Abort(.expectationFailed)
-    }
-    return user
+  func findSurveys(_ connection: Connection? = nil,
+                   byUser: User) throws -> [Survey] {
+    return try Survey.makeQuery(connection)
+      .filter(Survey.Keys.userId, .equals, byUser.id)
+      .all()
+  }
+  
+  func getAllSurveys(_ connection: Connection? = nil) throws -> [Survey] {
+    return try Survey.makeQuery(connection).all()
   }
   
   func deleteSurvey(_ connection: Connection? = nil,
@@ -510,6 +535,13 @@ extension ModelManager {
     
   }
   
+  func findAbioticFactor(_ connection: Connection? = nil,
+                         byId: Identifier) throws -> AbioticFactor? {
+    
+    return try AbioticFactor.makeQuery(connection).find(byId)
+    
+  }
+  
   func getMeasurementUnit(_ connection: Connection? = nil,
                           name: MeasurementUnit.Name) throws -> MeasurementUnit {
     
@@ -520,6 +552,13 @@ extension ModelManager {
     }
     
     return measurementUnit
+    
+  }
+  
+  func findMeasurementUnit(_ connection: Connection? = nil,
+                           byId: Identifier) throws -> MeasurementUnit? {
+    
+    return try MeasurementUnit.makeQuery(connection).find(byId)
     
   }
   
@@ -567,18 +606,13 @@ extension ModelManager {
     
   }
   
+  func getAllMeasurements(_ connection: Connection? = nil) throws -> [Measurement] {
+    return try Measurement.makeQuery(connection).all()
+  }
+  
   func findMeasurement(_ connection: Connection? = nil,
                        byId: Identifier) throws -> Measurement? {
     return try Measurement.makeQuery(connection).find(byId)
-  }
-  
-  func findMeasurementOwner(_ connection: Connection? = nil,
-                            measurement: Measurement) throws -> User? {
-    guard let survey = try measurement.survey.get(),
-      let user = try findSurveyOwner(connection, survey: survey) else {
-        throw Abort(.expectationFailed)
-    }
-    return user
   }
   
   func updateMeasurement(_ connection: Connection? = nil,

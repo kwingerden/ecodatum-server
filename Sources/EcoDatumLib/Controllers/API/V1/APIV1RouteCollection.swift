@@ -103,6 +103,12 @@ final class APIV1RouteCollection: RouteCollection {
       modelManager: modelManager)
       .build(tokenProtected.grouped("sites"))
     
+    // /protected/surveys
+    APIV1TokenSurveysRouteCollection(
+      drop: drop,
+      modelManager: modelManager)
+      .build(tokenProtected.grouped("surveys"))
+    
     // /protected/users
     APIV1TokenUsersRouteCollection(
       drop: drop,

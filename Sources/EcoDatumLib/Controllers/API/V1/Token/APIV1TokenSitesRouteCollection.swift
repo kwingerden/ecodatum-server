@@ -20,8 +20,14 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
     
     // GET /sites/:id
     routeBuilder.get(
-      Int.parameter,
+      Site.parameter,
       handler: getSiteById)
+    
+    // GET /sites/:id/surveys
+    routeBuilder.get(
+      Site.parameter,
+      "surveys",
+      handler: getSurveysBySite)
     
     // POST /sites
     routeBuilder.post(
@@ -41,29 +47,53 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
   
   private func getSiteById(_ request: Request) throws -> ResponseRepresentable {
     
-    guard let id = try? request.parameters.next(Int.self),
-      let site = try modelManager.findSite(byId: Identifier(id)) else {
-        throw Abort(.notFound)
-    }
+    let site = try request.parameters.next(Site.self)
     
     if try modelManager.isRootUser(request.user()) {
+      
       return site
+    
     } else if let organization = try site.organization.get(),
       try modelManager.doesUserBelongToOrganization(
         user: request.user(),
         organization: organization) {
+      
       return site
+    
     } else {
+    
       throw Abort(.notFound)
+    
+    }
+    
+  }
+  
+  private func getSurveysBySite(_ request: Request) throws -> ResponseRepresentable {
+    
+    let site = try request.parameters.next(Site.self)
+    
+    if try modelManager.isRootUser(request.user()) {
+      
+      return try site.surveys.all().makeJSON()
+      
+    } else if let organization = try site.organization.get(),
+      try modelManager.doesUserBelongToOrganization(
+        user: request.user(),
+        organization: organization) {
+      
+      return try site.surveys.all().makeJSON()
+      
+    } else {
+      
+      throw Abort(.notFound)
+      
     }
     
   }
   
   private func createNewSite(_ request: Request) throws -> ResponseRepresentable {
     
-    guard let json = try? request.assertJson() else {
-      throw Abort(.badRequest, reason: "Expecting JSON.")
-    }
+    let json = try request.assertJson()
     
     guard let name: String = try json.get(Site.Json.name),
       !name.isEmpty else {
