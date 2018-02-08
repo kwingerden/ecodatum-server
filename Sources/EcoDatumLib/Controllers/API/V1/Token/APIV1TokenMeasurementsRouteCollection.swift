@@ -27,24 +27,18 @@ final class APIV1TokenMeasurementsRouteCollection: RouteCollection {
   }
   
   private func getMeasurementById(_ request: Request) throws -> ResponseRepresentable {
-    
-    let measurement = try request.parameters.next(Measurement.self)
-    
-    if try modelManager.isRootUser(request.user()) {
-      
+
+    let (measurement, isRootUser, doesUserBelongToOrganization) =
+      try isRootOrMeasurementUser(request)
+
+    if isRootUser || doesUserBelongToOrganization {
+
       return measurement
-      
-    } else if let organization = try measurement.survey.get()?.site.get()?.organization.get(),
-      try modelManager.doesUserBelongToOrganization(
-        user: request.user(),
-        organization: organization) {
-      
-      return measurement
-      
+
     } else {
-      
+
       throw Abort(.notFound)
-      
+
     }
     
   }
@@ -78,6 +72,22 @@ final class APIV1TokenMeasurementsRouteCollection: RouteCollection {
       measurementUnit: measurementUnit.name,
       survey: survey)
     
+  }
+
+  private func isRootOrMeasurementUser(_ request: Request) throws -> (Measurement, Bool, Bool) {
+
+    let measurement = try request.parameters.next(Measurement.self)
+    guard let organization = try measurement.survey.get()?.site.get()?.organization.get() else {
+      throw Abort(.internalServerError)
+    }
+    let user = try request.user()
+    let isRootUser = try modelManager.isRootUser(user)
+    let doesUserBelongToOrganization = try modelManager.doesUserBelongToOrganization(
+      user: user,
+      organization: organization)
+
+    return (measurement, isRootUser, doesUserBelongToOrganization)
+
   }
   
 }

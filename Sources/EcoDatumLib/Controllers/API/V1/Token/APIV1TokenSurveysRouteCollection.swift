@@ -52,20 +52,14 @@ final class APIV1TokenSurveysRouteCollection: RouteCollection {
   }
   
   private func getSurveyById(_ request: Request) throws -> ResponseRepresentable {
+
+    let (survey, isRootUser, doesUserBelongToOrganization) =
+      try isRootOrSurveyUser(request)
     
-    let survey = try request.parameters.next(Survey.self)
-    
-    if try modelManager.isRootUser(request.user()) {
+    if isRootUser || doesUserBelongToOrganization {
       
       return survey
-    
-    } else if let organization = try survey.site.get()?.organization.get(),
-      try modelManager.doesUserBelongToOrganization(
-        user: request.user(),
-        organization: organization) {
-      
-      return survey
-    
+
     } else {
     
       throw Abort(.notFound)
@@ -75,17 +69,11 @@ final class APIV1TokenSurveysRouteCollection: RouteCollection {
   }
   
   private func getMeasurementsBySurvey(_ request: Request) throws -> ResponseRepresentable {
+
+    let (survey, isRootUser, doesUserBelongToOrganization) =
+      try isRootOrSurveyUser(request)
     
-    let survey = try request.parameters.next(Survey.self)
-    
-    if try modelManager.isRootUser(request.user()) {
-      
-      return try survey.measurements.all().makeJSON()
-      
-    } else if let organization = try survey.site.get()?.organization.get(),
-      try modelManager.doesUserBelongToOrganization(
-        user: request.user(),
-        organization: organization) {
+    if isRootUser || doesUserBelongToOrganization {
       
       return try survey.measurements.all().makeJSON()
       
@@ -111,6 +99,22 @@ final class APIV1TokenSurveysRouteCollection: RouteCollection {
       site: site,
       user: try request.user())
     
+  }
+
+  private func isRootOrSurveyUser(_ request: Request) throws -> (Survey, Bool, Bool) {
+
+    let survey = try request.parameters.next(Survey.self)
+    guard let organization = try survey.site.get()?.organization.get() else {
+      throw Abort(.internalServerError)
+    }
+    let user = try request.user()
+    let isRootUser = try modelManager.isRootUser(user)
+    let doesUserBelongToOrganization = try modelManager.doesUserBelongToOrganization(
+      user: user,
+      organization: organization)
+
+    return (survey, isRootUser, doesUserBelongToOrganization)
+
   }
   
 }

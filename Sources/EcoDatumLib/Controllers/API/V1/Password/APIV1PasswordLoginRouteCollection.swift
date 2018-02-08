@@ -14,7 +14,9 @@ final class APIV1PasswordLoginRouteCollection: RouteCollection {
   }
   
   func build(_ routeBuilder: RouteBuilder) {
+    
     routeBuilder.post(handler: login)
+  
   }
   
   // POST /login

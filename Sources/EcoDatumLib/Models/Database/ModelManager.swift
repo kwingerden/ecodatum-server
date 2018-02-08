@@ -342,8 +342,8 @@ extension ModelManager {
   
   func getOrganizationUsers(_ connection: Connection? = nil,
                             organization: Organization,
-                            byRole: Role.Name? = nil) throws -> [User] {
-    let role = try getRole(connection, name: .ADMINISTRATOR)
+                            byRole: Role.Name) throws -> [User] {
+    let role = try getRole(connection, name: byRole)
     return try UserOrganizationRole.makeQuery(connection)
       .filter(UserOrganizationRole.Keys.organizationId, .equals, organization.id)
       .filter(UserOrganizationRole.Keys.roleId, .equals, role.id)
@@ -353,7 +353,7 @@ extension ModelManager {
         return try self.findUser(byId: userOrganizationRole.userId)
       }
   }
-  
+
 }
 
 // MARK: Site Extension

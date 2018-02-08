@@ -17,50 +17,44 @@ final class APIV1PublicAbioticFactorsRouteCollection: RouteCollection {
   func build(_ routeBuilder: RouteBuilder) {
     
     // GET /abioticFactors
-    routeBuilder.get(handler: getAllAbioticFactors)
+    routeBuilder.get(
+      handler: getAllAbioticFactors)
     
     // GET /abioticFactors/:id
     routeBuilder.get(
-      Int.parameter,
+      AbioticFactor.parameter,
       handler: getAbioticFactorById)
     
     // GET /abioticFactors/:id/measurementUnits
     routeBuilder.get(
-      Int.parameter,
+      AbioticFactor.parameter,
       "measurementUnits",
       handler: getMeasurementUnitsByAbioticFactorId)
     
   }
   
   private func getAllAbioticFactors(_ request: Request) throws -> ResponseRepresentable {
-    return try AbioticFactor.makeQuery().all().makeJSON()
+    
+    return try AbioticFactor.makeQuery()
+      .all()
+      .makeJSON()
+    
   }
   
   private func getAbioticFactorById(_ request: Request) throws -> ResponseRepresentable {
     
-    guard let id = try? request.parameters.next(Int.self) else {
-      throw Abort(.badRequest)
-    }
-    
-    guard let abioticFactor = try AbioticFactor.makeQuery().find(id) else {
-      throw Abort(.notFound)
-    }
-    
-    return try abioticFactor.makeJSON()
+    return try request.parameters
+      .next(AbioticFactor.self)
+      .makeJSON()
     
   }
   
   private func getMeasurementUnitsByAbioticFactorId(_ request: Request) throws -> ResponseRepresentable {
     
-    guard let id = try? request.parameters.next(Int.self) else {
-      throw Abort(.badRequest)
-    }
-    
-    guard let abioticFactor = try AbioticFactor.makeQuery().find(id) else {
-      throw Abort(.notFound)
-    }
-    
-    let measurementUnits = try MeasurementUnit.makeQuery().all()
+    let abioticFactor = try request.parameters
+      .next(AbioticFactor.self)
+    let measurementUnits = try MeasurementUnit.makeQuery()
+      .all()
     
     switch abioticFactor.name {
       

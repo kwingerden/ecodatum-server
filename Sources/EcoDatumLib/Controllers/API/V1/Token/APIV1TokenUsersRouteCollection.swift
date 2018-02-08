@@ -21,7 +21,7 @@ final class APIV1TokenUsersRouteCollection: RouteCollection {
     
     // GET /users/:id
     routeBuilder.get(
-      Int.parameter,
+      User.parameter,
       handler: getUserById)
     
     // POST /users
@@ -38,13 +38,10 @@ final class APIV1TokenUsersRouteCollection: RouteCollection {
   }
   
   private func getUserById(_ request: Request) throws -> ResponseRepresentable {
-    
-    guard let id = try? request.parameters.next(Int.self) else {
-        throw Abort(.notFound)
-    }
-    
-    try modelManager.assertRootOrRequestUser(id, request.user())
-    return try modelManager.getUser(byId: Identifier(id))
+
+    let user = try request.parameters.next(User.self)
+    try modelManager.assertRootOrRequestUser(user.id!.int!, request.user())
+    return user
     
   }
 

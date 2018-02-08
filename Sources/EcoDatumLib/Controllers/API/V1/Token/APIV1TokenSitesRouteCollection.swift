@@ -38,55 +38,50 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
   private func getSitesByUser(_ request: Request) throws -> ResponseRepresentable {
     
     if try modelManager.isRootUser(request.user()) {
-      return try modelManager.getAllSites().makeJSON()
+
+      return try modelManager.getAllSites()
+        .makeJSON()
+
     } else {
-      return try modelManager.findSites(byUser: request.user()).makeJSON()
+
+      return try modelManager.findSites(
+        byUser: request.user())
+        .makeJSON()
+
     }
     
   }
   
   private func getSiteById(_ request: Request) throws -> ResponseRepresentable {
-    
-    let site = try request.parameters.next(Site.self)
-    
-    if try modelManager.isRootUser(request.user()) {
-      
+
+    let (site, isRootUser, doesUserBelongToOrganization) =
+      try isRootOrSiteUser(request)
+
+    if isRootUser || doesUserBelongToOrganization {
+
       return site
-    
-    } else if let organization = try site.organization.get(),
-      try modelManager.doesUserBelongToOrganization(
-        user: request.user(),
-        organization: organization) {
-      
-      return site
-    
+
     } else {
-    
+
       throw Abort(.notFound)
-    
+
     }
     
   }
   
   private func getSurveysBySite(_ request: Request) throws -> ResponseRepresentable {
-    
-    let site = try request.parameters.next(Site.self)
-    
-    if try modelManager.isRootUser(request.user()) {
-      
+
+    let (site, isRootUser, doesUserBelongToOrganization) =
+      try isRootOrSiteUser(request)
+
+    if isRootUser || doesUserBelongToOrganization {
+
       return try site.surveys.all().makeJSON()
-      
-    } else if let organization = try site.organization.get(),
-      try modelManager.doesUserBelongToOrganization(
-        user: request.user(),
-        organization: organization) {
-      
-      return try site.surveys.all().makeJSON()
-      
+
     } else {
-      
+
       throw Abort(.notFound)
-      
+
     }
     
   }
@@ -130,6 +125,22 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
       longitude: longitude,
       user: try request.user(),
       organization: organization)
+
+  }
+
+  private func isRootOrSiteUser(_ request: Request) throws -> (Site, Bool, Bool) {
+
+    let site = try request.parameters.next(Site.self)
+    guard let organization = try site.organization.get() else {
+      throw Abort(.internalServerError)
+    }
+    let user = try request.user()
+    let isRootUser = try modelManager.isRootUser(user)
+    let doesUserBelongToOrganization = try modelManager.doesUserBelongToOrganization(
+      user: user,
+      organization: organization)
+
+    return (site, isRootUser, doesUserBelongToOrganization)
 
   }
   
