@@ -12,6 +12,7 @@
     "file"
   ],
   "commands": [
+    "add-test-data",
     "initialize-database",
     "prepare"
   ]

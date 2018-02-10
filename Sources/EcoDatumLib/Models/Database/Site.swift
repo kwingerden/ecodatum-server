@@ -41,9 +41,9 @@ final class Site: EquatableModel {
        description: String? = nil,
        latitude: Double,
        longitude: Double,
-       altitude: Double?,
-       horizontalAccuracy: Double?,
-       verticalAccuracy: Double?,
+       altitude: Double? = nil,
+       horizontalAccuracy: Double? = nil,
+       verticalAccuracy: Double? = nil,
        organizationId: Identifier,
        userId: Identifier) {
     self.name = name
