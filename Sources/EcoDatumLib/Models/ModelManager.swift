@@ -76,21 +76,21 @@ class ModelManager {
     }
   }
   
-  func isRequestUser(_ userId: Int, _ user: User) throws -> Bool {
+  func isRequestUser(_ userId: String, _ user: User) throws -> Bool {
     return user == (try findUser(byId: Identifier(userId)))
   }
   
-  func assertRequestUser(_ userId: Int, _ user: User) throws {
+  func assertRequestUser(_ userId: String, _ user: User) throws {
     if !(try isRequestUser(userId, user)) {
       throw Abort(.forbidden)
     }
   }
   
-  func isRootOrRequestUser(_ userId: Int, _ user: User) throws -> Bool {
+  func isRootOrRequestUser(_ userId: String, _ user: User) throws -> Bool {
     return try isRootUser(user) || (try isRequestUser(userId, user))
   }
   
-  func assertRootOrRequestUser(_ userId: Int, _ user: User) throws {
+  func assertRootOrRequestUser(_ userId: String, _ user: User) throws {
     if !(try isRootOrRequestUser(userId, user)) {
       throw Abort(.forbidden)
     }

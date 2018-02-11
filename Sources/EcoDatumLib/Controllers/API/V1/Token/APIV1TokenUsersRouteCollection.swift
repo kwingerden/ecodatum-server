@@ -40,7 +40,7 @@ final class APIV1TokenUsersRouteCollection: RouteCollection {
   private func getUserById(_ request: Request) throws -> ResponseRepresentable {
 
     let user = try request.parameters.next(User.self)
-    try modelManager.assertRootOrRequestUser(user.id!.int!, request.user())
+    try modelManager.assertRootOrRequestUser(user.id!.string!, request.user())
     return user
     
   }
