@@ -20,7 +20,9 @@ class ModelManager {
         throw Abort(.expectationFailed)
     }
     
-    guard let rootUser = try User.find(Constants.ROOT_USER_ID),
+    guard let rootUser = try User.makeQuery()
+      .filter(User.Keys.fullName, .equals, rootUserName)
+      .first(),
       rootUser.fullName == rootUserName,
       rootUser.email == rootUserEmail else {
         throw Abort(.expectationFailed)

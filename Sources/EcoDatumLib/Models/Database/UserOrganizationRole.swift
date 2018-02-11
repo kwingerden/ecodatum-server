@@ -52,15 +52,15 @@ extension UserOrganizationRole: Preparation {
     try database.create(self) {
       builder in
       builder.id()
-      builder.int(
+      builder.string(
         Keys.userId,
         optional: false,
         unique: false)
-      builder.int(
+      builder.string(
         Keys.organizationId,
         optional: false,
         unique: false)
-      builder.int(
+      builder.string(
         Keys.roleId,
         optional: false,
         unique: false)

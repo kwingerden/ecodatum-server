@@ -19,6 +19,11 @@ final class APIV1TokenOrganizationsRouteCollection: RouteCollection {
     routeBuilder.get(
       handler: getOrganizationsByUser)
 
+    // GET /organizations/:id
+    routeBuilder.get(
+      Organization.parameter,
+      handler: getOrganizationById)
+    
     // GET /organizations/:id/administrator
     routeBuilder.get(
       Organization.parameter,
@@ -69,7 +74,25 @@ final class APIV1TokenOrganizationsRouteCollection: RouteCollection {
     }
 
   }
-
+  
+  private func getOrganizationById(_ request: Request)
+    throws -> ResponseRepresentable {
+      
+      let (organization, isRootUser, doesUserBelongToOrganization) =
+        try isRootOrOrganizationUser(request)
+      
+      if isRootUser || doesUserBelongToOrganization {
+        
+        return organization
+        
+      } else {
+        
+        throw Abort(.notFound)
+        
+      }
+      
+  }
+  
   private func getOrganizationAdministrator(_ request: Request)
   throws -> ResponseRepresentable {
 
@@ -93,24 +116,6 @@ final class APIV1TokenOrganizationsRouteCollection: RouteCollection {
     if isRootUser || doesUserBelongToOrganization {
 
       return try organization.sites.all().makeJSON()
-
-    } else {
-
-      throw Abort(.notFound)
-
-    }
-
-  }
-
-  private func getOrganizationById(_ request: Request)
-  throws -> ResponseRepresentable {
-
-    let (organization, isRootUser, doesUserBelongToOrganization) =
-      try isRootOrOrganizationUser(request)
-
-    if isRootUser || doesUserBelongToOrganization {
-
-      return organization
 
     } else {
 

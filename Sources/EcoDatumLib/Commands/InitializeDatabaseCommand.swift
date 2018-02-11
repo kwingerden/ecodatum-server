@@ -27,105 +27,102 @@ public final class InitializeDatabaseCommand: Command {
   public func run(arguments: [String]) throws {
     
     // Create "root" user
-    if let user = try User.find(Constants.ROOT_USER_ID) {
+    if let rootUser = try User.makeQuery()
+      .filter(User.Keys.fullName, .equals, rootUserName)
+      .first() {
       
-      if user.fullName == rootUserName && user.email == rootUserEmail {
-        console.print("Root user '\(rootUserName)' already exists.")
-      } else {
-        throw Abort(.internalServerError,
-                    reason: "Root user name and email address do not match.")
-      }
+      console.print("Root user '\(rootUser.fullName)' already exists.")
       
     } else {
       
-      let user = User(fullName: rootUserName, 
-                      email: rootUserEmail, 
-                      password: rootUserPassword)
-      try user.save()
-      if let userId = user.id?.int,
-        userId == Constants.ROOT_USER_ID {
-        console.print("Successfully created the root user.")
-      } else {
-        throw Abort(.internalServerError,
-                    reason: "Root user id is not \(Constants.ROOT_USER_ID).")
-      }
+      let rootUser = User(
+        fullName: rootUserName,
+        email: rootUserEmail,
+        password: rootUserPassword)
+      try rootUser.save()
+      
+      console.print("Successfully created the root user with name \(rootUser.fullName).")
       
     }
     
     // Abiotic Factors
-    var id = 1
     try AbioticFactor.Name.all.forEach {
+      
       if let abioticFactor = try AbioticFactor.makeQuery()
         .filter(AbioticFactor.Keys.name, .equals, $0.rawValue)
         .first() {
-        if id == abioticFactor.id?.int {
-          console.print("Abiotic Factor \($0) already exists.")
-        } else {
-          console.print("WARNING: unexpected id \(id) for Abiotic Factor \($0)")
-        }
+        
+        console.print("Abiotic Factor \(abioticFactor.name.rawValue) already exists.")
+      
       } else {
+      
         let abioticFactor = AbioticFactor(name: $0)
         try abioticFactor.save()
-        console.print("Successfully created Abiotic Factor \($0).")
+        
+        console.print("Successfully created Abiotic Factor \(abioticFactor.name.rawValue).")
+      
       }
-      id = id + 1
+      
     }
     
     // Measurement Units
-    id = 1
     try MeasurementUnit.Name.all.forEach {
+      
       if let measurementUnit = try MeasurementUnit.makeQuery()
         .filter(MeasurementUnit.Keys.name, .equals, $0.rawValue)
         .first() {
-        if id == measurementUnit.id?.int {
-          console.print("Measurement Unit \($0) already exists.")
-        } else {
-          console.print("WARNING: unexpected id \(id) for Measurement Unit \($0)")
-        }
+      
+        console.print("Measurement Unit \(measurementUnit.name.rawValue) already exists.")
+
       } else {
+        
         let measurementUnit = MeasurementUnit(name: $0)
         try measurementUnit.save()
-        console.print("Successfully created Measurement Unit \($0).")
+       
+        console.print("Successfully created Measurement Unit \(measurementUnit.name.rawValue).")
+      
       }
-      id = id + 1
+      
     }
     
     // Image Types
-    id = 1
     try ImageType.Name.all.forEach {
+      
       if let imageType = try ImageType.makeQuery()
         .filter(ImageType.Keys.name, .equals, $0.rawValue)
         .first() {
-        if id == imageType.id?.int {
-          console.print("Image Type \($0) already exists.")
-        } else {
-          console.print("WARNING: unexpected id \(id) for Image Type \($0)")
-        }
+      
+        console.print("Image Type \(imageType.name.rawValue) already exists.")
+        
       } else {
+        
         let imageType = ImageType(name: $0)
         try imageType.save()
-        console.print("Successfully created Image Type \($0).")
+        
+        console.print("Successfully created Image Type \(imageType.name.rawValue).")
+        
       }
-      id = id + 1
+      
     }
     
     // Roles
-    id = 1
     try Role.Name.all.forEach {
+      
       if let role = try Role.makeQuery()
         .filter(Role.Keys.name, .equals, $0.rawValue)
         .first() {
-        if id == role.id?.int {
-          console.print("Role \($0) already exists.")
-        } else {
-          console.print("WARNING: unexpected id \(id) for Role \($0)")
-        }
+        
+        console.print("Role \(role.name.rawValue) already exists.")
+        
       } else {
+        
         let role = Role(name: $0)
         try role.save()
-        console.print("Successfully created Role \($0).")
+        
+        console.print("Successfully created Role \(role.name.rawValue).")
+      
       }
-      id = id + 1
+      
     }
     
   }

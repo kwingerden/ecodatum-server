@@ -6,5 +6,6 @@
   "autoForeignKeys": true,
   "defaultPageKey": "page",  
   "defaultPageSize": 10,
-  "log": true
+  "log": true,
+  "idType": "uuid"
 }
