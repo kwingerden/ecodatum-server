@@ -1,10 +1,7 @@
 import Console
 import FluentProvider
+import Random
 import Vapor
-
-#if os(Linux)
-	import ClibBSD
-#endif
 
 public final class AddTestDataCommand: Command {
   
@@ -315,9 +312,12 @@ public final class AddTestDataCommand: Command {
   }
   
   private func randomSignedDouble() -> Double {
-    let sign = arc4random_uniform(2) == 0 ? 1.0 : -1.0
-    let random = (Double(arc4random()) / 0xFFFFFFFF) * 100.0
-    return sign * random
+    
+    let sign = makeRandom(min: 0, max: 1) == 0 ? 1.0 : -1.0
+    let number = Double(makeRandom(min: 1, max: 500))
+    let fraction = Double(makeRandom(min: 1, max: 500)) / 100.0
+    return sign * (number + fraction)
+  
   }
   
 }
