@@ -2,6 +2,10 @@ import Console
 import FluentProvider
 import Vapor
 
+#if os(Linux)
+	import ClibBSD
+#endif
+
 public final class AddTestDataCommand: Command {
   
   public let id = "add-test-data"
