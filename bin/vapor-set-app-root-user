@@ -1,0 +1,16 @@
+#!/bin/bash
+
+ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
+
+APP_ROOT_USER_NAME=$1
+APP_ROOT_USER_EMAIL=$2
+APP_ROOT_USER_PASSWORD=$3
+cat << EOF > $ROOT_DIR/Config/secrets/app.json
+{
+	"root-user": {
+		"name": "$APP_ROOT_USER_NAME",
+		"email": "$APP_ROOT_USER_EMAIL",
+		"password": "$APP_ROOT_USER_PASSWORD"
+	}
+}
+EOF

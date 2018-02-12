@@ -7,6 +7,9 @@ services:
       context: ./
       args:
         CIPER_KEY: $CIPER_KEY
+        APP_ROOT_USER_NAME: $APP_ROOT_USER_NAME
+        APP_ROOT_USER_EMAIL: $APP_ROOT_USER_EMAIL
+        APP_ROOT_USER_PASSWORD: $APP_ROOT_USER_PASSWORD
         POSTGRESQL_PASSWORD: $POSTGRESQL_PASSWORD
     image: kwingerden/ecodatum-server:1.0
     networks:

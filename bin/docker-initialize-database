@@ -1,0 +1,7 @@
+#!/bin/bash
+
+ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
+pushd $ROOT_DIR
+docker exec -it ecodatumserver_ecodatum-server_1 vapor run --release prepare --env=production
+docker exec -it ecodatumserver_ecodatum-server_1 vapor run --release initialize-database --env=production
+popd

@@ -4,6 +4,9 @@ LABEL maintainer="Ken Wingerden <ken.wingerden@gmail.com>"
 LABEL Description="Docker Container for EcoDatum's web application"
 
 ARG CIPER_KEY
+ARG APP_ROOT_USER_NAME
+ARG APP_ROOT_USER_EMAIL
+ARG APP_ROOT_USER_PASSWORD
 ARG POSTGRESQL_PASSWORD
 
 RUN apt-get update && \
@@ -30,6 +33,7 @@ COPY Tests Tests
 COPY Package.swift Package.swift
 
 RUN ./bin/vapor-set-cipher-key $CIPER_KEY && \
+    ./bin/vapor-set-app-root-user $APP_ROOT_USER_NAME $APP_ROOT_USER_EMAIL $APP_ROOT_USER_PASSWORD && \
     ./bin/vapor-set-postgresql-password $POSTGRESQL_PASSWORD && \
     ./bin/vapor-build-release
 
