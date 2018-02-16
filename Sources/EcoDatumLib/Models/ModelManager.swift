@@ -476,15 +476,7 @@ extension ModelManager {
                     user: User) throws -> Survey {
     
     let siteId = try site.assertExists()
-    let organizationId = site.organizationId
     let userId = try user.assertExists()
-    
-    guard let _ = try UserOrganizationRole.makeQuery(connection)
-      .filter(UserOrganizationRole.Keys.organizationId, .equals, organizationId)
-      .filter(UserOrganizationRole.Keys.userId, .equals, userId)
-      .first() else {
-        throw Abort(.expectationFailed)
-    }
     
     let survey = Survey(
       date: date,

@@ -94,25 +94,47 @@ final class APIV1TokenSurveysRouteCollection: RouteCollection {
         throw Abort(.notFound, reason: "Site not found")
     }
     
-    return try modelManager.createSurvey(
-      date: Date(),
-      site: site,
-      user: try request.user())
+    let (isRootUser, doesUserBelongToOrganization) =
+      try isRootOrSiteUser(request, site)
+    
+    if isRootUser || doesUserBelongToOrganization {
+      
+      return try modelManager.createSurvey(
+        date: Date(),
+        site: site,
+        user: try request.user())
+    
+    } else {
+      
+      throw Abort(.notFound)
+      
+    }
     
   }
-
-  private func isRootOrSurveyUser(_ request: Request) throws -> (Survey, Bool, Bool) {
-
-    let survey = try request.parameters.next(Survey.self)
-    guard let organization = try survey.site.get()?.organization.get() else {
-      throw Abort(.internalServerError)
-    }
+  
+  private func isRootOrSiteUser(_ request: Request, _ site: Site) throws -> (Bool, Bool) {
+    
     let user = try request.user()
     let isRootUser = try modelManager.isRootUser(user)
+    let organization = try site.organization.get()!
     let doesUserBelongToOrganization = try modelManager.doesUserBelongToOrganization(
       user: user,
       organization: organization)
+    
+    return (isRootUser, doesUserBelongToOrganization)
+    
+  }
+  
+  private func isRootOrSurveyUser(_ request: Request) throws -> (Survey, Bool, Bool) {
 
+    let survey = try request.parameters.next(Survey.self)
+    guard let site = try survey.site.get() else {
+      throw Abort(.internalServerError)
+    }
+    
+    let (isRootUser, doesUserBelongToOrganization) =
+      try isRootOrSiteUser(request, site)
+    
     return (survey, isRootUser, doesUserBelongToOrganization)
 
   }

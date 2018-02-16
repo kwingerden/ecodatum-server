@@ -90,6 +90,18 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
     
     let json = try request.assertJson()
     
+    guard let organizationId: Identifier = try json.get(Site.Json.organizationId),
+      let organization = try modelManager.findOrganization(byId: organizationId) else {
+        throw Abort(.badRequest, reason: "Site must have associated organization.")
+    }
+    
+    let (isRootUser, doesUserBelongToOrganization) =
+      try isRootOrOrganizationUser(request, organization)
+    
+    guard isRootUser || doesUserBelongToOrganization else {
+      throw Abort(.notFound)
+    }
+    
     guard let name: String = try json.get(Site.Json.name),
       !name.isEmpty else {
       throw Abort(.badRequest, reason: "Site must have a name.")
@@ -113,11 +125,6 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
       throw Abort(.badRequest, reason: "Site must have a longitude.")
     }
     
-    guard let organizationId: Identifier = try json.get(Site.Json.organizationId),
-      let organization = try modelManager.findOrganization(byId: organizationId) else {
-      throw Abort(.badRequest, reason: "Site must have associated organization.")
-    }
-    
     return try modelManager.createSite(
       name: name,
       description: description,
@@ -128,17 +135,30 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
 
   }
 
+  private func isRootOrOrganizationUser(
+    _ request: Request,
+    _ organization: Organization)
+    throws -> (Bool, Bool) {
+    
+    let user = try request.user()
+    let isRootUser = try modelManager.isRootUser(user)
+    let doesUserBelongToOrganization = try modelManager.doesUserBelongToOrganization(
+      user: user,
+      organization: organization)
+    
+    return (isRootUser, doesUserBelongToOrganization)
+    
+  }
+  
   private func isRootOrSiteUser(_ request: Request) throws -> (Site, Bool, Bool) {
 
     let site = try request.parameters.next(Site.self)
     guard let organization = try site.organization.get() else {
       throw Abort(.internalServerError)
     }
-    let user = try request.user()
-    let isRootUser = try modelManager.isRootUser(user)
-    let doesUserBelongToOrganization = try modelManager.doesUserBelongToOrganization(
-      user: user,
-      organization: organization)
+    
+    let (isRootUser, doesUserBelongToOrganization) =
+      try isRootOrOrganizationUser(request, organization)
 
     return (site, isRootUser, doesUserBelongToOrganization)
 
