@@ -1,6 +1,7 @@
 #!/bin/bash
 
-ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
-pushd $ROOT_DIR
-docker exec -it ecodatumserver_ecodatum-server_1 vapor run --release add-test-data --env=production
-popd
+docker run \
+  --rm \
+  --network ecodatumserver_private-network \
+  kwingerden/ecodatum-server:1.0 \
+  vapor run --release add-test-data --env=production 

@@ -1,7 +1,15 @@
 #!/bin/bash
 
-ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
-pushd $ROOT_DIR
-docker exec -it ecodatumserver_ecodatum-server_1 vapor run --release prepare --env=production
-docker exec -it ecodatumserver_ecodatum-server_1 vapor run --release initialize-database --env=production
-popd
+CONTAINER_NAME=kwingerden/ecodatum-server:1.0
+
+docker_run() {
+  CMD=$1
+  docker run \
+    --rm \
+    --network ecodatumserver_private-network \
+    $CONTAINER_NAME \
+    vapor run --release $CMD --env=production  
+}
+
+docker_run prepare
+docker_run initialize-database
