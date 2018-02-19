@@ -21,7 +21,7 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
     // GET /sites/:id
     routeBuilder.get(
       Site.parameter,
-      handler: getSiteById)
+      handler: getSite)
     
     // GET /sites/:id/surveys
     routeBuilder.get(
@@ -31,12 +31,17 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
     
     // POST /sites
     routeBuilder.post(
-      handler: createNewSite)
+      handler: newSite)
+    
+    // PUT /sites/:id
+    routeBuilder.put(
+      Site.parameter,
+      handler: updateSite)
     
     // DELETE /sites/:id
     routeBuilder.delete(
       Site.parameter,
-      handler: deleteSiteById)
+      handler: deleteSite)
     
   }
   
@@ -57,7 +62,7 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
     
   }
   
-  private func getSiteById(_ request: Request) throws -> ResponseRepresentable {
+  private func getSite(_ request: Request) throws -> ResponseRepresentable {
 
     let (site, isRootUser, doesUserBelongToOrganization) =
       try isRootOrSiteUser(request)
@@ -91,7 +96,7 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
     
   }
   
-  private func createNewSite(_ request: Request) throws -> ResponseRepresentable {
+  private func newSite(_ request: Request) throws -> ResponseRepresentable {
     
     let json = try request.assertJson()
     
@@ -107,27 +112,10 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
       throw Abort(.notFound)
     }
     
-    guard let name: String = try json.get(Site.Json.name),
-      !name.isEmpty else {
-      throw Abort(.badRequest, reason: "Site must have a name.")
-    }
+    let (name, description, latitude, longitude) = try toSiteAttributes(json)
     
     if let site = try modelManager.findSite(byName: name) {
       throw Abort(.conflict, reason: "Site \(site.name) already exists.")
-    }
-    
-    var description: String? = nil
-    if let _description: String = try json.get(Site.Json.description),
-      !_description.isEmpty {
-      description = _description
-    }
-    
-    guard let latitude: Double = try json.get(Site.Json.latitude) else {
-      throw Abort(.badRequest, reason: "Site must have a latitude.")
-    }
-    
-    guard let longitude: Double = try json.get(Site.Json.longitude) else {
-      throw Abort(.badRequest, reason: "Site must have a longitude.")
     }
     
     return try modelManager.createSite(
@@ -140,7 +128,37 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
 
   }
 
-  private func deleteSiteById(_ request: Request) throws -> ResponseRepresentable {
+  private func updateSite(_ request: Request) throws -> ResponseRepresentable {
+    
+    let (site, isRootUser, doesUserBelongToOrganization) =
+      try isRootOrSiteUser(request)
+    
+    if isRootUser || doesUserBelongToOrganization {
+      
+      let json = try request.assertJson()
+      
+      let (name, description, latitude, longitude) = try toSiteAttributes(json)
+      
+      if let site = try modelManager.findSite(byName: name) {
+        throw Abort(.conflict, reason: "Site \(site.name) already exists.")
+      }
+      
+      site.name = name
+      site.description = description
+      site.latitude = latitude
+      site.longitude = longitude
+      
+      return try modelManager.updateSite(site: site)
+      
+    } else {
+      
+      throw Abort(.notFound)
+      
+    }
+    
+  }
+  
+  private func deleteSite(_ request: Request) throws -> ResponseRepresentable {
     
     let (site, isRootUser, doesUserBelongToOrganization) =
       try isRootOrSiteUser(request)
@@ -160,6 +178,32 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
       
     }
     
+  }
+  
+  private func toSiteAttributes(_ json: JSON) throws ->
+    (name: String, description: String?, latitude: Double, longitude: Double) {
+    
+    guard let name: String = try json.get(Site.Json.name),
+      !name.isEmpty else {
+        throw Abort(.badRequest, reason: "Site must have a name.")
+    }
+    
+    var description: String? = nil
+    if let _description: String = try json.get(Site.Json.description),
+      !_description.isEmpty {
+      description = _description
+    }
+    
+    guard let latitude: Double = try json.get(Site.Json.latitude) else {
+      throw Abort(.badRequest, reason: "Site must have a latitude.")
+    }
+    
+    guard let longitude: Double = try json.get(Site.Json.longitude) else {
+      throw Abort(.badRequest, reason: "Site must have a longitude.")
+    }
+    
+    return (name: name, description: description, latitude: latitude, longitude: longitude)
+      
   }
   
   private func isRootOrOrganizationUser(
