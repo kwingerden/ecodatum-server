@@ -112,11 +112,15 @@ final class APIV1TokenSurveysRouteCollection: RouteCollection {
     
   }
   
-  private func isRootOrSiteUser(_ request: Request, _ site: Site) throws -> (Bool, Bool) {
+  private func isRootOrSiteUser(_ request: Request,
+                                _ site: Site) throws -> (Bool, Bool) {
     
+    guard let organization = try site.organization.get() else {
+      throw Abort(.internalServerError, reason: "No site organization")
+    }
+      
     let user = try request.user()
     let isRootUser = try modelManager.isRootUser(user)
-    let organization = try site.organization.get()!
     let doesUserBelongToOrganization = try modelManager.doesUserBelongToOrganization(
       user: user,
       organization: organization)

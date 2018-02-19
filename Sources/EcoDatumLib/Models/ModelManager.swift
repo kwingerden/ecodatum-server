@@ -95,6 +95,14 @@ class ModelManager {
       throw Abort(.forbidden)
     }
   }
+ 
+  func transaction(_ closure: (Connection) throws -> Void) throws {
+    let database = try drop.assertDatabase()
+    return try database.transaction {
+      connection in
+      try closure(connection)
+    }
+  }
   
   private func hashPassword(_ password: String) throws -> String {
     return try drop.hash.make(password.makeBytes()).makeString()
@@ -460,8 +468,35 @@ extension ModelManager {
   
   func deleteSite(_ connection: Connection? = nil,
                   site: Site) throws {
-    try site.assertExists()
+    
+    for survey in try site.surveys.all() {
+      
+      for image in try survey.images.all() {
+        try deleteImage(
+          connection,
+          image: image)
+      }
+      
+      for measurement in try survey.measurements.all() {
+        try deleteMeasurement(
+          connection,
+          measurement: measurement)
+      }
+      
+      for note in try survey.notes.all() {
+        try deleteNote(
+          connection,
+          note: note)
+      }
+      
+      try deleteSurvey(
+        connection,
+        survey: survey)
+      
+    }
+    
     try Site.makeQuery(connection).delete(site)
+    
   }
   
 }
@@ -565,14 +600,6 @@ extension ModelManager {
     let abioticFactorId = try abioticFactor.assertExists()
     let measurementUnitId = try measurementUnit.assertExists()
     let surveyId = try survey.assertExists()
-    
-    guard let organizationId = try findOrganization(connection, bySurvey: survey)?.id,
-      let _ = try UserOrganizationRole.makeQuery(connection)
-        .filter(UserOrganizationRole.Keys.organizationId, .equals, organizationId)
-        .filter(UserOrganizationRole.Keys.userId, .equals, survey.userId)
-        .first() else {
-          throw Abort(.expectationFailed)
-    }
     
     let measurement = Measurement(
       value: value,

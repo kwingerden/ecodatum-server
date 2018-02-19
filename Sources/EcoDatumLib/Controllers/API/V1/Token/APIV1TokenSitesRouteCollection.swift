@@ -33,6 +33,11 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
     routeBuilder.post(
       handler: createNewSite)
     
+    // DELETE /sites/:id
+    routeBuilder.delete(
+      Site.parameter,
+      handler: deleteSiteById)
+    
   }
   
   private func getSitesByUser(_ request: Request) throws -> ResponseRepresentable {
@@ -135,6 +140,28 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
 
   }
 
+  private func deleteSiteById(_ request: Request) throws -> ResponseRepresentable {
+    
+    let (site, isRootUser, doesUserBelongToOrganization) =
+      try isRootOrSiteUser(request)
+    
+    if isRootUser || doesUserBelongToOrganization {
+      
+      try modelManager.transaction {
+        connection in
+        try self.modelManager.deleteSite(connection, site: site)
+      }
+      
+      return Response(status: .ok)
+      
+    } else {
+      
+      throw Abort(.notFound)
+      
+    }
+    
+  }
+  
   private func isRootOrOrganizationUser(
     _ request: Request,
     _ organization: Organization)
