@@ -426,40 +426,8 @@ extension ModelManager {
   }
   
   func updateSite(_ connection: Connection? = nil,
-                  site: Site,
-                  newName: String? = nil,
-                  newLatitude: Double? = nil,
-                  newLongitude: Double? = nil,
-                  newAltitude: Double? = nil,
-                  newHorizontalAccuracy: Double? = nil,
-                  newVerticalAccuracy: Double? = nil) throws -> Site {
-    
-    try site.assertExists()
-    
-    if let name = newName {
-      site.name = name
-    }
-    
-    if let latitude = newLatitude {
-      site.latitude = latitude
-    }
-    
-    if let longitude = newLongitude {
-      site.longitude = longitude
-    }
-    
-    if let altitude = newAltitude {
-      site.altitude = altitude
-    }
-    
-    if let horizontalAccuracy = newHorizontalAccuracy {
-      site.horizontalAccuracy = horizontalAccuracy
-    }
-    
-    if let verticalAccuracy = newVerticalAccuracy {
-      site.verticalAccuracy = verticalAccuracy
-    }
-    
+                  site: Site) throws -> Site {
+
     try Site.makeQuery(connection).save(site)
     
     return site
@@ -470,24 +438,6 @@ extension ModelManager {
                   site: Site) throws {
     
     for survey in try site.surveys.all() {
-      
-      for image in try survey.images.all() {
-        try deleteImage(
-          connection,
-          image: image)
-      }
-      
-      for measurement in try survey.measurements.all() {
-        try deleteMeasurement(
-          connection,
-          measurement: measurement)
-      }
-      
-      for note in try survey.notes.all() {
-        try deleteNote(
-          connection,
-          note: note)
-      }
       
       try deleteSurvey(
         connection,
@@ -507,6 +457,7 @@ extension ModelManager {
   
   func createSurvey(_ connection: Connection? = nil,
                     date: Date,
+                    description: String? = nil,
                     site: Site,
                     user: User) throws -> Survey {
     
@@ -515,6 +466,7 @@ extension ModelManager {
     
     let survey = Survey(
       date: date,
+      description: description,
       siteId: siteId,
       userId: userId)
     try Survey.makeQuery(connection).save(survey)
@@ -538,11 +490,39 @@ extension ModelManager {
   func getAllSurveys(_ connection: Connection? = nil) throws -> [Survey] {
     return try Survey.makeQuery(connection).all()
   }
-  
+
+  func updateSurvey(_ connection: Connection? = nil,
+                    survey: Survey) throws -> Survey {
+
+    try Survey.makeQuery(connection).save(survey)
+
+    return survey
+
+  }
+
   func deleteSurvey(_ connection: Connection? = nil,
                     survey: Survey) throws {
-    try survey.assertExists()
+
+    for image in try survey.images.all() {
+      try deleteImage(
+        connection,
+        image: image)
+    }
+
+    for measurement in try survey.measurements.all() {
+      try deleteMeasurement(
+        connection,
+        measurement: measurement)
+    }
+
+    for note in try survey.notes.all() {
+      try deleteNote(
+        connection,
+        note: note)
+    }
+
     try Survey.makeQuery(connection).delete(survey)
+
   }
   
 }

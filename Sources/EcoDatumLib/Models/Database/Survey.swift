@@ -6,8 +6,10 @@ final class Survey: EquatableModel {
   
   let storage = Storage()
 
-  let date: Date
-  
+  var date: Date
+
+  var description: String?
+
   let siteId: Identifier
 
   let userId: Identifier
@@ -15,14 +17,17 @@ final class Survey: EquatableModel {
   struct Keys {
     static let id = "id"
     static let date = "date"
+    static let description = "description"
     static let siteId = Site.foreignIdKey
     static let userId = User.foreignIdKey
   }
   
   init(date: Date,
+       description: String? = nil,
        siteId: Identifier,
        userId: Identifier) {
     self.date = date
+    self.description = description
     self.siteId = siteId
     self.userId = userId
   }
@@ -31,6 +36,7 @@ final class Survey: EquatableModel {
   
   init(row: Row) throws {
     date = try row.get(Keys.date)
+    description = try row.get(Keys.description)
     siteId = try row.get(Keys.siteId)
     userId = try row.get(Keys.userId)
   }
@@ -38,6 +44,7 @@ final class Survey: EquatableModel {
   func makeRow() throws -> Row {
     var row = Row()
     try row.set(Keys.date, date)
+    try row.set(Keys.description, description)
     try row.set(Keys.siteId, siteId)
     try row.set(Keys.userId, userId)
     return row
@@ -56,6 +63,11 @@ extension Survey: Preparation {
       builder.date(
         Keys.date,
         optional: false,
+        unique: false)
+      builder.string(
+        Keys.description,
+        length: 500,
+        optional: true,
         unique: false)
       builder.foreignId(
         for: Site.self,

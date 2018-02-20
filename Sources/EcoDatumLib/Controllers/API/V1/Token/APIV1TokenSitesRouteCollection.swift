@@ -139,7 +139,8 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
       
       let (name, description, latitude, longitude) = try toSiteAttributes(json)
       
-      if let site = try modelManager.findSite(byName: name) {
+      if let findSite = try modelManager.findSite(byName: name),
+         findSite.id != site.id {
         throw Abort(.conflict, reason: "Site \(site.name) already exists.")
       }
       
