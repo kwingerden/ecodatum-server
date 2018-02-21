@@ -7,27 +7,32 @@ final class Measurement: EquatableModel {
   let storage = Storage()
   
   var value: Double
-  
-  var abioticFactorId: Identifier
-  
+
+  var primaryAbioticFactorId: Identifier
+
+  var secondaryAbioticFactorId: Identifier
+
   var measurementUnitId: Identifier
-  
+
   let surveyId: Identifier
   
   struct Keys {
     static let id = "id"
     static let value = "value"
-    static let abioticFactorId = AbioticFactor.foreignIdKey
+    static let primaryAbioticFactorId = PrimaryAbioticFactor.foreignIdKey
+    static let secondaryAbioticFactorId = SecondaryAbioticFactor.foreignIdKey
     static let measurementUnitId = MeasurementUnit.foreignIdKey
     static let surveyId = Survey.foreignIdKey
   }
   
   init(value: Double,
-       abioticFactorId: Identifier,
+       primaryAbioticFactorId: Identifier,
+       secondaryAbioticFactorId: Identifier,
        measurementUnitId: Identifier,
        surveyId: Identifier) {
     self.value = value
-    self.abioticFactorId = abioticFactorId
+    self.primaryAbioticFactorId = primaryAbioticFactorId
+    self.secondaryAbioticFactorId = secondaryAbioticFactorId
     self.measurementUnitId = measurementUnitId
     self.surveyId = surveyId
   }
@@ -36,7 +41,8 @@ final class Measurement: EquatableModel {
   
   init(row: Row) throws {
     value = try row.get(Keys.value)
-    abioticFactorId = try row.get(Keys.abioticFactorId)
+    primaryAbioticFactorId = try row.get(Keys.primaryAbioticFactorId)
+    secondaryAbioticFactorId = try row.get(Keys.secondaryAbioticFactorId)
     measurementUnitId = try row.get(Keys.measurementUnitId)
     surveyId = try row.get(Keys.surveyId)
   }
@@ -44,7 +50,8 @@ final class Measurement: EquatableModel {
   func makeRow() throws -> Row {
     var row = Row()
     try row.set(Keys.value, value)
-    try row.set(Keys.abioticFactorId, abioticFactorId)
+    try row.set(Keys.primaryAbioticFactorId, primaryAbioticFactorId)
+    try row.set(Keys.secondaryAbioticFactorId, secondaryAbioticFactorId)
     try row.set(Keys.measurementUnitId, measurementUnitId)
     try row.set(Keys.surveyId, surveyId)
     return row
@@ -65,7 +72,11 @@ extension Measurement: Preparation {
         optional: false,
         unique: false)
       builder.foreignId(
-        for: AbioticFactor.self,
+        for: PrimaryAbioticFactor.self,
+        optional: false,
+        unique: false)
+      builder.foreignId(
+        for: SecondaryAbioticFactor.self,
         optional: false,
         unique: false)
       builder.foreignId(
@@ -89,8 +100,12 @@ extension Measurement: Preparation {
 
 extension Measurement {
   
-  var abioticFactor: Parent<Measurement, AbioticFactor> {
-    return parent(id: abioticFactorId)
+  var primaryAbioticFactor: Parent<Measurement, PrimaryAbioticFactor> {
+    return parent(id: primaryAbioticFactorId)
+  }
+
+  var secondaryAbioticFactor: Parent<Measurement, SecondaryAbioticFactor> {
+    return parent(id: primaryAbioticFactorId)
   }
   
   var measurementUnit: Parent<Measurement, MeasurementUnit> {

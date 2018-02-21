@@ -30,10 +30,13 @@ extension Config {
     preparations.append(Site.self)
     preparations.append(Survey.self)
     
-    preparations.append(AbioticFactor.self)
-    preparations.append(ImageType.self)
+    preparations.append(PrimaryAbioticFactor.self)
+    preparations.append(SecondaryAbioticFactor.self)
     preparations.append(MeasurementUnit.self)
+    preparations.append(ImageType.self)
     preparations.append(Role.self)
+
+    preparations.append(AbioticFactorMeasurementUnit.self)
     
     preparations.append(Image.self)
     preparations.append(Note.self)

@@ -78,7 +78,7 @@ class FullModelTest: TestCase {
     let site1User1Survey1Measurement1 = try modelManager.createMeasurement(
       value: 4.5,
       abioticFactor: .AIR,
-      measurementUnit: .TEMPERATURE_CELCIUS,
+      measurementUnit: .TEMPERATURE_CELSIUS,
       survey: site1User1Organization1Survey1)
     
     let site1User1Survey1Note1 = try modelManager.createNote(
@@ -93,7 +93,7 @@ class FullModelTest: TestCase {
     let site2User4Organization2Survey3Measurement1 = try modelManager.createMeasurement(
       value: 324.5,
       abioticFactor: .WATER,
-      measurementUnit: .ACIDITY_PH,
+      measurementUnit: .PH,
       survey: site2User4Organization2Survey3)
     
     let site2User4Organization2Survey3Note1 = try modelManager.createNote(

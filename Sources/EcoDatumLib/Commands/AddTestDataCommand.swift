@@ -291,9 +291,10 @@ public final class AddTestDataCommand: Command {
     _ count: Int = 5,
     for surveys: [Survey]) throws {
   
-    let abioticFactors = try AbioticFactor.all()
+    let abioticFactors = try PrimaryAbioticFactor.all()
     let measurementUnits = try MeasurementUnit.all()
-    
+
+    /*
     for survey in surveys {
       
       for _ in 0...count - 1 {
@@ -308,6 +309,7 @@ public final class AddTestDataCommand: Command {
       }
       
     }
+    */
     
   }
   

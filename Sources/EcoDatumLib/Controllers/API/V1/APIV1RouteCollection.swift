@@ -26,13 +26,7 @@ final class APIV1RouteCollection: RouteCollection {
   private func makePublicRoutes(_ routeBuilder: RouteBuilder) {
     
     let `public` = routeBuilder.grouped("public")
-  
-    // /public/abioticFactors
-    APIV1PublicAbioticFactorsRouteCollection(
-      drop: drop,
-      modelManager: modelManager)
-      .build(`public`.grouped("abioticFactors"))
-    
+
     // /public/images
     APIV1PublicImagesRouteCollection(
       drop: drop,
@@ -74,9 +68,9 @@ final class APIV1RouteCollection: RouteCollection {
   
   private func makeTokenProtectedRoutes(_ routeBuilder: RouteBuilder) {
     
-    let exirationSeconds = drop.config["app", "token-expiration-seconds"]?.int ?? 86400
+    let expirationSeconds = drop.config["app", "token-expiration-seconds"]?.int ?? 86400
     let tokenProtected = routeBuilder.grouped("protected").grouped([
-      TokenExpirationMiddleware(exirationSeconds),
+      TokenExpirationMiddleware(expirationSeconds),
       TokenAuthenticationMiddleware(User.self)])
     
     // /protected/logout

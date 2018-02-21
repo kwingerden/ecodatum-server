@@ -530,80 +530,45 @@ extension ModelManager {
 // MARK: Measurement Extension
 
 extension ModelManager {
-  
-  func getAbioticFactor(_ connection: Connection? = nil,
-                        name: AbioticFactor.Name) throws -> AbioticFactor {
+
+  func findAbioticFactorMeasurementUnit(
+    _ connection: Connection? = nil,
+    primaryAbioticFactorId: Identifier,
+    secondaryAbioticFactorId: Identifier,
+    measurementUnitId: Identifier)
+  throws -> AbioticFactorMeasurementUnit? {
     
-    guard let abioticFactor = try AbioticFactor.makeQuery(connection)
-      .filter(AbioticFactor.Keys.name, .equals, name.rawValue)
-      .first() else {
-        throw Abort(.expectationFailed)
-    }
-    
-    return abioticFactor
-    
-  }
-  
-  func findAbioticFactor(_ connection: Connection? = nil,
-                         byId: Identifier) throws -> AbioticFactor? {
-    
-    return try AbioticFactor.makeQuery(connection).find(byId)
-    
-  }
-  
-  func getMeasurementUnit(_ connection: Connection? = nil,
-                          name: MeasurementUnit.Name) throws -> MeasurementUnit {
-    
-    guard let measurementUnit = try MeasurementUnit.makeQuery(connection)
-      .filter(MeasurementUnit.Keys.name, .equals, name.rawValue)
-      .first() else {
-        throw Abort(.expectationFailed)
-    }
-    
-    return measurementUnit
-    
-  }
-  
-  func findMeasurementUnit(_ connection: Connection? = nil,
-                           byId: Identifier) throws -> MeasurementUnit? {
-    
-    return try MeasurementUnit.makeQuery(connection).find(byId)
+    return try AbioticFactorMeasurementUnit.makeQuery(connection)
+      .filter(
+        AbioticFactorMeasurementUnit.Keys.primaryAbioticFactorId,
+        .equals,
+        primaryAbioticFactorId)
+      .filter(
+        AbioticFactorMeasurementUnit.Keys.secondaryAbioticFactorId,
+        .equals,
+        secondaryAbioticFactorId)
+      .filter(
+        AbioticFactorMeasurementUnit.Keys.measurementUnitId,
+        .equals,
+        measurementUnitId)
+    .first()
     
   }
   
   func createMeasurement(_ connection: Connection? = nil,
                          value: Double,
-                         abioticFactor: AbioticFactor,
-                         measurementUnit: MeasurementUnit,
-                         survey: Survey) throws -> Measurement {
-    
-    let abioticFactorId = try abioticFactor.assertExists()
-    let measurementUnitId = try measurementUnit.assertExists()
-    let surveyId = try survey.assertExists()
-    
+                         abioticFactorMeasurementUnit: AbioticFactorMeasurementUnit,
+                         surveyId: Identifier) throws -> Measurement {
+
     let measurement = Measurement(
       value: value,
-      abioticFactorId: abioticFactorId,
-      measurementUnitId: measurementUnitId,
+      primaryAbioticFactorId: abioticFactorMeasurementUnit.primaryAbioticFactorId,
+      secondaryAbioticFactorId: abioticFactorMeasurementUnit.secondaryAbioticFactorId,
+      measurementUnitId: abioticFactorMeasurementUnit.measurementUnitId,
       surveyId: surveyId)
     try Measurement.makeQuery(connection).save(measurement)
     
     return measurement
-    
-  }
-  
-  func createMeasurement(_ connection: Connection? = nil,
-                         value: Double,
-                         abioticFactor abioticFactorName: AbioticFactor.Name,
-                         measurementUnit measurementUnitName: MeasurementUnit.Name,
-                         survey: Survey) throws -> Measurement {
-  
-    return try createMeasurement(
-      connection,
-      value: value,
-      abioticFactor: try getAbioticFactor(name: abioticFactorName),
-      measurementUnit: try getMeasurementUnit(name: measurementUnitName),
-      survey: survey)
     
   }
   
@@ -616,35 +581,8 @@ extension ModelManager {
     return try Measurement.makeQuery(connection).find(byId)
   }
   
-  func updateMeasurement(_ connection: Connection? = nil,
-                         measurement: Measurement,
-                         newValue: Double? = nil,
-                         newAbioticFactor: AbioticFactor? = nil,
-                         newMeasurementUnit: MeasurementUnit? = nil) throws -> Measurement {
-    
-    try measurement.assertExists()
-    
-    if let value = newValue {
-      measurement.value = value
-    }
-    
-    if let abioticFactorId = try newAbioticFactor?.assertExists() {
-      measurement.abioticFactorId = abioticFactorId
-    }
-    
-    if let measurementUnitId = try newMeasurementUnit?.assertExists() {
-      measurement.measurementUnitId = measurementUnitId
-    }
-    
-    try Measurement.makeQuery(connection).save(measurement)
-    
-    return measurement
-    
-  }
-  
   func deleteMeasurement(_ connection: Connection? = nil,
                          measurement: Measurement) throws {
-    try measurement.assertExists()
     try Measurement.makeQuery(connection).delete(measurement)
   }
   
@@ -710,7 +648,7 @@ extension ModelManager {
                    description: String? = nil,
                    imageType: ImageType,
                    survey: Survey) throws -> Image {
-    
+
     let imageTypeId = try imageType.assertExists()
     let surveyId = try survey.assertExists()
     

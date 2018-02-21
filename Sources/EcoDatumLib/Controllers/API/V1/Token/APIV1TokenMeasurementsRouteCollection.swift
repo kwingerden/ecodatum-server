@@ -57,14 +57,14 @@ final class APIV1TokenMeasurementsRouteCollection: RouteCollection {
     
     if isRootUser || doesUserBelongToOrganization {
       
-      guard let abioticFactorId: Identifier = try json.get(Measurement.Json.abioticFactorId),
-        let abioticFactor = try modelManager.findAbioticFactor(byId: abioticFactorId) else {
-          throw Abort(.notFound, reason: "Abiotic Factor not found")
-      }
-      
-      guard let measurementUnitId: Identifier = try json.get(Measurement.Json.measurementUnitId),
-        let measurementUnit = try modelManager.findMeasurementUnit(byId: measurementUnitId) else {
-          throw Abort(.notFound, reason: "Measurement Unit not found")
+      guard let primaryAbioticFactorId: Identifier = try json.get(Measurement.Json.primaryAbioticFactorId),
+            let secondaryAbioticFactorId: Identifier = try json.get(Measurement.Json.secondaryAbioticFactorId),
+            let measurementUnitId: Identifier = try json.get(Measurement.Json.measurementUnitId),
+            let abioticFactorMeasurementUnit = try modelManager.findAbioticFactorMeasurementUnit(
+              primaryAbioticFactorId: primaryAbioticFactorId,
+              secondaryAbioticFactorId: secondaryAbioticFactorId,
+              measurementUnitId: measurementUnitId) else {
+          throw Abort(.notFound, reason: "Abiotic Factors and/or measurement unit not found")
       }
       
       guard let value: Double = try json.get(Measurement.Json.value) else {
@@ -73,9 +73,8 @@ final class APIV1TokenMeasurementsRouteCollection: RouteCollection {
       
       return try modelManager.createMeasurement(
         value: value,
-        abioticFactor: abioticFactor.name,
-        measurementUnit: measurementUnit.name,
-        survey: survey)
+        abioticFactorMeasurementUnit: abioticFactorMeasurementUnit,
+        surveyId: surveyId)
       
     } else {
       

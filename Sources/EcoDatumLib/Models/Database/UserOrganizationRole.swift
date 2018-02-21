@@ -68,7 +68,8 @@ extension UserOrganizationRole: Preparation {
     try database.index(
       [
         Keys.userId,
-        Keys.organizationId
+        Keys.organizationId,
+        Keys.roleId
       ],
       for: self)
   }

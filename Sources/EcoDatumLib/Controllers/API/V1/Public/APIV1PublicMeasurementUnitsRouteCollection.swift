@@ -22,7 +22,44 @@ final class APIV1PublicMeasurementUnitsRouteCollection: RouteCollection {
   }
   
   private func getAllMeasurementUnits(_ request: Request) throws -> ResponseRepresentable {
-    return try MeasurementUnit.makeQuery().all().makeJSON()
+
+    var fullMeasurementUnits: [FullMeasurementUnit] = []
+    try AbioticFactorMeasurementUnit.makeQuery().all().forEach {
+
+      guard let primaryAbioticFactor = try $0.primaryAbioticFactor.get(),
+            let secondaryAbioticFactor = try $0.secondaryAbioticFactor.get(),
+            let measurementUnit = try $0.measurementUnit.get() else {
+        throw Abort(.internalServerError)
+      }
+
+      fullMeasurementUnits.append(
+        FullMeasurementUnit(
+          primaryAbioticFactor: primaryAbioticFactor,
+          secondaryAbioticFactor: secondaryAbioticFactor,
+          measurementUnit: measurementUnit))
+
+    }
+
+    return try fullMeasurementUnits.makeJSON()
+
+  }
+
+  private struct FullMeasurementUnit: JSONRepresentable {
+
+    let primaryAbioticFactor: PrimaryAbioticFactor
+    let secondaryAbioticFactor: SecondaryAbioticFactor
+    let measurementUnit: MeasurementUnit
+
+    func makeJSON() throws -> JSON {
+
+      let j1 =  try primaryAbioticFactor.makeJSON()
+      let j2 =  try secondaryAbioticFactor.makeJSON()
+      let j3 =  try measurementUnit.makeJSON()
+
+      return try [j1, j2, j3].makeJSON()
+
+    }
+
   }
   
 }
