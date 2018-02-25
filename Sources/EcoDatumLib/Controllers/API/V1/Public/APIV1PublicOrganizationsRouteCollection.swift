@@ -19,6 +19,10 @@ final class APIV1PublicOrganizationsRouteCollection: RouteCollection {
       String.parameter,
       handler: getOrganizationByCodeRouteHandler)
     
+    routeBuilder.get(
+      "roles",
+      handler: getOrganizationRoles)
+    
   }
   
   // GET /public/organizations/:code
@@ -32,6 +36,15 @@ final class APIV1PublicOrganizationsRouteCollection: RouteCollection {
       }
       
       return organization
+      
+  }
+  
+  // GET /public/organizations/roles
+  private func getOrganizationRoles(
+    _ request: Request)
+    throws -> ResponseRepresentable {
+      
+      return try Role.all().makeJSON()
       
   }
   

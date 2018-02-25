@@ -74,7 +74,8 @@ final class APIV1TokenMeasurementsRouteCollection: RouteCollection {
       return try modelManager.createMeasurement(
         value: value,
         abioticFactorMeasurementUnit: abioticFactorMeasurementUnit,
-        surveyId: surveyId)
+        surveyId: surveyId,
+        userId: try request.user().assertExists())
       
     } else {
       

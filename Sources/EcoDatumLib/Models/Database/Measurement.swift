@@ -16,6 +16,8 @@ final class Measurement: EquatableModel {
 
   let surveyId: Identifier
   
+  let userId: Identifier
+  
   struct Keys {
     static let id = "id"
     static let value = "value"
@@ -23,18 +25,21 @@ final class Measurement: EquatableModel {
     static let secondaryAbioticFactorId = SecondaryAbioticFactor.foreignIdKey
     static let measurementUnitId = MeasurementUnit.foreignIdKey
     static let surveyId = Survey.foreignIdKey
+    static let userId = User.foreignIdKey
   }
   
   init(value: Double,
        primaryAbioticFactorId: Identifier,
        secondaryAbioticFactorId: Identifier,
        measurementUnitId: Identifier,
-       surveyId: Identifier) {
+       surveyId: Identifier,
+       userId: Identifier) {
     self.value = value
     self.primaryAbioticFactorId = primaryAbioticFactorId
     self.secondaryAbioticFactorId = secondaryAbioticFactorId
     self.measurementUnitId = measurementUnitId
     self.surveyId = surveyId
+    self.userId = userId
   }
   
   // MARK: Row
@@ -45,6 +50,7 @@ final class Measurement: EquatableModel {
     secondaryAbioticFactorId = try row.get(Keys.secondaryAbioticFactorId)
     measurementUnitId = try row.get(Keys.measurementUnitId)
     surveyId = try row.get(Keys.surveyId)
+    userId = try row.get(Keys.userId)
   }
   
   func makeRow() throws -> Row {
@@ -54,6 +60,7 @@ final class Measurement: EquatableModel {
     try row.set(Keys.secondaryAbioticFactorId, secondaryAbioticFactorId)
     try row.set(Keys.measurementUnitId, measurementUnitId)
     try row.set(Keys.surveyId, surveyId)
+    try row.set(Keys.userId, userId)
     return row
   }
   
@@ -87,6 +94,10 @@ extension Measurement: Preparation {
         for: Survey.self,
         optional: false,
         unique: false)
+      builder.foreignId(
+        for: User.self,
+        optional: false,
+        unique: false)
     }
   }
   
@@ -114,6 +125,10 @@ extension Measurement {
   
   var survey: Parent<Measurement, Survey> {
     return parent(id: surveyId)
+  }
+  
+  var user: Parent<Measurement, User> {
+    return parent(id: userId)
   }
   
 }

@@ -10,6 +10,7 @@ extension Measurement: JSONConvertible {
     static let secondaryAbioticFactorId = "secondaryAbioticFactorId"
     static let measurementUnitId = "measurementUnitId"
     static let surveyId = "surveyId"
+    static let userId = "userId"
   }
   
   convenience init(json: JSON) throws {
@@ -18,7 +19,8 @@ extension Measurement: JSONConvertible {
       primaryAbioticFactorId: try json.get(Json.primaryAbioticFactorId),
       secondaryAbioticFactorId: try json.get(Json.secondaryAbioticFactorId),
       measurementUnitId: try json.get(Json.measurementUnitId),
-      surveyId: try json.get(Json.surveyId))
+      surveyId: try json.get(Json.surveyId),
+      userId: try json.get(Json.userId))
   }
   
   func makeJSON() throws -> JSON {
@@ -29,6 +31,7 @@ extension Measurement: JSONConvertible {
     try json.set(Json.secondaryAbioticFactorId, secondaryAbioticFactorId)
     try json.set(Json.measurementUnitId, measurementUnitId)
     try json.set(Json.surveyId, surveyId)
+    try json.set(Json.userId, userId)
     return json
   }
   

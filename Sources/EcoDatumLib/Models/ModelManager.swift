@@ -558,14 +558,16 @@ extension ModelManager {
   func createMeasurement(_ connection: Connection? = nil,
                          value: Double,
                          abioticFactorMeasurementUnit: AbioticFactorMeasurementUnit,
-                         surveyId: Identifier) throws -> Measurement {
+                         surveyId: Identifier,
+                         userId: Identifier) throws -> Measurement {
 
     let measurement = Measurement(
       value: value,
       primaryAbioticFactorId: abioticFactorMeasurementUnit.primaryAbioticFactorId,
       secondaryAbioticFactorId: abioticFactorMeasurementUnit.secondaryAbioticFactorId,
       measurementUnitId: abioticFactorMeasurementUnit.measurementUnitId,
-      surveyId: surveyId)
+      surveyId: surveyId,
+      userId: userId)
     try Measurement.makeQuery(connection).save(measurement)
     
     return measurement

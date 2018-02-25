@@ -25,7 +25,9 @@ final class APIV1PasswordLoginRouteCollection: RouteCollection {
     let user = try request.user()
     drop.log.debug("Logging in as user: \(user.fullName)")
     
-    return try modelManager.generateToken(for: user)
+    return try RootUserToken(
+      isRootUser: modelManager.isRootUser(user),
+      token: try modelManager.generateToken(for: user))
   
   }
   

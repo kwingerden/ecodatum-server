@@ -12,9 +12,10 @@ extension User: JSONConvertible {
   }
   
   convenience init(json: JSON) throws {
-    self.init(fullName: try json.get(Json.fullName),
-              email: try json.get(Json.email),
-              password: try json.get(Json.password))
+    self.init(
+      fullName: try json.get(Json.fullName),
+      email: try json.get(Json.email),
+      password: try json.get(Json.password))
   }
   
   func makeJSON() throws -> JSON {

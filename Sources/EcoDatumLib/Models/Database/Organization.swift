@@ -83,8 +83,8 @@ extension Organization: Preparation {
 
 extension Organization {
   
-  var userOrganizationRole: Parent<Organization, UserOrganizationRole> {
-    return parent(id: id)
+  var userOrganizationRoles: Children<Organization, UserOrganizationRole> {
+    return children()
   }
 
   var sites: Children<Organization, Site> {

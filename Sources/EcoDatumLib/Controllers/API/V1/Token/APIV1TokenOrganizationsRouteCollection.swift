@@ -23,12 +23,6 @@ final class APIV1TokenOrganizationsRouteCollection: RouteCollection {
     routeBuilder.get(
       Organization.parameter,
       handler: getOrganizationById)
-    
-    // GET /organizations/:id/administrator
-    routeBuilder.get(
-      Organization.parameter,
-      "administrator",
-      handler: getOrganizationAdministrator)
 
     // GET /organizations/:id/members
     routeBuilder.get(
@@ -92,18 +86,34 @@ final class APIV1TokenOrganizationsRouteCollection: RouteCollection {
       }
       
   }
-  
-  private func getOrganizationAdministrator(_ request: Request)
-  throws -> ResponseRepresentable {
-
-    return try getOrganizationUsers(request, .ADMINISTRATOR)
-
-  }
 
   private func getOrganizationMembers(_ request: Request)
   throws -> ResponseRepresentable {
 
-    return try getOrganizationUsers(request, .MEMBER)
+    let (organization, isRootUser, doesUserBelongToOrganization) =
+      try isRootOrOrganizationUser(request)
+
+    if isRootUser || doesUserBelongToOrganization {
+      
+      let usersAndRoles: [UserAndRole] = try organization.userOrganizationRoles
+        .all()
+        .map {
+        
+        guard let user = try $0.user.get(), let role = try $0.role.get() else {
+          throw Abort(.internalServerError)
+        }
+        
+        return try UserAndRole(user: user, role: role)
+      
+      }
+      
+      return try JSON(node: usersAndRoles)
+
+    } else {
+
+      throw Abort(.notFound)
+
+    }
 
   }
 
@@ -182,7 +192,7 @@ final class APIV1TokenOrganizationsRouteCollection: RouteCollection {
 
   }
 
-  func isRootOrOrganizationUser(_ request: Request) throws -> (Organization, Bool, Bool) {
+  private func isRootOrOrganizationUser(_ request: Request) throws -> (Organization, Bool, Bool) {
 
     let organization = try request.parameters.next(Organization.self)
     let user = try request.user()
@@ -192,27 +202,6 @@ final class APIV1TokenOrganizationsRouteCollection: RouteCollection {
       organization: organization)
 
     return (organization, isRootUser, doesUserBelongToOrganization)
-
-  }
-
-  func getOrganizationUsers(_ request: Request,
-                            _ byRole: Role.Name) throws -> ResponseRepresentable {
-
-    let (organization, isRootUser, doesUserBelongToOrganization) =
-      try isRootOrOrganizationUser(request)
-
-    if isRootUser || doesUserBelongToOrganization {
-
-      return try modelManager.getOrganizationUsers(
-        organization: organization,
-        byRole: byRole)
-        .makeJSON()
-
-    } else {
-
-      throw Abort(.notFound)
-
-    }
 
   }
 

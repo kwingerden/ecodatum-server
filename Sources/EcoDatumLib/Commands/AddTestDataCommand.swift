@@ -49,7 +49,8 @@ public final class AddTestDataCommand: Command {
       with: users)
     try createMeasurements(
       count,
-      for: surveys)
+      for: surveys,
+      with: users)
     
   }
   
@@ -289,27 +290,28 @@ public final class AddTestDataCommand: Command {
   
   private func createMeasurements(
     _ count: Int = 5,
-    for surveys: [Survey]) throws {
+    for surveys: [Survey],
+    with users: [User]) throws {
   
-    let abioticFactors = try PrimaryAbioticFactor.all()
-    let measurementUnits = try MeasurementUnit.all()
+    let afmus = try AbioticFactorMeasurementUnit.all()
 
-    /*
     for survey in surveys {
       
       for _ in 0...count - 1 {
         
+        let amfu = afmus.random!
         let measurement = Measurement(
           value: randomSignedDouble(),
-          abioticFactorId: abioticFactors.random!.id!,
-          measurementUnitId: measurementUnits.random!.id!,
-          surveyId: survey.id!)
+          primaryAbioticFactorId: amfu.primaryAbioticFactorId,
+          secondaryAbioticFactorId: amfu.secondaryAbioticFactorId,
+          measurementUnitId: amfu.measurementUnitId,
+          surveyId: survey.id!,
+          userId: users.random!.id!)
         try measurement.save()
       
       }
       
     }
-    */
     
   }
   

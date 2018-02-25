@@ -150,7 +150,7 @@ public final class InitializeDatabaseCommand: Command {
                 measurementUnitId: muId)
               try AbioticFactorMeasurementUnit.makeQuery().save(amu)
               
-              console.print("Successfully create Abiotic Factor Measurement Unit \(paf.name.rawValue), \(saf.name.rawValue), \(mu.dimension.rawValue) already exists.")
+              console.print("Successfully created Abiotic Factor Measurement Unit \(paf.name.rawValue), \(saf.name.rawValue), \(mu.dimension.rawValue).")
               
             } else {
               
