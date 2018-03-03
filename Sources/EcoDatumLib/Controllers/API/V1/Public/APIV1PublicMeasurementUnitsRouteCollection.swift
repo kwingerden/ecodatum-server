@@ -56,7 +56,11 @@ final class APIV1PublicMeasurementUnitsRouteCollection: RouteCollection {
       let j2 =  try secondaryAbioticFactor.makeJSON()
       let j3 =  try measurementUnit.makeJSON()
 
-      return try [j1, j2, j3].makeJSON()
+      return try JSON(node: [
+        "primaryAbioticFactor": j1,
+        "secondaryAbioticFactor": j2,
+        "measurementUnit": j3
+      ])
 
     }
 
