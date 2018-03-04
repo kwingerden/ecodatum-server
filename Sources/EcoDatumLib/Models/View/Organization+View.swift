@@ -8,6 +8,8 @@ extension Organization: JSONConvertible {
     static let name = Keys.name
     static let description = Keys.description
     static let code = Keys.code
+    static let createdAt = "createdAt"
+    static let updatedAt = "updatedAt"
   }
   
   convenience init(json: JSON) throws {
@@ -22,6 +24,8 @@ extension Organization: JSONConvertible {
     try json.set(Json.name, name)
     try json.set(Json.description, description)
     try json.set(Json.code, code)
+    try json.set(Json.createdAt, createdAt)
+    try json.set(Json.updatedAt, updatedAt)
     return json
   }
   

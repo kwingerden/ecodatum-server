@@ -9,6 +9,8 @@ extension Survey: JSONConvertible {
     static let description = Keys.description
     static let siteId = "siteId"
     static let userId = "userId"
+    static let createdAt = "createdAt"
+    static let updatedAt = "updatedAt"
   }
 
   convenience init(json: JSON) throws {
@@ -26,6 +28,8 @@ extension Survey: JSONConvertible {
     try json.set(Json.description, description)
     try json.set(Json.siteId, siteId)
     try json.set(Json.userId, userId)
+    try json.set(Json.createdAt, createdAt)
+    try json.set(Json.updatedAt, updatedAt)
     return json
   }
 

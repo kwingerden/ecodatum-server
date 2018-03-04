@@ -7,6 +7,8 @@ extension Note: JSONConvertible {
     static let id = Keys.id
     static let text = Keys.text
     static let surveyId = "surveyId"
+    static let createdAt = "createdAt"
+    static let updatedAt = "updatedAt"
   }
   
   convenience init(json: JSON) throws {
@@ -19,6 +21,8 @@ extension Note: JSONConvertible {
     try json.set(Json.id, id)
     try json.set(Json.text, text)
     try json.set(Json.surveyId, surveyId)
+    try json.set(Json.createdAt, createdAt)
+    try json.set(Json.updatedAt, updatedAt)
     return json
   }
   

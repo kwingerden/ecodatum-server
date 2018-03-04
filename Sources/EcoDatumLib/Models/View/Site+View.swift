@@ -14,6 +14,8 @@ extension Site: JSONConvertible {
     static let verticalAccuracy = "verticalAccuracy"
     static let organizationId = "organizationId"
     static let userId = "userId"
+    static let createdAt = "createdAt"
+    static let updatedAt = "updatedAt"
   }
   
   convenience init(json: JSON) throws {
@@ -40,6 +42,8 @@ extension Site: JSONConvertible {
     try json.set(Json.verticalAccuracy, verticalAccuracy)
     try json.set(Json.organizationId, organizationId)
     try json.set(Json.userId, userId)
+    try json.set(Json.createdAt, createdAt)
+    try json.set(Json.updatedAt, updatedAt)
     return json
   }
   

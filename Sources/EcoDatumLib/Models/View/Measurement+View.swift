@@ -11,6 +11,8 @@ extension Measurement: JSONConvertible {
     static let measurementUnitId = "measurementUnitId"
     static let surveyId = "surveyId"
     static let userId = "userId"
+    static let createdAt = "createdAt"
+    static let updatedAt = "updatedAt"
   }
   
   convenience init(json: JSON) throws {
@@ -32,6 +34,8 @@ extension Measurement: JSONConvertible {
     try json.set(Json.measurementUnitId, measurementUnitId)
     try json.set(Json.surveyId, surveyId)
     try json.set(Json.userId, userId)
+    try json.set(Json.createdAt, createdAt)
+    try json.set(Json.updatedAt, updatedAt)
     return json
   }
   

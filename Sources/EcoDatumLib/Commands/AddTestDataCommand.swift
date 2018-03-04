@@ -342,9 +342,9 @@ public final class AddTestDataCommand: Command {
     let today = Date(timeIntervalSinceNow: 0)
     let gregorian = Calendar(identifier: .gregorian)
     var offsetComponents = DateComponents()
-    offsetComponents.day = Int(day - 1)
-    offsetComponents.hour = Int(hour)
-    offsetComponents.minute = Int(minute)
+    offsetComponents.day = -Int(day - 1)
+    offsetComponents.hour = -Int(hour)
+    offsetComponents.minute = -Int(minute)
     
     return gregorian.date(
       byAdding: offsetComponents,

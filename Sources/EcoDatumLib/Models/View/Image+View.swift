@@ -10,6 +10,8 @@ extension Image: JSONConvertible {
     static let description = Keys.description
     static let imageTypeId = "imageTypeId"
     static let surveyId = "surveyId"
+    static let createdAt = "createdAt"
+    static let updatedAt = "updatedAt"
   }
   
   convenience init(json: JSON) throws {
@@ -26,6 +28,8 @@ extension Image: JSONConvertible {
     try json.set(Json.description, description)
     try json.set(Json.imageTypeId, imageTypeId)
     try json.set(Json.surveyId, surveyId)
+    try json.set(Json.createdAt, createdAt)
+    try json.set(Json.updatedAt, updatedAt)
     return json
   }
   
