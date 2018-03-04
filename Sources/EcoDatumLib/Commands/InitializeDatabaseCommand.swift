@@ -105,6 +105,7 @@ public final class InitializeDatabaseCommand: Command {
         let measurementUnit = MeasurementUnit(
           dimension: $0.dimension,
           unit: $0.unit,
+          label: $0.label,
           description: $0.description)
         try measurementUnit.save()
 
@@ -116,41 +117,107 @@ public final class InitializeDatabaseCommand: Command {
 
     // Abiotic Factors X Measurement Units
 
-    try AbioticFactorMeasurementUnit.all.forEach {
+    typealias MeasurementUnits = [MeasurementUnit.Unit]
+    typealias DimensionXUnit = [MeasurementUnit.Dimension: MeasurementUnits]
+    typealias SecondaryAbioticFactorXDimensionXUnit = [SecondaryAbioticFactor.Name: DimensionXUnit]
+    typealias PrimaryXSecondaryXDimensionXUnit = [PrimaryAbioticFactor.Name: SecondaryAbioticFactorXDimensionXUnit]
+    
+    let acidity: DimensionXUnit = [
+      .Acidity: [
+        .potential_of_hydrogen
+      ]
+    ]
+    
+    let dispersion: DimensionXUnit = [
+      .Dispersion: [
+        .parts_per_million
+      ]
+    ]
+    
+    let illuminance: DimensionXUnit = [
+      .Illuminance: [
+        .lux
+      ]
+    ]
+    
+    let temperature: DimensionXUnit = [
+      .Temperature: [
+        .degree_centigrade,
+        .degree_fahrenheit,
+        .kelvin
+      ]
+    ]
+    
+    let allAbioticFactorMeasurementUnits: PrimaryXSecondaryXDimensionXUnit = [
+      .Air: [
+        .CARBON_DIOXIDE: dispersion,
+        .LUMINOUS_INTENSITY: illuminance,
+        .TEMPERATURE: temperature
+      ],
+      .Soil: [
+        .HYDROGEN_ION: acidity,
+        .TEMPERATURE: temperature
+      ],
+      .Water: [
+        .HYDROGEN_ION: acidity,
+        .TEMPERATURE: temperature
+      ]
+    ]
+
+    try allAbioticFactorMeasurementUnits.forEach {
       primaryAbioticFactor in
       
       try primaryAbioticFactor.value.forEach {
         secondaryAbioticFactor in
         
-        if let paf = try PrimaryAbioticFactor.makeQuery().filter(
-            PrimaryAbioticFactor.Keys.name, .equals, primaryAbioticFactor.key.rawValue)
-            .first(),
-          let saf = try SecondaryAbioticFactor.makeQuery().filter(
-            SecondaryAbioticFactor.Keys.name, .equals, secondaryAbioticFactor.key.rawValue)
-            .first(),
-          let mu = try MeasurementUnit.makeQuery().filter(
-            MeasurementUnit.Keys.dimension, .equals, secondaryAbioticFactor.value.rawValue)
-            .first() {
+        try secondaryAbioticFactor.value.forEach {
+          dimension in
           
-          if let _ = try AbioticFactorMeasurementUnit.makeQuery()
-            .filter(AbioticFactorMeasurementUnit.Keys.primaryAbioticFactorId, .equals, paf.id)
-            .filter(AbioticFactorMeasurementUnit.Keys.secondaryAbioticFactorId, .equals, saf.id)
-            .filter(AbioticFactorMeasurementUnit.Keys.measurementUnitId, .equals, mu.id)
-            .first() {
+          try dimension.value.forEach {
+            unit in
             
-            console.print("Abiotic Factor Measurement Unit \(paf.name.rawValue), \(saf.name.rawValue), \(mu.dimension.rawValue) already exists.")
-            
-          } else {
-            
-            if let pafId = paf.id, let safId = saf.id, let muId = mu.id {
+            if let paf = try PrimaryAbioticFactor.makeQuery()
+                .filter(
+                  PrimaryAbioticFactor.Keys.name, .equals, primaryAbioticFactor.key.rawValue)
+                .first(),
+              let saf = try SecondaryAbioticFactor.makeQuery()
+                .filter(
+                  SecondaryAbioticFactor.Keys.name, .equals, secondaryAbioticFactor.key.rawValue)
+                .first(),
+              let mu = try MeasurementUnit.makeQuery()
+                .filter(
+                  MeasurementUnit.Keys.dimension, .equals, dimension.key.rawValue)
+                .filter(
+                  MeasurementUnit.Keys.unit, .equals, unit.rawValue)
+                .first() {
               
-              let amu = AbioticFactorMeasurementUnit(
-                primaryAbioticFactorId: pafId,
-                secondaryAbioticFactorId: safId,
-                measurementUnitId: muId)
-              try AbioticFactorMeasurementUnit.makeQuery().save(amu)
-              
-              console.print("Successfully created Abiotic Factor Measurement Unit \(paf.name.rawValue), \(saf.name.rawValue), \(mu.dimension.rawValue).")
+              if let _ = try AbioticFactorMeasurementUnit.makeQuery()
+                .filter(AbioticFactorMeasurementUnit.Keys.primaryAbioticFactorId, .equals, paf.id)
+                .filter(AbioticFactorMeasurementUnit.Keys.secondaryAbioticFactorId, .equals, saf.id)
+                .filter(AbioticFactorMeasurementUnit.Keys.measurementUnitId, .equals, mu.id)
+                .first() {
+                
+                console.print("Abiotic Factor Measurement Unit \(paf.name.rawValue), \(saf.name.rawValue), \(mu.dimension.rawValue) already exists.")
+                
+              } else {
+                
+                if let pafId = paf.id, let safId = saf.id, let muId = mu.id {
+                  
+                  let amu = AbioticFactorMeasurementUnit(
+                    primaryAbioticFactorId: pafId,
+                    secondaryAbioticFactorId: safId,
+                    measurementUnitId: muId)
+                  try AbioticFactorMeasurementUnit.makeQuery().save(amu)
+                  
+                  console.print("Successfully created Abiotic Factor Measurement Unit \(paf.name.rawValue), \(saf.name.rawValue), \(mu.dimension.rawValue).")
+                  
+                } else {
+                  
+                  console.print("Failed to create Primary, Secondary, or Measurement Unit!!!")
+                  
+                }
+                
+              }
               
             } else {
               
@@ -159,10 +226,6 @@ public final class InitializeDatabaseCommand: Command {
             }
             
           }
-          
-        } else {
-          
-          console.print("Failed to create Primary, Secondary, or Measurement Unit!!!")
           
         }
         

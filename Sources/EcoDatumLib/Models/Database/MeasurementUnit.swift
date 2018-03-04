@@ -6,11 +6,16 @@ import Vapor
 final class MeasurementUnit: EquatableModel {
 
   enum Unit: String {
-    case pH
+    case degree_centigrade = "°C"
+    case degree_fahrenheit = "°F"
+    case kelvin = "K"
     case parts_per_million = "ppm"
-    case seconds = "s"
-    case lx
-    case celsius = "°C"
+    case potential_of_hydrogen = "pH"
+    case second = "s"
+    case minute = "min"
+    case hour = "h"
+    case day = "d"
+    case lux = "lx"
   }
 
   enum Dimension: String {
@@ -23,53 +28,116 @@ final class MeasurementUnit: EquatableModel {
     (
       dimension: Dimension,
       unit: Unit,
+      label: String,
       description: String
     )] = [
+      
+      // ACIDITY
+      
       (
         dimension: .Acidity,
-        unit: .pH,
+        unit: .potential_of_hydrogen,
+        label: "Potential of Hydrogen",
         description: """
-        pH (potential of hydrogen) is a scale of acidity from 0 to 14. It 
-        tells how acidic or alkaline a substance is. More acidic solutions 
-        have lower pH. More alkaline solutions have higher pH.
+        pH is a measure of the acidity or alkalinity of a solution. The pH value
+        states the relative quantity of hydrogen ions (H+) contained in a solution.
+        The greater the concentration of H+ the more acidic the solution and the
+        lower the pH.
         """
       ),
+      
+      // DISPERSION
+      
       (
         dimension: .Dispersion,
         unit: .parts_per_million,
+        label: "Parts Per Million",
         description: """
-        Usually describes the concentration of something in water or soil. 
-        One ppm is equivalent to 1 milligram of something per liter of water 
-        (mg/l) or 1 milligram of something per kilogram soil (mg/kg).
+        A way of expressing very dilute concentrations of substances. One ppm is
+        equivalent to 1 milligram of something per liter of water (mg/l) or 1
+        milligram of something per kilogram soil (mg/kg).
+        """
+      ),
+      
+      // DURATION
+      
+      (
+        dimension: .Duration,
+        unit: .second,
+        label: "Second",
+        description: """
+        The second is the duration of 9,192,631,770 periods of the radiation
+        corresponding to the transition between the two hyperfine levels of the
+        ground state of the cesium 133 atom.
         """
       ),
       (
         dimension: .Duration,
-        unit: .seconds,
+        unit: .minute,
+        label: "Minute",
         description: """
-        A unit of time or time unit is any particular time interval, used as 
-        a standard way of measuring or expressing duration. 
+        A period of time equal to 60 seconds or a 60th of an hour.
         """
       ),
       (
-        dimension: .Illuminance,
-        unit: .lx,
+        dimension: .Duration,
+        unit: .hour,
+        label: "Hour",
         description: """
-        In photometry, illuminance is the total luminous flux incident on a 
-        surface, per unit area. It is a measure of how much the incident light 
-        illuminates the surface, wavelength-weighted by the luminosity function
-        to correlate with human brightness perception.
+        A period of time equal to 3600 seconds or a 24th part of a day and night.
+        """
+      ),
+      (
+        dimension: .Duration,
+        unit: .day,
+        label: "Day",
+        description: """
+        A period of 24 hours as a unit of time, reckoned from one midnight to the
+        next, corresponding to a rotation of the earth on its axis.
+        """
+      ),
+      
+      // ILLUMINANCE
+      
+      (
+        dimension: .Illuminance,
+        unit: .lux,
+        label: "lux",
+        description: """
+        A unit of illuminance, equal to one lumen per square meter.
+        """
+      ),
+      
+      // TEMPERATURE
+      
+      (
+        dimension: .Temperature,
+        unit: .degree_centigrade,
+        label: "Degree Centigrade",
+        description: """
+        A scale of temperature in which water freezes at 0° and boils at 100°
+        under standard conditions.
         """
       ),
       (
         dimension: .Temperature,
-        unit: .celsius,
+        unit: .degree_fahrenheit,
+        label: "Degree Fahrenheit",
         description: """
-        Temperature is a proportional measure of the average translational 
-        kinetic energy of the random motions of the constituent microscopic 
-        particles in a system (such as electrons, atoms, and molecules).
+        A scale of temperature on which water freezes at 32° and boils at 212°
+        under standard conditions.
+        """
+      ),
+      (
+        dimension: .Temperature,
+        unit: .kelvin,
+        label: "Kelvin",
+        description: """
+        A base unit of thermodynamic temperature, equal in magnitude to the
+        degree Celsius.
         """
       )
+      
     ]
   }
 
@@ -79,20 +147,25 @@ final class MeasurementUnit: EquatableModel {
 
   let unit: Unit
 
+  let label: String
+
   let description: String
 
   struct Keys {
     static let id = "id"
     static let dimension = "dimension"
     static let unit = "unit"
+    static let label = "label"
     static let description = "description"
   }
 
   init(dimension: Dimension,
        unit: Unit,
+       label: String,
        description: String) {
     self.dimension = dimension
     self.unit = unit
+    self.label = label
     self.description = description
   }
 
@@ -107,6 +180,7 @@ final class MeasurementUnit: EquatableModel {
       throw Abort(.internalServerError)
     }
     self.unit = unit
+    label = try row.get(Keys.label)
     description = try row.get(Keys.description)
   }
 
@@ -114,6 +188,7 @@ final class MeasurementUnit: EquatableModel {
     var row = Row()
     try row.set(Keys.dimension, dimension.rawValue)
     try row.set(Keys.unit, unit.rawValue)
+    try row.set(Keys.label, label)
     try row.set(Keys.description, description)
     return row
   }
@@ -135,6 +210,11 @@ extension MeasurementUnit: Preparation {
       builder.string(
         Keys.unit,
         length: 20,
+        optional: false,
+        unique: false)
+      builder.string(
+        Keys.label,
+        length: 50,
         optional: false,
         unique: false)
       builder.string(

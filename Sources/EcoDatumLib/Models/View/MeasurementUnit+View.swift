@@ -7,6 +7,7 @@ extension MeasurementUnit: JSONConvertible {
     static let id = Keys.id
     static let dimension = Keys.dimension
     static let unit = Keys.unit
+    static let label = Keys.label
     static let description = Keys.description
   }
   
@@ -20,6 +21,7 @@ extension MeasurementUnit: JSONConvertible {
     self.init(
       dimension: dimension,
       unit: unit,
+      label: try json.get(Json.label),
       description: try json.get(Json.description))
   }
   
@@ -28,6 +30,7 @@ extension MeasurementUnit: JSONConvertible {
     try json.set(Json.id, id)
     try json.set(Json.dimension, dimension.rawValue)
     try json.set(Json.unit, unit.rawValue)
+    try json.set(Json.label, label)
     try json.set(Json.description, description)
     return json
   }

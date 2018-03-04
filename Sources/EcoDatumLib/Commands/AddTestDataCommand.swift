@@ -1,5 +1,6 @@
 import Console
 import FluentProvider
+import Foundation
 import Random
 import Vapor
 
@@ -35,7 +36,7 @@ public final class AddTestDataCommand: Command {
   
   public func run(arguments: [String]) throws {
     
-    let count = 5
+    let count = 10
     let users = try createOrGetUsers(count)
     let organizations = try createOrGetOrganizations(count)
     try associate(
@@ -57,18 +58,14 @@ public final class AddTestDataCommand: Command {
   private func createOrGetUsers(
     _ count: Int = 5) throws -> [User] {
     
-    guard 1...9 ~= count else {
-      throw CommandError.invalidCount("Invalid User count: \(count)")
-    }
-    
     let password = try hash.make(
       "password".makeBytes())
       .makeString()
     
     var users: [User] = []
-    for index in 0...count - 1 {
+    for index in 1...count {
       
-      let fullName = "Test User\(index)"
+      let fullName = "Test User \(index)"
       let email = "test.user\(index)@ecodatum.org"
       
       var user: User
@@ -92,7 +89,7 @@ public final class AddTestDataCommand: Command {
         
       }
       
-      users.insert(user, at: index)
+      users.append(user)
       
     }
     
@@ -103,16 +100,18 @@ public final class AddTestDataCommand: Command {
   private func createOrGetOrganizations(
     _ count: Int = 5) throws -> [Organization] {
     
-    guard 1...9 ~= count else {
-      throw CommandError.invalidCount("Invalid Organization count: \(count)")
-    }
-    
     var organizations: [Organization] = []
-    for index in 0...count - 1 {
+    for index in 1...count {
     
-      let name = "Test Organization\(index)"
-      let description = "The description for Test Organization\(index)"
-      let code = "AAAAA\(index)"
+      let name = "Test Organization \(index)"
+      let description = "The description for \(name)"
+      let code: String = {
+        if index < 10 {
+          return "AAAAA\(index)"
+        } else {
+          return "AAAA\(index)"
+        }
+      }()
       
       var organization: Organization
       if let existingOrganization = try Organization.makeQuery()
@@ -135,7 +134,7 @@ public final class AddTestDataCommand: Command {
         
       }
       
-      organizations.insert(organization, at: index)
+      organizations.append(organization)
       
     }
     
@@ -198,7 +197,8 @@ public final class AddTestDataCommand: Command {
   
   private func createOrGetSites(
     for organizations: [Organization],
-    with users: [User]) throws -> [Site] {
+    with users: [User],
+    _ count: Int = 5) throws -> [Site] {
     
     var sites: [Site] = []
     
@@ -229,36 +229,40 @@ public final class AddTestDataCommand: Command {
         
       }
       
-      let name = "Site for \(organization.name)"
-      let description = "This is the description for Site for \(organization.name)"
-      let latitude = randomSignedDouble()
-      let longitude = randomSignedDouble()
-    
-      var site: Site
-      if let existingSite = try Site.makeQuery()
-        .filter(Site.Keys.name,
-                .equals,
-                name)
-        .first() {
+      for index in 1...count {
         
-        site = existingSite
-        
-      } else {
-        
-        let newSite = Site(
-          name: name,
-          description: description,
-          latitude: latitude,
-          longitude: longitude,
-          organizationId: organization.id!,
-          userId: user.id!)
-        try newSite.save()
-        
-        site = newSite
-        
-      }
+        let name = "Site \(index) for \(organization.name)"
+        let description = "This is the description for Site for \(organization.name)"
+        let latitude = randomSignedDouble()
+        let longitude = randomSignedDouble()
+      
+        var site: Site
+        if let existingSite = try Site.makeQuery()
+          .filter(Site.Keys.name,
+                  .equals,
+                  name)
+          .first() {
+          
+          site = existingSite
+          
+        } else {
+          
+          let newSite = Site(
+            name: name,
+            description: description,
+            latitude: latitude,
+            longitude: longitude,
+            organizationId: organization.id!,
+            userId: user.id!)
+          try newSite.save()
+          
+          site = newSite
+          
+        }
 
-      sites.append(site)
+        sites.append(site)
+     
+      }
     
     }
     
@@ -268,19 +272,24 @@ public final class AddTestDataCommand: Command {
   
   private func createSurveys(
     for sites: [Site],
-    with users: [User]) throws -> [Survey] {
+    with users: [User],
+    _ count: Int = 5) throws -> [Survey] {
     
     var surveys: [Survey] = []
     
     for site in sites {
      
-      let survey = Survey(
-        date: Date(),
-        siteId: site.id!,
-        userId: users.random!.id!)
-      try survey.save()
+      for _ in 1...count {
       
-      surveys.append(survey)
+        let survey = Survey(
+          date: generateRandomDate(daysBack: 356)!,
+          siteId: site.id!,
+          userId: users.random!.id!)
+        try survey.save()
+        
+        surveys.append(survey)
+      
+      }
       
     }
 
@@ -297,7 +306,7 @@ public final class AddTestDataCommand: Command {
 
     for survey in surveys {
       
-      for _ in 0...count - 1 {
+      for _ in 1...count {
         
         let amfu = afmus.random!
         let measurement = Measurement(
@@ -322,6 +331,25 @@ public final class AddTestDataCommand: Command {
     let fraction = Double(makeRandom(min: 1, max: 500)) / 100.0
     return sign * (number + fraction)
   
+  }
+  
+  private func generateRandomDate(daysBack: Int) -> Date? {
+    
+    let day = makeRandom(min: 0, max: daysBack) + 1
+    let hour = makeRandom(min: 0, max: 23)
+    let minute = makeRandom(min: 0, max: 59)
+    
+    let today = Date(timeIntervalSinceNow: 0)
+    let gregorian = Calendar(identifier: .gregorian)
+    var offsetComponents = DateComponents()
+    offsetComponents.day = Int(day - 1)
+    offsetComponents.hour = Int(hour)
+    offsetComponents.minute = Int(minute)
+    
+    return gregorian.date(
+      byAdding: offsetComponents,
+      to: today)
+    
   }
   
 }

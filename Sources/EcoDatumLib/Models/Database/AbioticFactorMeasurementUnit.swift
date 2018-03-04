@@ -3,22 +3,6 @@ import Vapor
 
 final class AbioticFactorMeasurementUnit: EquatableModel {
 
-  static let all: [PrimaryAbioticFactor.Name: [SecondaryAbioticFactor.Name: MeasurementUnit.Dimension]] = [
-    PrimaryAbioticFactor.Name.Air: [
-      SecondaryAbioticFactor.Name.CARBON_DIOXIDE: MeasurementUnit.Dimension.Dispersion,
-      SecondaryAbioticFactor.Name.LUMINOUS_INTENSITY: MeasurementUnit.Dimension.Illuminance,
-      SecondaryAbioticFactor.Name.TEMPERATURE: MeasurementUnit.Dimension.Temperature
-    ],
-    PrimaryAbioticFactor.Name.Soil: [
-      SecondaryAbioticFactor.Name.HYDROGEN_ION: MeasurementUnit.Dimension.Acidity,
-      SecondaryAbioticFactor.Name.TEMPERATURE: MeasurementUnit.Dimension.Temperature
-    ],
-    PrimaryAbioticFactor.Name.Water: [
-      SecondaryAbioticFactor.Name.HYDROGEN_ION: MeasurementUnit.Dimension.Acidity,
-      SecondaryAbioticFactor.Name.TEMPERATURE: MeasurementUnit.Dimension.Temperature
-    ]
-  ]
-
   let storage = Storage()
 
   let primaryAbioticFactorId: Identifier
