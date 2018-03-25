@@ -4,59 +4,57 @@ import Foundation
 import Vapor
 
 final class Image: EquatableModel {
-  
-  static let CODE_LENGTH = 10
-  
+    
   let storage = Storage()
   
   var image: Blob?
-  
-  let code: String
 
   var description: String?
   
   var imageTypeId: Identifier
   
   let surveyId: Identifier
-  
+
+  let userId: Identifier
+
   struct Keys {
     static let id = "id"
     static let image = "image"
-    static let code = "code"
     static let description = "description"
     static let imageTypeId = ImageType.foreignIdKey
     static let surveyId = Survey.foreignIdKey
+    static let userId = User.foreignIdKey
   }
   
   init(image: Blob? = nil,
-       code: String,
        description: String? = nil,
        imageTypeId: Identifier,
-       surveyId: Identifier) {
+       surveyId: Identifier,
+       userId: Identifier) {
     self.image = image
-    self.code = code
     self.description = description
     self.imageTypeId = imageTypeId
     self.surveyId = surveyId
+    self.userId = userId
   }
   
   // MARK: Row
   
   init(row: Row) throws {
     image = try row.get(Keys.image)
-    code = try row.get(Keys.code)
     description = try row.get(Keys.description)
     imageTypeId = try row.get(Keys.imageTypeId)
     surveyId = try row.get(Keys.surveyId)
+    userId = try row.get(Keys.userId)
   }
   
   func makeRow() throws -> Row {
     var row = Row()
     try row.set(Keys.image, image)
-    try row.set(Keys.code, code)
     try row.set(Keys.description, description)
     try row.set(Keys.imageTypeId, imageTypeId)
     try row.set(Keys.surveyId, surveyId)
+    try row.set(Keys.userId, userId)
     return row
   }
   
@@ -74,11 +72,6 @@ extension Image: Preparation {
         Keys.image,
         optional: false,
         unique: false)
-      builder.custom(
-        Keys.code,
-        type: "CHARACTER(\(CODE_LENGTH))",
-        optional: false,
-        unique: true)
       builder.string(
         Keys.description,
         length: 500,
@@ -90,6 +83,10 @@ extension Image: Preparation {
         unique: false)
       builder.foreignId(
         for: Survey.self,
+        optional: false,
+        unique: false)
+      builder.foreignId(
+        for: User.self,
         optional: false,
         unique: false)
     }
@@ -111,6 +108,10 @@ extension Image {
   
   var survey: Parent<Image, Survey> {
     return parent(id: surveyId)
+  }
+
+  var user: Parent<Image, User> {
+    return parent(id: userId)
   }
   
 }

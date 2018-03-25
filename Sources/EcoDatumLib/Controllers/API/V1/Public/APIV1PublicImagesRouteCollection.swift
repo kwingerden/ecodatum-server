@@ -17,41 +17,38 @@ final class APIV1PublicImagesRouteCollection: RouteCollection {
   }
   
   func build(_ routeBuilder: RouteBuilder) {
-    
+
+    // GET /public/images/:id
     routeBuilder.get(
-      String.parameter,
-      handler: getImageByCodeRouteHandler)
+      Image.parameter,
+      handler: getImageById)
     
   }
-  
-  // GET /public/images/:code
-  private func getImageByCodeRouteHandler(
-    _ request: Request)
-    throws -> ResponseRepresentable {
-      
-      guard let code = try? request.parameters.next(String.self),
-        let image = try self.modelManager.findImage(byCode: code),
-        let imageBytes = image.image?.bytes,
-        let imageType = try image.imageType.get() else {
-          throw Abort(.notFound)
-      }
-      
-      var contentType = ""
-      switch imageType.name {
-      case .GIF:
-        contentType = "image/gif"
-      case .JPEG:
-        contentType = "image/jpeg"
-      case .PNG:
-        contentType = "image/png"
-      }
-      
-      return Response(
-        status: .ok,
-        headers: [
-          HeaderKey("Content-Type") : contentType
-        ],
-        body: .data(imageBytes))
+
+  private func getImageById(_ request: Request) throws -> ResponseRepresentable {
+
+    let image = try request.parameters.next(Image.self)
+    guard let imageType = try image.imageType.get(),
+    let imageBytes = image.image?.bytes else {
+      throw Abort(.internalServerError)
+    }
+
+    var contentType = ""
+    switch imageType.name {
+    case .GIF:
+      contentType = "image/gif"
+    case .JPEG:
+      contentType = "image/jpeg"
+    case .PNG:
+      contentType = "image/png"
+    }
+
+    return Response(
+      status: .ok,
+      headers: [
+        HeaderKey("Content-Type") : contentType
+      ],
+      body: .data(imageBytes))
   
   }
   

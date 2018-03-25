@@ -649,10 +649,12 @@ extension ModelManager {
                    bytes: Bytes,
                    description: String? = nil,
                    imageType: ImageType,
-                   survey: Survey) throws -> Image {
+                   survey: Survey,
+                   user: User) throws -> Image {
 
     let imageTypeId = try imageType.assertExists()
     let surveyId = try survey.assertExists()
+    let userId = try user.assertExists()
     
     guard let organizationId = try findOrganization(connection, bySurvey: survey)?.id,
       let _ = try UserOrganizationRole.makeQuery(connection)
@@ -662,19 +664,22 @@ extension ModelManager {
           throw Abort(.expectationFailed)
     }
     
-    let code = String(randomUpperCaseAlphaNumericLength: Image.CODE_LENGTH)
     let image = Image(
       image: Blob(bytes: bytes),
-      code: code,
       description: description,
       imageTypeId: imageTypeId,
-      surveyId: surveyId)
+      surveyId: surveyId,
+      userId: userId)
     try Image.makeQuery(connection).save(image)
     
     return image
     
   }
-  
+
+  func getAllImages(_ connection: Connection? = nil) throws -> [Image] {
+    return try Image.makeQuery(connection).all()
+  }
+
   func getImageType(_ connection: Connection? = nil,
                     name: ImageType.Name) throws -> ImageType {
     
@@ -688,33 +693,18 @@ extension ModelManager {
     
   }
   
-  func createImage(_ connection: Connection? = nil,
-                   bytes: Bytes,
-                   description: String? = nil,
-                   imageType imageTypeName: ImageType.Name,
-                   survey: Survey) throws -> Image {
-  
-    return try createImage(
-      connection,
-      bytes: bytes,
-      description: description,
-      imageType: try getImageType(name: imageTypeName),
-      survey: survey)
-    
-  }
-  
   func findImage(_ connection: Connection? = nil,
-                 byId: Int) throws -> Image? {
+                 byId: Identifier) throws -> Image? {
     return try Image.makeQuery(connection).find(byId)
   }
-  
-  func findImage(_ connection: Connection? = nil,
-                 byCode: String) throws -> Image? {
+
+  func findImages(_ connection: Connection? = nil,
+                  byUser: User) throws -> [Image] {
     return try Image.makeQuery(connection)
-      .filter(Image.Keys.code, .equals, byCode.uppercased())
-      .first()
+      .filter(Image.Keys.userId, .equals, byUser.id)
+      .all()
   }
-  
+
   func updateImage(_ connection: Connection? = nil,
                    image: Image,
                    newBytes: Bytes? = nil,

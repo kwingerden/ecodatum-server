@@ -90,7 +90,13 @@ final class APIV1RouteCollection: RouteCollection {
       drop: drop,
       modelManager: modelManager)
       .build(tokenProtected.grouped("organizations"))
-    
+
+    // /protected/photos
+    APIV1TokenImagesRouteCollection(
+      drop: drop,
+      modelManager: modelManager)
+      .build(tokenProtected.grouped("photos"))
+
     // /protected/sites
     APIV1TokenSitesRouteCollection(
       drop: drop,

@@ -42,7 +42,7 @@ final class APIV1PublicUsersRouteCollection: RouteCollection {
       
       guard let organization = try modelManager.findOrganization(byCode: organizationCode) else {
         throw Abort(
-          .preconditionFailed,
+          .notFound,
           reason: "Unable to find organization with code: \(organizationCode)")
       }
       

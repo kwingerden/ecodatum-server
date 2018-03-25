@@ -63,10 +63,9 @@ final class APIV1TokenSurveysRouteCollection: RouteCollection {
   
   private func getSurvey(_ request: Request) throws -> ResponseRepresentable {
 
-    let (survey, isRootUser, doesUserBelongToOrganization) =
-      try isRootOrSurveyUser(request)
+    let (survey, isRootUser, isSurveyUser) = try isRootOrSurveyUser(request)
     
-    if isRootUser || doesUserBelongToOrganization {
+    if isRootUser || isSurveyUser {
       
       return survey
 
@@ -107,7 +106,7 @@ final class APIV1TokenSurveysRouteCollection: RouteCollection {
     let (isRootUser, doesUserBelongToOrganization) =
       try isRootOrSiteUser(request, site)
 
-    let (date, description) = try toSiteAttributes(json)
+    let (date, description) = try toSurveyAttributes(json)
 
     if isRootUser || doesUserBelongToOrganization {
       
@@ -134,7 +133,7 @@ final class APIV1TokenSurveysRouteCollection: RouteCollection {
 
       let json = try request.assertJson()
 
-      let (date, description) = try toSiteAttributes(json)
+      let (date, description) = try toSurveyAttributes(json)
 
       survey.date = date
       survey.description = description
@@ -171,7 +170,7 @@ final class APIV1TokenSurveysRouteCollection: RouteCollection {
 
   }
 
-  private func toSiteAttributes(_ json: JSON) throws -> (date: Date, description: String?) {
+  private func toSurveyAttributes(_ json: JSON) throws -> (date: Date, description: String?) {
 
     guard let date: Date = try json.get(Survey.Json.date) else {
       throw Abort(.badRequest, reason: "Survey must have a date.")
