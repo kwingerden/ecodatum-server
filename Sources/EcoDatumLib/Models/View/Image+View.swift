@@ -31,6 +31,7 @@ extension Image: JSONConvertible {
   func makeJSON() throws -> JSON {
     var json = JSON()
     try json.set(Json.id, id)
+    try json.set(Json.userId, userId)
     try json.set(Json.description, description)
     try json.set(Json.imageTypeId, imageTypeId)
     try json.set(Json.surveyId, surveyId)
