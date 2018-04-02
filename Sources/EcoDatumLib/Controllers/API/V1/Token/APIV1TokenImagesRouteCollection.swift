@@ -30,6 +30,16 @@ final class APIV1TokenImagesRouteCollection: RouteCollection {
     routeBuilder.post(
       handler: newImage)
     
+    // PUT /images/:id
+    routeBuilder.put(
+      Image.parameter,
+      handler: updateImage)
+    
+    // DELETE /images/:id
+    routeBuilder.delete(
+      Image.parameter,
+      handler: deleteImage)
+    
   }
   
   private func getImagesByUser(_ request: Request) throws -> ResponseRepresentable {
@@ -87,6 +97,52 @@ final class APIV1TokenImagesRouteCollection: RouteCollection {
     }
 
   }
+  
+  private func updateImage(_ request: Request) throws -> ResponseRepresentable {
+    
+    let (image, isRootUser, doesUserBelongToOrganization) =
+      try isRootOrImageUser(request)
+    
+    if isRootUser || doesUserBelongToOrganization {
+      
+      let json = try request.assertJson()
+      let (imageBytes, description) = try toImageAttributes(json)
+      return try modelManager.updateImage(
+        image: image,
+        newBytes: imageBytes,
+        newDescription: description,
+        newImageType: try modelManager.getImageType(name: .JPEG))
+      
+    } else {
+      
+      throw Abort(.notFound)
+      
+    }
+    
+  }
+  
+  private func deleteImage(_ request: Request) throws -> ResponseRepresentable {
+    
+    let (image, isRootUser, doesUserBelongToOrganization) =
+      try isRootOrImageUser(request)
+    
+    if isRootUser || doesUserBelongToOrganization {
+      
+      try modelManager.transaction {
+        connection in
+        try self.modelManager.deleteImage(connection, image: image)
+      }
+      
+      return Response(status: .ok)
+      
+    } else {
+      
+      throw Abort(.notFound)
+      
+    }
+    
+  }
+
 
   private func toImageAttributes(_ json: JSON) throws ->
     (imageBytes: Bytes, description: String?) {

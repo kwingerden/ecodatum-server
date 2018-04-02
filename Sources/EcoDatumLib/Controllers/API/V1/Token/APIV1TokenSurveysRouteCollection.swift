@@ -30,6 +30,12 @@ final class APIV1TokenSurveysRouteCollection: RouteCollection {
       "measurements",
       handler: getMeasurementsBySurvey)
     
+    // GET /surveys/:id/images
+    routeBuilder.get(
+      Survey.parameter,
+      "images",
+      handler: getImagesBySurvey)
+    
     // POST /surveys
     routeBuilder.post(
       handler: newSurvey)
@@ -85,6 +91,23 @@ final class APIV1TokenSurveysRouteCollection: RouteCollection {
     if isRootUser || doesUserBelongToOrganization {
       
       return try survey.measurements.all().makeJSON()
+      
+    } else {
+      
+      throw Abort(.notFound)
+      
+    }
+    
+  }
+  
+  private func getImagesBySurvey(_ request: Request) throws -> ResponseRepresentable {
+    
+    let (survey, isRootUser, doesUserBelongToOrganization) =
+      try isRootOrSurveyUser(request)
+    
+    if isRootUser || doesUserBelongToOrganization {
+      
+      return try survey.images.all().makeJSON()
       
     } else {
       

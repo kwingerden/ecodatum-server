@@ -709,7 +709,7 @@ extension ModelManager {
                    image: Image,
                    newBytes: Bytes? = nil,
                    newDescription: String? = nil,
-                   newImageType: ImageType? = nil) throws -> Image? {
+                   newImageType: ImageType? = nil) throws -> Image {
     
     try image.assertExists()
     
