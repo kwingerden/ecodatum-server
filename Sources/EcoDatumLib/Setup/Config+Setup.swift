@@ -28,22 +28,19 @@ extension Config {
     preparations.append(User.self)
     preparations.append(Organization.self)
     preparations.append(Site.self)
-    preparations.append(Survey.self)
     
-    preparations.append(PrimaryAbioticFactor.self)
-    preparations.append(SecondaryAbioticFactor.self)
+    preparations.append(EcosystemFactor.self)
     preparations.append(MeasurementUnit.self)
-    preparations.append(ImageType.self)
+    preparations.append(MediaType.self)
     preparations.append(Role.self)
+    preparations.append(QualitativeObservationType.self)
+    preparations.append(QuantitativeObservationType.self)
 
-    preparations.append(AbioticFactorMeasurementUnit.self)
-    
-    preparations.append(Image.self)
-    preparations.append(Note.self)
     preparations.append(Token.self)
     preparations.append(UserOrganizationRole.self)
   
-    preparations.append(Measurement.self)
+    preparations.append(QualitativeObservationFactor.self)
+    preparations.append(QuantitativeObservationFactor.self)
     
   }
   

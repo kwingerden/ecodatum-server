@@ -92,7 +92,11 @@ extension User {
     return children()
   }
   
-  var surveys: Children<User, Survey> {
+  var qualitativeObservationFactors: Children<User, QualitativeObservationFactor> {
+    return children()
+  }
+
+  var quantitativeObservationFactors: Children<User, QuantitativeObservationFactor> {
     return children()
   }
 

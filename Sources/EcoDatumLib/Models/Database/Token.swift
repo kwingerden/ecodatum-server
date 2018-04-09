@@ -1,5 +1,6 @@
-import Vapor
+import Crypto
 import FluentProvider
+import Vapor
 
 final class Token: EquatableModel {
   
@@ -70,5 +71,6 @@ extension Token: Preparation {
 // MARK: TIMESTAMP
 
 extension Token: Timestampable { }
+
 
 

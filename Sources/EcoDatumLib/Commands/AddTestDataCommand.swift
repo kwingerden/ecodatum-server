@@ -45,6 +45,7 @@ public final class AddTestDataCommand: Command {
     let sites = try createOrGetSites(
       for: organizations,
       with: users)
+    /*
     let surveys = try createSurveys(
       for: sites,
       with: users)
@@ -52,7 +53,8 @@ public final class AddTestDataCommand: Command {
       count,
       for: surveys,
       with: users)
-    
+    */
+
   }
   
   private func createOrGetUsers(
@@ -269,7 +271,8 @@ public final class AddTestDataCommand: Command {
     return sites
     
   }
-  
+
+  /*
   private func createSurveys(
     for sites: [Site],
     with users: [User],
@@ -323,6 +326,7 @@ public final class AddTestDataCommand: Command {
     }
     
   }
+  */
   
   private func randomSignedDouble() -> Double {
     

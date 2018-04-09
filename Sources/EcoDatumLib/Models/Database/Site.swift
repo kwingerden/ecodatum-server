@@ -153,8 +153,12 @@ extension Site {
   var organization: Parent<Site, Organization> {
     return parent(id: organizationId)
   }
-  
-  var surveys: Children<Site, Survey> {
+
+  var qualitativeObservationFactors: Children<Site, QualitativeObservationFactor> {
+    return children()
+  }
+
+  var quantitativeObservationFactors: Children<Site, QuantitativeObservationFactor> {
     return children()
   }
 

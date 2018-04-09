@@ -26,18 +26,6 @@ final class APIV1RouteCollection: RouteCollection {
   private func makePublicRoutes(_ routeBuilder: RouteBuilder) {
     
     let `public` = routeBuilder.grouped("public")
-
-    // /public/images
-    APIV1PublicImagesRouteCollection(
-      drop: drop,
-      modelManager: modelManager)
-      .build(`public`.grouped("images"))
-    
-    // /public/measurementUnits
-    APIV1PublicMeasurementUnitsRouteCollection(
-      drop: drop,
-      modelManager: modelManager)
-      .build(`public`.grouped("measurementUnits"))
     
     // /public/organizations
     APIV1PublicOrganizationsRouteCollection(
@@ -79,35 +67,17 @@ final class APIV1RouteCollection: RouteCollection {
       modelManager: modelManager)
       .build(tokenProtected.grouped("logout"))
     
-    // /protected/measurements
-    APIV1TokenMeasurementsRouteCollection(
-      drop: drop,
-      modelManager: modelManager)
-      .build(tokenProtected.grouped("measurements"))
-    
     // /protected/organizations
     APIV1TokenOrganizationsRouteCollection(
       drop: drop,
       modelManager: modelManager)
       .build(tokenProtected.grouped("organizations"))
 
-    // /protected/images
-    APIV1TokenImagesRouteCollection(
-      drop: drop,
-      modelManager: modelManager)
-      .build(tokenProtected.grouped("images"))
-
     // /protected/sites
     APIV1TokenSitesRouteCollection(
       drop: drop,
       modelManager: modelManager)
       .build(tokenProtected.grouped("sites"))
-    
-    // /protected/surveys
-    APIV1TokenSurveysRouteCollection(
-      drop: drop,
-      modelManager: modelManager)
-      .build(tokenProtected.grouped("surveys"))
     
     // /protected/users
     APIV1TokenUsersRouteCollection(

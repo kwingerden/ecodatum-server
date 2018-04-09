@@ -271,7 +271,8 @@ extension ModelManager {
     try bySite.assertExists()
     return try findOrganization(connection, byId: bySite.organizationId)
   }
-  
+
+  /*
   func findOrganization(_ connection: Connection? = nil,
                         bySurvey: Survey) throws -> Organization? {
     try bySurvey.assertExists()
@@ -280,6 +281,7 @@ extension ModelManager {
     }
     return try findOrganization(connection, bySite: site)
   }
+  */
   
   func findOrganizations(_ connection: Connection? = nil,
                          byUser: User) throws -> [Organization] {
@@ -407,12 +409,14 @@ extension ModelManager {
       .filter(Site.Keys.name, .equals, byName)
       .first()
   }
-  
+
+  /*
   func findSite(_ connection: Connection? = nil,
                 bySurvey: Survey) throws -> Site? {
     try bySurvey.assertExists()
     return try findSite(connection, byId: bySurvey.siteId)
   }
+  */
   
   func findSites(_ connection: Connection? = nil,
                  byUser: User) throws -> [Site] {
@@ -436,7 +440,8 @@ extension ModelManager {
   
   func deleteSite(_ connection: Connection? = nil,
                   site: Site) throws {
-    
+
+    /*
     for survey in try site.surveys.all() {
       
       try deleteSurvey(
@@ -444,6 +449,7 @@ extension ModelManager {
         survey: survey)
       
     }
+    */
     
     try Site.makeQuery(connection).delete(site)
     
@@ -453,6 +459,7 @@ extension ModelManager {
 
 // MARK: Survey Extension
 
+/*
 extension ModelManager {
   
   func createSurvey(_ connection: Connection? = nil,
@@ -738,3 +745,4 @@ extension ModelManager {
   }
   
 }
+*/

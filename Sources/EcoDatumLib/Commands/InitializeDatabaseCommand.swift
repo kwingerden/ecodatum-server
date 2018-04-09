@@ -44,7 +44,7 @@ public final class InitializeDatabaseCommand: Command {
       console.print("Successfully created the root user with name \(rootUser.fullName).")
       
     }
-
+/*
     // Primary Abiotic Factors
     try PrimaryAbioticFactor.Name.all.forEach {
 
@@ -272,6 +272,7 @@ public final class InitializeDatabaseCommand: Command {
       }
       
     }
+    */
     
   }
   

@@ -23,12 +23,6 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
       Site.parameter,
       handler: getSite)
     
-    // GET /sites/:id/surveys
-    routeBuilder.get(
-      Site.parameter,
-      "surveys",
-      handler: getSurveysBySite)
-    
     // POST /sites
     routeBuilder.post(
       handler: newSite)
@@ -70,23 +64,6 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
     if isRootUser || doesUserBelongToOrganization {
 
       return site
-
-    } else {
-
-      throw Abort(.notFound)
-
-    }
-    
-  }
-  
-  private func getSurveysBySite(_ request: Request) throws -> ResponseRepresentable {
-
-    let (site, isRootUser, doesUserBelongToOrganization) =
-      try isRootOrSiteUser(request)
-
-    if isRootUser || doesUserBelongToOrganization {
-
-      return try site.surveys.all().makeJSON()
 
     } else {
 
