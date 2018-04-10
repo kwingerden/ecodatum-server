@@ -44,216 +44,114 @@ public final class InitializeDatabaseCommand: Command {
       console.print("Successfully created the root user with name \(rootUser.fullName).")
       
     }
-/*
-    // Primary Abiotic Factors
-    try PrimaryAbioticFactor.Name.all.forEach {
-
-      if let primaryAbioticFactor = try PrimaryAbioticFactor.makeQuery()
-        .filter(PrimaryAbioticFactor.Keys.name, .equals, $0.name.rawValue)
+    
+    // Ecosystem Factors
+    
+    try EcosystemFactor.Name.all.forEach {
+      
+      if let ecosystemFactor = try EcosystemFactor.makeQuery()
+        .filter(EcosystemFactor.Keys.name, .equals, $0.rawValue)
         .first() {
-
-        console.print("Primary Abiotic Factor \(primaryAbioticFactor.name.rawValue) already exists.")
-
+        
+        console.print("Ecosystem Factor \(ecosystemFactor.name.rawValue) already exists.")
+        
       } else {
-
-        let primaryAbioticFactor = PrimaryAbioticFactor(
-          name: $0.name,
-          description: $0.description)
-        try primaryAbioticFactor.save()
-
-        console.print("Successfully created Primary Abiotic Factor \(primaryAbioticFactor.name.rawValue).")
-
+        
+        let ecosystemFactor = EcosystemFactor(name: $0)
+        try ecosystemFactor.save()
+        
+        console.print("Successfully created Ecosystem Factor \(ecosystemFactor.name.rawValue).")
+        
       }
-
+        
     }
     
-    // Secondary Abiotic Factors
-    try SecondaryAbioticFactor.Name.all.forEach {
-      
-      if let secondaryAbioticFactor = try SecondaryAbioticFactor.makeQuery()
-        .filter(SecondaryAbioticFactor.Keys.name, .equals, $0.name.rawValue)
-        .first() {
-        
-        console.print("Secondary Abiotic Factor \(secondaryAbioticFactor.name.rawValue) already exists.")
-        
-      } else {
-        
-        let secondaryAbioticFactor = SecondaryAbioticFactor(
-          name: $0.name,
-          label: $0.label,
-          description: $0.description)
-        try secondaryAbioticFactor.save()
-        
-        console.print("Successfully created Secondary Abiotic Factor \(secondaryAbioticFactor.name.rawValue).")
-        
-      }
-      
-    }
-
     // Measurement Units
-    try MeasurementUnit.Dimension.all.forEach {
-
+    
+    try MeasurementUnit.Name.all.forEach {
+      
       if let measurementUnit = try MeasurementUnit.makeQuery()
-        .filter(MeasurementUnit.Keys.dimension, .equals, $0.dimension.rawValue)
-        .filter(MeasurementUnit.Keys.unit, .equals, $0.unit.rawValue)
+        .filter(MeasurementUnit.Keys.name, .equals, $0.rawValue)
         .first() {
-
-        console.print("Measurement Unit \(measurementUnit.dimension.rawValue), \(measurementUnit.unit.rawValue) already exists.")
-
+        
+        console.print("Measurement Unit \(measurementUnit.name.rawValue) already exists.")
+        
       } else {
-
-        let measurementUnit = MeasurementUnit(
-          dimension: $0.dimension,
-          unit: $0.unit,
-          label: $0.label,
-          description: $0.description)
+        
+        let measurementUnit = MeasurementUnit(name: $0)
         try measurementUnit.save()
-
-        console.print("Successfully created Measurement Unit \(measurementUnit.dimension.rawValue), \(measurementUnit.unit.rawValue).")
-
-      }
-
-    }
-
-    // Abiotic Factors X Measurement Units
-
-    typealias MeasurementUnits = [MeasurementUnit.Unit]
-    typealias DimensionXUnit = [MeasurementUnit.Dimension: MeasurementUnits]
-    typealias SecondaryAbioticFactorXDimensionXUnit = [SecondaryAbioticFactor.Name: DimensionXUnit]
-    typealias PrimaryXSecondaryXDimensionXUnit = [PrimaryAbioticFactor.Name: SecondaryAbioticFactorXDimensionXUnit]
-    
-    let acidity: DimensionXUnit = [
-      .Acidity: [
-        .potential_of_hydrogen
-      ]
-    ]
-    
-    let dispersion: DimensionXUnit = [
-      .Dispersion: [
-        .parts_per_million
-      ]
-    ]
-    
-    let illuminance: DimensionXUnit = [
-      .Illuminance: [
-        .lux
-      ]
-    ]
-    
-    let temperature: DimensionXUnit = [
-      .Temperature: [
-        .degree_centigrade,
-        .degree_fahrenheit,
-        .kelvin
-      ]
-    ]
-    
-    let allAbioticFactorMeasurementUnits: PrimaryXSecondaryXDimensionXUnit = [
-      .Air: [
-        .CARBON_DIOXIDE: dispersion,
-        .LUMINOUS_INTENSITY: illuminance,
-        .TEMPERATURE: temperature
-      ],
-      .Soil: [
-        .HYDROGEN_ION: acidity,
-        .TEMPERATURE: temperature
-      ],
-      .Water: [
-        .HYDROGEN_ION: acidity,
-        .TEMPERATURE: temperature
-      ]
-    ]
-
-    try allAbioticFactorMeasurementUnits.forEach {
-      primaryAbioticFactor in
-      
-      try primaryAbioticFactor.value.forEach {
-        secondaryAbioticFactor in
         
-        try secondaryAbioticFactor.value.forEach {
-          dimension in
-          
-          try dimension.value.forEach {
-            unit in
-            
-            if let paf = try PrimaryAbioticFactor.makeQuery()
-                .filter(
-                  PrimaryAbioticFactor.Keys.name, .equals, primaryAbioticFactor.key.rawValue)
-                .first(),
-              let saf = try SecondaryAbioticFactor.makeQuery()
-                .filter(
-                  SecondaryAbioticFactor.Keys.name, .equals, secondaryAbioticFactor.key.rawValue)
-                .first(),
-              let mu = try MeasurementUnit.makeQuery()
-                .filter(
-                  MeasurementUnit.Keys.dimension, .equals, dimension.key.rawValue)
-                .filter(
-                  MeasurementUnit.Keys.unit, .equals, unit.rawValue)
-                .first() {
-              
-              if let _ = try AbioticFactorMeasurementUnit.makeQuery()
-                .filter(AbioticFactorMeasurementUnit.Keys.primaryAbioticFactorId, .equals, paf.id)
-                .filter(AbioticFactorMeasurementUnit.Keys.secondaryAbioticFactorId, .equals, saf.id)
-                .filter(AbioticFactorMeasurementUnit.Keys.measurementUnitId, .equals, mu.id)
-                .first() {
-                
-                console.print("Abiotic Factor Measurement Unit \(paf.name.rawValue), \(saf.name.rawValue), \(mu.dimension.rawValue) already exists.")
-                
-              } else {
-                
-                if let pafId = paf.id, let safId = saf.id, let muId = mu.id {
-                  
-                  let amu = AbioticFactorMeasurementUnit(
-                    primaryAbioticFactorId: pafId,
-                    secondaryAbioticFactorId: safId,
-                    measurementUnitId: muId)
-                  try AbioticFactorMeasurementUnit.makeQuery().save(amu)
-                  
-                  console.print("Successfully created Abiotic Factor Measurement Unit \(paf.name.rawValue), \(saf.name.rawValue), \(mu.dimension.rawValue).")
-                  
-                } else {
-                  
-                  console.print("Failed to create Primary, Secondary, or Measurement Unit!!!")
-                  
-                }
-                
-              }
-              
-            } else {
-              
-              console.print("Failed to create Primary, Secondary, or Measurement Unit!!!")
-              
-            }
-            
-          }
-          
-        }
+        console.print("Successfully created Measurement Unit \(measurementUnit.name.rawValue).")
         
       }
       
     }
-
-    // Image Types
-    try ImageType.Name.all.forEach {
+    
+    // Media Type
+    
+    try MediaType.Name.all.forEach {
       
-      if let imageType = try ImageType.makeQuery()
-        .filter(ImageType.Keys.name, .equals, $0.rawValue)
+      if let mediaType = try MediaType.makeQuery()
+        .filter(MediaType.Keys.name, .equals, $0.rawValue)
         .first() {
-      
-        console.print("Image Type \(imageType.name.rawValue) already exists.")
+        
+        console.print("Media Type \(mediaType.name.rawValue) already exists.")
         
       } else {
         
-        let imageType = ImageType(name: $0)
-        try imageType.save()
+        let mediaType = MediaType(name: $0)
+        try mediaType.save()
         
-        console.print("Successfully created Image Type \(imageType.name.rawValue).")
+        console.print("Successfully created Media Type \(mediaType.name.rawValue).")
+        
+      }
+      
+    }
+    
+    // Qualitative Observation Types
+    
+    try QualitativeObservationType.Name.all.forEach {
+      
+      if let qualitativeObservationType = try QualitativeObservationType.makeQuery()
+        .filter(QualitativeObservationType.Keys.name, .equals, $0.rawValue)
+        .first() {
+        
+        console.print("Qualitative Observation Type \(qualitativeObservationType.name.rawValue) already exists.")
+        
+      } else {
+        
+        let qualitativeObservationType = QualitativeObservationType(name: $0)
+        try qualitativeObservationType.save()
+        
+        console.print("Successfully created Qualitative Observation Type \(qualitativeObservationType.name.rawValue).")
+        
+      }
+      
+    }
+    
+    // Quantitative Observation Types
+    
+    try QuantitativeObservationType.Name.all.forEach {
+      
+      if let quantitativeObservationType = try QuantitativeObservationType.makeQuery()
+        .filter(QuantitativeObservationType.Keys.name, .equals, $0.rawValue)
+        .first() {
+        
+        console.print("Quantitative Observation Type \(quantitativeObservationType.name.rawValue) already exists.")
+        
+      } else {
+        
+        let quantitativeObservationType = QuantitativeObservationType(name: $0)
+        try quantitativeObservationType.save()
+        
+        console.print("Successfully created Quantitative Observation Type \(quantitativeObservationType.name.rawValue).")
         
       }
       
     }
     
     // Roles
+    
     try Role.Name.all.forEach {
       
       if let role = try Role.makeQuery()
@@ -272,7 +170,6 @@ public final class InitializeDatabaseCommand: Command {
       }
       
     }
-    */
     
   }
   

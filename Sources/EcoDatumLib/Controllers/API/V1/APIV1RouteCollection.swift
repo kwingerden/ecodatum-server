@@ -26,13 +26,43 @@ final class APIV1RouteCollection: RouteCollection {
   private func makePublicRoutes(_ routeBuilder: RouteBuilder) {
     
     let `public` = routeBuilder.grouped("public")
-    
+
+    // /public/ecosystemFactors
+    APIV1PublicEcosystemFactorsRouteCollection(
+      drop: drop,
+      modelManager: modelManager)
+      .build(`public`.grouped("ecosystemFactors"))
+
+    // /public/measurementUnits
+    APIV1PublicMeasurementUnitsRouteCollection(
+      drop: drop,
+      modelManager: modelManager)
+      .build(`public`.grouped("measurementUnits"))
+
+    // /public/mediaTypes
+    APIV1PublicMediaTypesRouteCollection(
+      drop: drop,
+      modelManager: modelManager)
+      .build(`public`.grouped("mediaTypes"))
+
     // /public/organizations
     APIV1PublicOrganizationsRouteCollection(
       drop: drop,
       modelManager: modelManager)
       .build(`public`.grouped("organizations"))
-    
+
+    // /public/qualitativeObservationTypes
+    APIV1PublicQualitativeObservationTypesRouteCollection(
+      drop: drop,
+      modelManager: modelManager)
+      .build(`public`.grouped("qualitativeObservationTypes"))
+
+    // /public/quantitativeObservationTypes
+    APIV1PublicQuantitativeObservationTypesRouteCollection(
+      drop: drop,
+      modelManager: modelManager)
+      .build(`public`.grouped("quantitativeObservationTypes"))
+
     // /public/users
     APIV1PublicUsersRouteCollection(
       drop: drop,
