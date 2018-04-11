@@ -45,15 +45,6 @@ public final class AddTestDataCommand: Command {
     let sites = try createOrGetSites(
       for: organizations,
       with: users)
-    /*
-    let surveys = try createSurveys(
-      for: sites,
-      with: users)
-    try createMeasurements(
-      count,
-      for: surveys,
-      with: users)
-    */
 
   }
   
@@ -271,62 +262,6 @@ public final class AddTestDataCommand: Command {
     return sites
     
   }
-
-  /*
-  private func createSurveys(
-    for sites: [Site],
-    with users: [User],
-    _ count: Int = 5) throws -> [Survey] {
-    
-    var surveys: [Survey] = []
-    
-    for site in sites {
-     
-      for _ in 1...count {
-      
-        let survey = Survey(
-          date: generateRandomDate(daysBack: 356)!,
-          siteId: site.id!,
-          userId: users.random!.id!)
-        try survey.save()
-        
-        surveys.append(survey)
-      
-      }
-      
-    }
-
-    return surveys
-    
-  }
-  
-  private func createMeasurements(
-    _ count: Int = 5,
-    for surveys: [Survey],
-    with users: [User]) throws {
-  
-    let afmus = try AbioticFactorMeasurementUnit.all()
-
-    for survey in surveys {
-      
-      for _ in 1...count {
-        
-        let amfu = afmus.random!
-        let measurement = Measurement(
-          value: randomSignedDouble(),
-          primaryAbioticFactorId: amfu.primaryAbioticFactorId,
-          secondaryAbioticFactorId: amfu.secondaryAbioticFactorId,
-          measurementUnitId: amfu.measurementUnitId,
-          surveyId: survey.id!,
-          userId: users.random!.id!)
-        try measurement.save()
-      
-      }
-      
-    }
-    
-  }
-  */
   
   private func randomSignedDouble() -> Double {
     
