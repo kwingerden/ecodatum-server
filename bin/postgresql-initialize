@@ -1,0 +1,19 @@
+#!/bin/bash
+
+psql \
+  -h localhost \
+  -d postgres \
+  -c "CREATE USER postgres WITH SUPERUSER PASSWORD 'password';"
+
+createuser ecodatum
+createdb ecodatum
+
+psql \
+  -h localhost \
+  -d postgres \
+  -c "ALTER USER ecodatum with encrypted password 'password';"
+
+psql \
+  -h localhost \
+  -d postgres \
+  -c "GRANT ALL ON DATABASE ecodatum TO ecodatum;"
