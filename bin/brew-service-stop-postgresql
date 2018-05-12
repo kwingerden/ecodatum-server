@@ -1,3 +1,5 @@
 #!/bin/bash
 
 brew services stop postgresql
+# Make sure that the PID file is removed
+rm /usr/local/var/postgres/postmaster.pid

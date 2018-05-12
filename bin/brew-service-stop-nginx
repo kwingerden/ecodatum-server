@@ -1,3 +1,5 @@
 #!/bin/bash
 
-brew services stop nginx
+sudo brew services stop nginx
+# Make sure that the PID file is removed.
+rm /usr/local/var/run/nginx.pid

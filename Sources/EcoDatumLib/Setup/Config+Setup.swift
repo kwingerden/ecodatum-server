@@ -28,7 +28,8 @@ extension Config {
     preparations.append(User.self)
     preparations.append(Organization.self)
     preparations.append(Site.self)
-    
+
+    preparations.append(EcoDatum.self)
     preparations.append(EcosystemFactor.self)
     preparations.append(MeasurementUnit.self)
     preparations.append(MediaType.self)

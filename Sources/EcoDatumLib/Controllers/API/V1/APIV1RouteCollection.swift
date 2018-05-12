@@ -108,7 +108,13 @@ final class APIV1RouteCollection: RouteCollection {
       drop: drop,
       modelManager: modelManager)
       .build(tokenProtected.grouped("sites"))
-    
+
+    // /protected/ecodatum
+    APIV1TokenEcoDatumRouteCollection(
+      drop: drop,
+      modelManager: modelManager)
+      .build(tokenProtected.grouped("ecodatum"))
+
     // /protected/users
     APIV1TokenUsersRouteCollection(
       drop: drop,
