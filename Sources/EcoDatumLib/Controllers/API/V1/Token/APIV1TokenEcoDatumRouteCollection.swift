@@ -20,7 +20,7 @@ final class APIV1TokenEcoDatumRouteCollection: RouteCollection {
     
     // GET /ecodatum/:id
     routeBuilder.get(
-      Site.parameter,
+      EcoDatum.parameter,
       handler: getEcoDatum)
     
     // POST /ecodatum
@@ -29,12 +29,12 @@ final class APIV1TokenEcoDatumRouteCollection: RouteCollection {
     
     // PUT /ecodatum/:id
     routeBuilder.put(
-      Site.parameter,
+      EcoDatum.parameter,
       handler: updateEcoDatum)
     
     // DELETE /ecodatum/:id
     routeBuilder.delete(
-      Site.parameter,
+      EcoDatum.parameter,
       handler: deleteEcoDatum)
     
   }

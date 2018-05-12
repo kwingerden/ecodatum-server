@@ -422,15 +422,12 @@ extension ModelManager {
   func deleteSite(_ connection: Connection? = nil,
                   site: Site) throws {
 
-    /*
-    for survey in try site.surveys.all() {
-      
-      try deleteSurvey(
+    for ecoDatum in try site.ecoData.all() {
+      try deleteEcoDatum(
         connection,
-        survey: survey)
-      
+        ecoDatum: ecoDatum)
+
     }
-    */
 
     try Site.makeQuery(connection).delete(site)
 
