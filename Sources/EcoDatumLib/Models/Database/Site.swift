@@ -162,6 +162,10 @@ extension Site {
     return children()
   }
 
+  var ecoData: Children<Site, EcoDatum> {
+    return children()
+  }
+
 }
 
 // MARK: Timestampable

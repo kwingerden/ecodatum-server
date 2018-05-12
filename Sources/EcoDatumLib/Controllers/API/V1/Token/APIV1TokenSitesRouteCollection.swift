@@ -37,6 +37,12 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
       Site.parameter,
       handler: deleteSite)
     
+    // GET /sites/:id/ecodata
+    routeBuilder.get(
+      Site.parameter,
+      "ecodata",
+      handler: getEcoDataBySite)
+    
   }
   
   private func getSitesByUser(_ request: Request) throws -> ResponseRepresentable {
@@ -156,6 +162,24 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
       
     }
     
+  }
+  
+  private func getEcoDataBySite(_ request: Request)
+    throws -> ResponseRepresentable {
+      
+      let (site, isRootUser, doesUserBelongToOrganization) =
+        try isRootOrSiteUser(request)
+      
+      if isRootUser || doesUserBelongToOrganization {
+        
+        return try site.ecoData.all().makeJSON()
+        
+      } else {
+        
+        throw Abort(.notFound)
+        
+      }
+      
   }
   
   private func toSiteAttributes(_ json: JSON) throws ->
