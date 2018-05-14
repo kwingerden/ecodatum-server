@@ -1,0 +1,6 @@
+#!/bin/bash
+
+ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
+pushd $ROOT_DIR
+vapor run add-erhs-data --env=development 
+popd

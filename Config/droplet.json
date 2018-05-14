@@ -12,6 +12,7 @@
     "file"
   ],
   "commands": [
+    "add-erhs-data",
     "add-test-data",
     "initialize-database",
     "prepare"

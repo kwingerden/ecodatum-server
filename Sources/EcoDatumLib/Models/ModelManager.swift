@@ -133,7 +133,9 @@ extension ModelManager {
                   json: JSON) throws -> User {
 
     let user = try User(json: json)
-    user.password = try hashPassword(user.password)
+    if let password = user.password {
+      user.password = try hashPassword(password)
+    }
     try user.save()
 
     return user
@@ -269,7 +271,11 @@ extension ModelManager {
   func findOrganization(_ connection: Connection? = nil,
                         bySite: Site) throws -> Organization? {
     try bySite.assertExists()
-    return try findOrganization(connection, byId: bySite.organizationId)
+    if let organizationId = bySite.organizationId {
+      return try findOrganization(connection, byId: organizationId)
+    } else {
+      return nil
+    }
   }
 
   func findOrganizations(_ connection: Connection? = nil,
@@ -349,7 +355,7 @@ extension ModelManager {
       .filter(UserOrganizationRole.Keys.organizationId, .equals, organization.id)
       .filter(UserOrganizationRole.Keys.roleId, .equals, role.id)
       .all()
-      .flatMap {
+      .compactMap {
         userOrganizationRole in
         return try self.findUser(byId: userOrganizationRole.userId)
       }
@@ -393,9 +399,11 @@ extension ModelManager {
   }
 
   func findSite(_ connection: Connection? = nil,
-                byName: String) throws -> Site? {
+                byName: String,
+                organizationId: Identifier) throws -> Site? {
     return try Site.makeQuery(connection)
       .filter(Site.Keys.name, .equals, byName)
+      .filter(Site.Keys.organizationId, .equals, organizationId)
       .first()
   }
 

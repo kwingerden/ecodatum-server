@@ -97,7 +97,7 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
     
     let (name, description, latitude, longitude) = try toSiteAttributes(json)
     
-    if let site = try modelManager.findSite(byName: name) {
+    if let site = try modelManager.findSite(byName: name, organizationId: organizationId) {
       throw Abort(.conflict, reason: "Site \(site.name) already exists.")
     }
     
@@ -112,17 +112,21 @@ final class APIV1TokenSitesRouteCollection: RouteCollection {
   }
 
   private func updateSite(_ request: Request) throws -> ResponseRepresentable {
-    
+
+    let json = try request.assertJson()
+
+    guard let organizationId: Identifier = try json.get(Site.Json.organizationId) else {
+      throw Abort(.badRequest, reason: "Site must have associated organization.")
+    }
+
     let (site, isRootUser, doesUserBelongToOrganization) =
       try isRootOrSiteUser(request)
     
     if isRootUser || doesUserBelongToOrganization {
       
-      let json = try request.assertJson()
-      
       let (name, description, latitude, longitude) = try toSiteAttributes(json)
       
-      if let findSite = try modelManager.findSite(byName: name),
+      if let findSite = try modelManager.findSite(byName: name, organizationId: organizationId),
          findSite.id != site.id {
         throw Abort(.conflict, reason: "Site \(site.name) already exists.")
       }

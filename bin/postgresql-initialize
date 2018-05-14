@@ -5,6 +5,9 @@ psql \
   -d postgres \
   -c "CREATE USER postgres WITH SUPERUSER PASSWORD 'password';"
 
+dropdb --if-exists ecodatum
+dropuser --if-exists ecodatum
+
 createuser ecodatum
 createdb ecodatum
 

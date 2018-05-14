@@ -13,7 +13,7 @@ final class User: EquatableModel {
   var email: String
   
   /// The user's _hashed_ password
-  var password: String
+  var password: String?
   
   struct Keys {
     static let id = "id"
@@ -24,7 +24,7 @@ final class User: EquatableModel {
   
   init(fullName: String,
        email: String,
-       password: String) {
+       password: String? = nil) {
     self.fullName = fullName
     self.email = email
     self.password = password

@@ -20,9 +20,9 @@ final class Site: EquatableModel {
   
   var verticalAccuracy: Double?
   
-  let organizationId: Identifier
+  var organizationId: Identifier?
 
-  let userId: Identifier
+  var userId: Identifier?
   
   struct Keys {
     static let id = "id"
@@ -44,8 +44,8 @@ final class Site: EquatableModel {
        altitude: Double? = nil,
        horizontalAccuracy: Double? = nil,
        verticalAccuracy: Double? = nil,
-       organizationId: Identifier,
-       userId: Identifier) {
+       organizationId: Identifier? = nil,
+       userId: Identifier? = nil) {
     self.name = name
     self.description = description
     self.latitude = latitude
@@ -99,7 +99,7 @@ extension Site: Preparation {
         Keys.name,
         length: 250,
         optional: false,
-        unique: true)
+        unique: false)
       builder.string(
         Keys.description,
         length: 500,

@@ -13,7 +13,7 @@ final class Organization: EquatableModel {
   var description: String?
 
   // The unique alphanumeric code assigned to the organization
-  let code: String
+  var code: String?
   
   struct Keys {
     static let id = "id"
@@ -24,7 +24,7 @@ final class Organization: EquatableModel {
   
   init(name: String,
        description: String? = nil,
-       code: String) {
+       code: String? = nil) {
     self.name = name
     self.description = description
     self.code = code
