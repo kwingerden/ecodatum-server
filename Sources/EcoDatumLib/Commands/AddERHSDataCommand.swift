@@ -22,6 +22,12 @@ public final class AddERHSDataCommand: Command {
 
   private let rootUserPassword: String
 
+  private static let alphabeticCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+  private static let numericCharacters = "1234567890"
+
+  private static let alphaNumericCharacters = alphabeticCharacters + numericCharacters
+  
   public init(console: ConsoleProtocol,
               hash: HashProtocol,
               rootUserName: String,
@@ -39,20 +45,28 @@ public final class AddERHSDataCommand: Command {
     let laura = try createOrGetUser(
       User(
         fullName: "Laura Branch",
-        email: "lbranch@smjuhsd.org"))
+        email: "lbranch@smjuhsd.org",
+        password: "95DjdKJy"))
 
     let rebecca = try createOrGetUser(
       User(
         fullName: "Rebecca Wingerden",
-        email: "rwingerden@smjuhsd.org"))
+        email: "rwingerden@smjuhsd.org",
+        password: "mZkeHhQa"))
 
     let apBio = try createOrGetOrganization(
-      Organization(name: "AP Biology"))
+      Organization(
+        name: "AP Biology",
+        code: "QMOLQC"))
     let honBio = try createOrGetOrganization(
-      Organization(name: "Honors Biology"))
+      Organization(
+        name: "Honors Biology",
+        code: "UNPICI"))
 
     let apes = try createOrGetOrganization(
-      Organization(name: "APES"))
+      Organization(
+        name: "APES",
+        code: "ZIBZ9Y"))
 
     try associateOrganizationUser(
       user: rebecca,
@@ -131,9 +145,16 @@ public final class AddERHSDataCommand: Command {
 
     } else {
 
-      let (password, hash) = try randomHashedPassword(8)
       user.id = nil
-      user.password = hash
+      var password = ""
+      if let pwd = user.password {
+        password = pwd
+        user.password = try hashPassword(pwd)
+      } else {
+        password = randomString(8)
+        user.password = try hashPassword(password)
+      }
+      
       try user.save()
 
       console.output(
@@ -166,9 +187,10 @@ public final class AddERHSDataCommand: Command {
 
     } else {
 
-      let organizationCode = randomOrganizationCode(Organization.CODE_LENGTH)
       organization.id = nil
-      organization.code = organizationCode
+      if organization.code == nil {
+        organization.code = randomString(Organization.CODE_LENGTH)
+      }
       try organization.save()
 
       console.output(
@@ -280,25 +302,40 @@ public final class AddERHSDataCommand: Command {
 
   }
 
-  func randomString(_ length: Int) -> String {
-    let characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+  func randomString(
+    _ length: Int,
+    _ characters: String = AddERHSDataCommand.alphaNumericCharacters) -> String {
+    
     var string = ""
     for _ in 0..<length {
       let random: Int = Int(arc4random_uniform(UInt32(characters.count)))
       string += String(characters[characters.index(characters.startIndex, offsetBy: random)])
     }
     return string
+  
   }
 
-  func randomHashedPassword(_ length: Int) throws -> (password: String, hash: String) {
-    let passwordString = randomString(length)
-    let passwordHash = try hash.make(passwordString.makeBytes()).makeString()
+  func hashPassword(_ password: String) throws -> String{
+    return try hash.make(password.makeBytes()).makeString()
+  }
+  
+  func randomHashedPassword(
+    _ length: Int,
+    _ characters: String = AddERHSDataCommand.alphaNumericCharacters) throws -> (password: String, hash: String) {
+
+    let passwordString = randomString(length, characters)
+    let passwordHash = try hashPassword(passwordString)
     return (password: passwordString, hash: passwordHash)
+
   }
 
-  func randomOrganizationCode(_ length: Int) -> String {
-    let organizationCode = randomString(length)
+  func randomOrganizationCode(
+    _ length: Int,
+    _ characters: String = AddERHSDataCommand.alphaNumericCharacters) -> String {
+    
+    let organizationCode = randomString(length, characters)
     return organizationCode.uppercased()
+  
   }
 
 }
